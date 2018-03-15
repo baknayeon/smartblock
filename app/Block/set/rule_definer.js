@@ -1,3 +1,6 @@
+
+var Block_colour_eca = "#"+"1f215a"
+
 Blockly.Blocks['eca'] = {
   init: function() {
     this.appendStatementInput("Event")
@@ -11,7 +14,7 @@ Blockly.Blocks['eca'] = {
         .appendField("Action");
     this.setPreviousStatement(true, ["ECA", "EA"]);
     this.setNextStatement(true, ["ECA", "EA"]);
-    this.setColour(240);
+    this.setColour(Block_colour_eca);
  this.setTooltip("");
  this.setHelpUrl("");
   }
@@ -27,7 +30,7 @@ Blockly.Blocks['ea'] = {
         .appendField("Action");
     this.setPreviousStatement(true, ["ECA", "EA"]);
     this.setNextStatement(true, ["ECA", "EA"]);
-    this.setColour(240);
+    this.setColour(Block_colour_eca);
  this.setTooltip("");
  this.setHelpUrl("");
   }

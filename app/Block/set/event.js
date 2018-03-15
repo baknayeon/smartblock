@@ -1,3 +1,6 @@
+
+var Block_colour_event = "#"+"669ca9"
+
 Blockly.Blocks['event_handler'] = {
   init: function() {
     this.appendDummyInput('from')
@@ -7,7 +10,7 @@ Blockly.Blocks['event_handler'] = {
         .appendField("to")
         .appendField(new Blockly.FieldDropdown([[".","."]]), "dropDownTo");
     this.setPreviousStatement(true, "Event_Handler");
-    this.setColour(195);
+    this.setColour(Block_colour_event);
     this.setInputsInline(true);
  	this.setTooltip("");
  	this.setHelpUrl("");
@@ -128,7 +131,7 @@ function event_block(device){
 			}
 			this.setNextStatement(true, "Event_Handler");
 			this.setPreviousStatement(true, "Event");
-			this.setColour(195);
+			this.setColour(Block_colour_event);
 			this.setTooltip("");
 			this.setHelpUrl("");
 		},

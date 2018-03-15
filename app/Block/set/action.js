@@ -1,3 +1,8 @@
+
+var Block_colour_action = "#"+"61abcb"
+
+
+
 function action_block(devname){
 	Blockly.SmartThings['a_'+devname] = function(block) {
 	   var variable_name = Blockly.SmartThings.variableDB_.getName(block.getFieldValue('name'), Blockly.Variables.NAME_TYPE);
@@ -33,7 +38,7 @@ function action_block(devname){
 			}
 			this.setPreviousStatement(true, "Action");
 			this.setNextStatement(true, "Action");
-			this.setColour(285);
+			this.setColour(Block_colour_action);
 			this.setTooltip("");
 			this.setHelpUrl("");
 		},
@@ -88,7 +93,7 @@ Blockly.Blocks['variable'] = {
         .appendField(new Blockly.FieldDropdown([["number","number"], ["phone","phone"], ["password","password"], ["time","time"], ["text","text"]]), "type");
 	this.setInputsInline(true);
 	this.setOutput(true, "number");
-    this.setColour(330);
+    this.setColour(Block_colour_action);
 	this.setTooltip("");
 	this.setHelpUrl("");
   }, onchange: function(event) {
@@ -108,7 +113,7 @@ Blockly.Blocks['sendpush'] = {
         .appendField(new Blockly.FieldTextInput(""), "text");
     this.setPreviousStatement(true, "Action");
     this.setNextStatement(true, "Action");
-    this.setColour(330);
+    this.setColour(Block_colour_action);
  this.setTooltip("");
  this.setHelpUrl("");
   }, onchange: function(event){
@@ -136,7 +141,7 @@ Blockly.Blocks['sendsms'] = {
         .appendField(new Blockly.FieldTextInput("+82010"), "phone");
     this.setPreviousStatement(true, "Action");
     this.setNextStatement(true, "Action");
-    this.setColour(330);
+    this.setColour(Block_colour_action);
  this.setTooltip("");
  this.setHelpUrl("");
   }, onchange: function(event){
@@ -165,7 +170,7 @@ Blockly.Blocks['sendnotification'] = {
         .appendField(new Blockly.FieldTextInput(""), "text");
     this.setPreviousStatement(true, "Action");
     this.setNextStatement(true, "Action");
-    this.setColour(330);
+    this.setColour(Block_colour_action);
  this.setTooltip("");
  this.setHelpUrl("");
   }, onchange: function(event){
