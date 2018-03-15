@@ -132,17 +132,20 @@ Blockly.Blocks['compare'] = {
 			if(blockA && blockB){
 				if(blockA.inputList.length > 0 && blockB.inputList.length > 0){
 					if(blockA.type.includes("c_")&& blockB.type == "dev_attr"){
-						
-						var device_Name = blockA.inputList["0"].fieldRow[1].text_;
-						var device_type = blockA.inputList["0"].fieldRow[1].variableTypes;
+							var device = blockA.getFieldValue("type")
+						if(attrMap.isOnlyENUM(device)){
+							var newAttr = attrMap.getENUM_vaules(device);
+							var device_Name = blockA.inputList["0"].fieldRow[1].text_;
+							var device_type = blockA.inputList["0"].fieldRow[1].variableTypes;
 
 
-						blockB.removeInput('dropDownDevice');
-						blockB.appendDummyInput('dropDownDevice')
-							  .appendField(new Blockly.FieldLabel(device_type.toLowerCase(), "device"), "device");
-						blockB.removeInput('dropDownField');
-						blockB.appendDummyInput('dropDownField')
-							  .appendField(setAttrField(device_type), 'attribute');
+							blockB.removeInput('dropDownDevice');
+							blockB.appendDummyInput('dropDownDevice')
+								  .appendField(new Blockly.FieldLabel(device_type.toLowerCase(), "device"), "device");
+							blockB.removeInput('dropDownField');
+							blockB.appendDummyInput('dropDownField')
+								  .appendField(new Blockly.FieldDropdown(newAttr), 'attribute');
+						}
 					}
 				}
 			}
