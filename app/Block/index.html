@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Visual Language For SmartThings</title>
+  <script src="../blockly_compressed.js"></script>
+  <script src="../blocks_compressed.js"></script>
+  <script src="../smartthings_compressed.js"></script>
+  <script src="../msg/js/en.js"></script>
+  <script src="FileSaver.js"></script>
+  <script src="help.js"></script>
+  <script src="cap.js"></script>
+  <script src="cap_help.js"></script>
+
+  <script src="set/rule_definer.js"></script>
+  <script src="set/rule_generator.js"></script>
+  <script src="set/event.js"></script>
+  <script src="set/condition.js"></script>
+  <script src="set/action.js"></script>
+  <script src="set/option.js"></script>
+  <script src="set/preference.js"></script>
+  <script src="set/timer.js"></script>
+
+  
+  <link href="list/css/style.css" rel="stylesheet" />
+  <script src="list/js/listbox.js"></script>
+
+<script>
+	var deviceList = new Map();
+	var attrMap = new AttributeMap(); 	
+	var commMap = new CommandMap(); 	
+	mapInit()
+
+	var event_num = 1;
+	var action_num = 1;
+	var variable_num = 1;
+	var ecaList_g;
+	var eca_num;
+
+  </script>
+  <style>
+    body {
+      background-color: #fff;
+      font-family: sans-serif;
+    }
+    h1 {
+      font-weight: normal;
+      font-size: 140%;
+      margin-left: 5px;
+      margin-right: 5px;
+    }
+	#mainbox{
+		position: absolute;
+		height: 800px; 
+		width: 1900px;
+	}
+	#box{
+		height: 800px; 
+		width: 1150px;
+		float:left;
+	}
+	#sidebar{
+		border-radius: 20px 20px 20px 20px ;
+		padding: 1px 1px 1px 1px;
+		margin:50px 1px 1px 1px;
+		height: 550px; 
+		width: 450px;
+		float:left;
+		 background-color:#eee
+	}
+	#smartapp{
+		height: 70px; 
+		padding: 1px 1px 1px 1px;
+		text-align: center;
+	}
+	#smartapp_info{
+		padding: 0px 0px 0px 40px;
+	}
+	#inbox_click{
+		padding-top: 1%;
+	}
+	ul{
+		padding: 0;
+	}
+	ul li{
+		display: inline;
+		padding: 15px 40px 16px 40px;
+		cursor: pointer;
+		border-radius: 15px 15px 0px 0px ;
+	}
+    button {
+      padding: 1px 1em;
+      font-size: 90%;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+      background-color: #eee;
+      color: black;
+    }
+  </style>
+</head>
+
+<body onload="all()">
+  <xml id="toolbox" style="display: none">
+	<category name="Rule" colour="240">
+		<block type="eca"></block>
+		<block type="ea"></block>
+	</category>
+
+	<category name="Event" colour="195" custom="SAMRT_DEVICE_E"></category>
+	<category name="Codition" colour="#BCBC01" custom="SAMRT_DEVICE_C"></category>
+	<category name="Action" colour="285" custom="SAMRT_DEVICE_A"></category>
+
+  </xml>
+  
+  
+ <b style=" font-weight: bold; 
+			font-size: 2.0em;
+			line-height: 1.0em;">Visual Language For SmartThings </b>	
+ <i style=" font-weight: bold; 
+			font-size: 1.8em;
+			line-height: 1.0em;">at <a href="http://cs.sookmyung.ac.kr/~uslab/sites/index.html">Software Language Lab</a>, SWU</i>					  
+ <h1><a href="https://github.com/baknayeon/nayeon">Visual Lang For SmartThings</a> &gt; web-based visual programming editor for SmartApp</h1>
+ <div id="mainbox">
+	 <div id="box" >
+		<div id="inbox_click" >
+			<ul class="tabs">
+				<li id="click1" onClick="click1()" style="font-size: 22px;">Rules</li>
+				<li id="click2" onClick="click2()" style="font-size: 22px;">Pref</li>
+				<li id="click3" onClick="click3()" style="font-size: 22px;">Code</li>
+				<li style = "padding: 15px 0px 20px 500px;">
+					<button id="saveCode" onclick="saveCode()">Save SmartApp</button>
+				</li>
+			</ul>
+		</div>
+
+		<div id="in_box1">
+		  <div id="blocklyDiv" style="height: 700px; width: 1100px;"></div>
+		</div>
+
+		<div id="in_box2">
+			<div id="blocklyDiv2" style="height: 700px; width: 1100px;"></div>
+		</div>
+
+		<div id="in_box3">
+			<textarea id="smart_app" style="height: 680px; width: 1080px; padding:10px;" readonly > </textarea>
+		</div>
+		
+	</div>
+	<div id="sidebar">
+		<div id="smartapp">
+			<p style="font-size: 1.5em;">Smart App Configuration</p>
+		</div>
+		<table id="smartapp_info">
+			<tr>
+				<td align="right"><label for="name">App Name</label>
+				</td>
+				<td><input type="text" id="name" maxlength="20" value = "sookmyung"></input>
+				</td>
+			</tr>
+			<tr>
+				<td align="right"><label for="author">Author</label>
+				</td>
+				<td><input type="text" id="author" maxlength="20" value="snow"></input>
+				</td>
+			</tr>
+			<tr>
+				<td align="right"><label for="category">Category</label>
+				</td>
+				<td><select id = "category">
+					  <option value="My Apps">My Apps</option>
+					  <option value="Convenience">Convenience</option>
+					  <option value="Family">Family</option>
+					  <option value="Fun & Social">Fun & Social</option>
+					  <option value="Green Living">Green Living</option>
+					  <option value="Health & Wellness">Health & Wellness</option>
+					  <option value="Mode Magic">Mode Magic</option>
+					  <option value="Pets">Pets</option>
+					  <option value="Safety & Securit">Safety & Security</option>
+					  <option value="SmartThings Labs">SmartThings Labs</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td align="right"><label for="description">Description</label>
+				</td>
+				<td><textarea id="description" rows="3" cols="30">made by snow :)</textarea>
+				</td>
+			</tr>
+
+		</table>
+		
+		<div class="container_listbox">
+		
+			<div class="select_0">
+				<label>Capability</label>
+			</div>
+			<div class="select_1">
+				<label>not yet</label>
+				<select id="select1" name="select1[]" multiple="multiple" >
+				<script>
+				deviceList = Array.from(deviceList); 
+				for(i =0; i < deviceList.length; i++)
+					document.write('<option value=\"'+deviceList[i][0]+'\">'+deviceList[i][0]+"</option>");
+				</script>
+				</select>
+			</div>
+
+			<div class="operadores">
+				<div class="add_all" onclick="add_all('select1','select2',false,'values_selecteds_listbox');"></div>
+				<div class="add" onclick="add('select1','select2',false,'values_selecteds_listbox');"></div>
+				<div class="remove" onclick="add('select2','select1',true,'values_selecteds_listbox');"></div>
+				<div class="remove_all" onclick="add_all('select2','select1',true,'values_selecteds_listbox');"></div>
+			</div>
+
+			<div class="select_2">
+				<label >to be used</label>
+				<select id="select2" name="select2[]" multiple="multiple" ></select>
+			</div>
+
+		</div>
+		
+	</div>
+</div>
+
+
+ <script>
+	var demoWorkspace = Blockly.inject('blocklyDiv', {media: '../media/',toolbox: document.getElementById('toolbox')});
+	demoWorkspace.registerToolboxCategoryCallback('SAMRT_DEVICE_C', Blockly.devicesFlyoutCallback_condition);
+	demoWorkspace.registerToolboxCategoryCallback('SAMRT_DEVICE_E', Blockly.devicesFlyoutCallback_event);
+	demoWorkspace.registerToolboxCategoryCallback('SAMRT_DEVICE_A', Blockly.devicesFlyoutCallback_action);
+	//demoWorkspace.registerButtonCallback("myFirstButtonPressed", add_newDevice);
+	var demoWorkspace2; 
+
+	///Blockly.Xml.domToWorkspace(document.getElementById('startBlocks'), demoWorkspace);
+
+	function click3(){
+		
+		_("in_box1").style.display = "none"
+		_("in_box2").style.display = "none"
+		_("in_box3").style.display = "block"
+		
+		_("click1").style.background = "#eee"
+		_("click2").style.background = "#eee"
+		_("click3").style.background = "#ddd"
+
+		var code = smartApp('SamrtApp');
+		_("smart_app").value = code;
+	}
+
+	function saveCode() {
+	
+		var fileName = window.prompt('What would you like to name your file?', 'SamrtApp');
+		if(fileName){
+			try{
+				var code = smartApp(fileName);
+				var blob = new Blob([code], {type: "text/plain;charset=utf-8"});
+				saveAs(blob, fileName+".groovy");
+			}catch(e){
+				alert(e);
+			}
+		}
+	}
+
+	function click2(){
+
+		_("in_box1").style.display = "none"
+		_("in_box2").style.display = "block"
+		_("in_box3").style.display = "none"
+		
+		_("click1").style.background = "#eee"
+		_("click2").style.background = "#ddd"
+		_("click3").style.background = "#eee"
+		
+		var toolbox_pre = '<xml>\n';
+		toolbox_pre += sample();
+		toolbox_pre += preference();
+		toolbox_pre += preference_option();
+
+		var ecaList = Blockly.SmartThings.workspaceToCode(demoWorkspace);
+		var event_block ="";
+		var action_block ="";
+		
+		toolbox_pre += '  <category name="input">\n';
+		if(ecaList){
+			for(i in ecaList){
+				var event = ecaList[i].event;
+				var actionList = ecaList[i].actionList;
+				
+				var e_devname = event.devname;
+				
+				//eliminate dutulicate
+				var eSt_e = event_block.indexOf(e_devname);
+				var aSt_e = action_block.indexOf(e_devname);
+
+				if(eSt_e == -1 && aSt_e == -1){
+					pre_block(e_devname, 195)
+					event_block += '    <block type="input '+e_devname+'">'+ ' </block> \n';
+				}
+
+				for(a in actionList){
+					var a_devname = actionList[a].devname
+					if(a_devname){
+						var eSt_a = event_block.indexOf(a_devname);
+						var aSt_a = action_block.indexOf(a_devname);
+						if(eSt_a == -1 && aSt_a == -1){
+							pre_block(a_devname, 285)
+							action_block += '    <block type="input '+a_devname+'">'+ ' </block> \n';
+						}
+					}
+				}
+			}
+		}
+
+		toolbox_pre += event_block+action_block;
+		toolbox_pre += '  </category>\n';
+		toolbox_pre += '</xml>\n';
+
+		if(demoWorkspace2){
+			demoWorkspace2.updateToolbox(toolbox_pre);
+		}else{	
+			demoWorkspace2 = Blockly.inject('blocklyDiv2', {media: '../media/', toolbox: toolbox_pre});
+			Blockly.Xml.domToWorkspace(document.getElementById('startBlocks2'), demoWorkspace2);
+		}	
+	}
+
+	function click1(){
+		_("in_box1").style.display = "block"
+		_("in_box2").style.display = "none"
+		_("in_box3").style.display = "none"
+		
+		_("click1").style.background = "#ddd"
+		_("click2").style.background = "#eee"
+		_("click3").style.background = "#eee"
+	}
+
+	function all(){
+		_("in_box1").style.display = "block"
+		_("in_box2").style.display = "none"
+		_("in_box3").style.display = "none"
+		
+		_("click1").style.background = "#ddd"
+		_("click2").style.background = "#eee"
+		_("click3").style.background = "#eee"
+
+		var cap_list = _("capabilities")
+		var cap = cap_list.getElementsByTagName("capability");
+		var cap_name =cap[0].getElementsByTagName("attributes")
+		var attri_name =cap_name[0].getAttribute("name")
+		var attri_type =cap_name[0].getAttribute("type")
+
+	}
+
+	 </script>
+
+	<xml id="capabilities" style="display: none">
+	<capability name = "Battery">
+		<attributes name = "battery" type = "NUMBER"></attributes>
+		<commands>
+		</commands>
+	</capability>
+	<capability name = "Button">
+		<attributes name ="button">
+			<name>button</name>
+			<type>ENUM</type>
+		</attributes>
+		<commands>
+		</commands>
+	</capability>
+	</xml>
+
+	 <script>
+	function _(x){
+		return document.getElementById(x);
+	}
+
+    function runCode() {
+      // Generate SmartThings code and run it.
+      window.LoopTrap = 1000;
+      Blockly.SmartThings.INFINITE_LOOP_TRAP =
+          'if (--window.LoopTrap == 0) throw "Infinite loop.";\n';
+      var code = Blockly.SmartThings.workspaceToCode(demoWorkspace);
+      Blockly.SmartThings.INFINITE_LOOP_TRAP = null;
+      try {
+        eval(code);
+      } catch (e) {
+        alert(e);
+      }
+    }
+
+	function sample(){
+	    var sample = '  <category name="Sample">\n'
+		//+' <block type="preference">\n'
+		//+ '   <statement name="page">'
+		+ '		<block type="page">'
+		+ '		<field name="name"></field>'
+		+'			<statement name="section">'
+		+'				<block type="section"></block>'
+        +'          </statement>'
+        +'      </block>'
+		//+'    </statement>'
+		//+'  </block>'
+		//+'<block type="preference">'
+		//+'    <statement name="page">'
+		+'      <block type="page">'
+		+'        <field name="name"></field>'
+		+'        <statement name="section">'
+		+'          <block type="section">'
+		+'            <value name="option">'
+		+'              <block type="option_title">'
+		+'                <field name="title">Event</field>'
+		+'              </block>'
+		+'            </value>'
+		+'            <next>'
+		+'              <block type="section">'
+		+'                <value name="option">'
+		+'                  <block type="option_title">'
+		+'                    <field name="title">Codtion</field>'
+		+'                  </block>'
+		+'                </value>'
+		+'              </block>'
+		+'            </next>'
+		+'            <next>'
+		+'              <block type="section">'
+		+'                <value name="option">'
+		+'                  <block type="option_title">'
+		+'                    <field name="title">Action</field>'
+		+'                  </block>'
+		+'                </value>'
+		+'              </block>'
+		+'            </next>'
+		+'          </block>'
+		+'        </statement>'
+		+'      </block>'
+		//+'    </statement>'
+		//+'  </block>'
+		//+'  <block type="preference">'
+		//+'    <statement name="page">'
+		+'      <block type="page">'
+		+'        <field name="name">Event</field>'
+		+'        <statement name="section">'
+		+'          <block type="section"></block>'
+		+'        </statement>'
+		+'        <next>'
+		+'          <block type="page">'
+		+'            <field name="name">Codition</field>'
+		+'            <statement name="section">'
+		+'              <block type="section"></block>'
+		+'            </statement>'
+		+'          </block>'
+		+'        </next>'
+		+'        <next>'
+		+'          <block type="page">'
+		+'            <field name="name">Action</field>'
+		+'            <statement name="section">'
+		+'              <block type="section"></block>'
+		+'            </statement>'
+		+'          </block>'
+		+'        </next>'
+		+'      </block>'
+		//+'    </statement>'
+	    //+' </block> '
+		+'</category>\n';
+		return sample
+	}
+
+	function preference(){
+		var pre = '  <category name="Preference">\n';
+		//pre += '    <block type="preference"></block>\n';
+		pre += '    <block type="page"> <field name="name"></field>\n  <field name="nextPage"></field>\n  </block>\n ';
+		pre += '    <block type="section">'+' <field name="NAME"></field>\n ' + ' </block>\n ';
+		pre += '    <block type="dynamicpage">'+' <field name="name"></field>\n ' + ' <field name="nextPage"></field>\n ' + ' </block>\n ';
+		pre += '  </category>\n';
+	
+		return pre
+	}
+
+	function preference_option(){
+		var preference_option = 
+		'  <category name="option">\n'
+		+'<block type="option_title"></block>\n'
+		+'<block type="option_nextpage"><field name="nextPage"></field></block>\n'
+		+'<block type="option_install"><field name="true">TRUE</field></block>\n'
+		+'<block type="option_uninstall"> <field name="true">TRUE</field></block>\n'
+		+'<block type="option_required"></block>\n'
+		+'<block type="option_multiple"></block>\n'
+		+'<block type="option_name"></block>\n'
+		+'  </category>\n';
+		return preference_option
+	}
+
+  </script>
+
+</body>
+</html>
+
+
+
+		<!--
+		<block type="logic_compare">
+		<value name = "A">
+		<block type="c_device"></block>
+		</value>
+		<value name = "B">
+		<block type="c_device"></block>
+		</value>
+		</block>
+		
+		<xml id="startBlocks" style="display: none">
+		<block type="eca">
+		</block>
+  </xml>
+
+		-->
