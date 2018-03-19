@@ -1,3 +1,5 @@
+var Block_colour_event = 195
+
 Blockly.Blocks['event_handler'] = {
   init: function() {
     this.appendDummyInput('from')
@@ -6,8 +8,8 @@ Blockly.Blocks['event_handler'] = {
     this.appendDummyInput('to')
         .appendField("to")
         .appendField(new Blockly.FieldDropdown([[".","."]]), "dropDownTo");
-    this.setPreviousStatement(true, "Event_Handler");
-    this.setColour(195);
+    this.setOutput(true, "Event_Handler");
+    this.setColour(Block_colour_event);
     this.setInputsInline(true);
  	this.setTooltip("");
  	this.setHelpUrl("");
@@ -82,8 +84,12 @@ Blockly.SmartThings['event_handler'] = function(block) {
   var dropdown_from = block.getFieldValue('dropDownFrom');
   var dropdown_to = block.getFieldValue('dropDownTo');
   // TODO: Assemble SmartThings into code variable.
-  var code = dropdown_from +"-"+dropdown_to;
-  return code;
+  
+  var smartevent = new Event();
+  smartevent.event_handler = true;
+  smartevent.from = dropdown_from;
+  smartevent.to = dropdown_to; 
+  return smartevent;
 };
 
 function event_block(device){
@@ -97,11 +103,9 @@ function event_block(device){
 	  var smartevent = new Event();
 	  smartevent.devname = variable_name;
 	  smartevent.device = device;
-	  smartevent.option = value_switch;
-	  smartevent.attr = device
+	  smartevent.event_handler = value_switch;
+	  smartevent.attr = dropdown_attributes
 
-	  if(this.childBlocks_.length == 0 && dropdown_attributes) // event_handler is not exist
-			smartevent.attr = dropdown_attributes;
 	  
 	  return smartevent;
 	};
@@ -110,7 +114,7 @@ function event_block(device){
 		
 		init: function() {
 			this.appendValueInput(device)
-					.setCheck("Option")
+					.setCheck("Event_Handler")
 					.appendField(device, "device")
 					.appendField(new Blockly.FieldVariable(device+event_num, true, device), "name");
 
@@ -126,14 +130,13 @@ function event_block(device){
 				block.appendField(new Blockly.FieldDropdown(attrMap.getMultiType(device)), "attribute_id")
 					.appendField(new Blockly.FieldTextInput(""), "attribute");
 			}
-			this.setNextStatement(true, "Event_Handler");
-			this.setPreviousStatement(true, "Event");
-			this.setColour(195);
+			this.setOutput(true, "Event");
+			this.setColour(Block_colour_event);
 			this.setTooltip("");
 			this.setHelpUrl("");
 		},
 		onchange: function(event) {
-			
+			if(event.blockId == this.id)		
 				if(event.oldParentId == this.id){
 					//disconneted
 					var device = this.getField("device").text_;

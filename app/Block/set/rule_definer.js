@@ -1,12 +1,12 @@
 Blockly.Blocks['eca'] = {
   init: function() {
-    this.appendStatementInput("Event")
+    this.appendValueInput("Event")
         .setCheck("Event")
         .appendField("Event");
     this.appendValueInput("Condition")
         .setCheck("Condition")
         .appendField("Condition");
-    this.appendStatementInput("Action")
+    this.appendValueInput("Action")
         .setCheck("Action")
         .appendField("Action");
     this.setPreviousStatement(true, ["ECA", "EA"]);
@@ -14,15 +14,17 @@ Blockly.Blocks['eca'] = {
     this.setColour(240);
  this.setTooltip("");
  this.setHelpUrl("");
+  },onchange: function(event) {
+    event
   }
 };
 
 Blockly.Blocks['ea'] = {
   init: function() {
-    this.appendStatementInput("Event")
+    this.appendValueInput("Event")
         .setCheck("Event")
         .appendField("Event");
-    this.appendStatementInput("Action")
+    this.appendValueInput("Action")
          .setCheck("Action")
         .appendField("Action");
     this.setPreviousStatement(true, ["ECA", "EA"]);

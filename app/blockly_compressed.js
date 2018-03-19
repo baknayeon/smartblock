@@ -1025,9 +1025,48 @@ this.updateColour()):(this.bubble_.dispose(),this.foreignObject_=this.textarea_=
 Blockly.Comment.prototype.setBubbleSize=function(a,b){this.textarea_?this.bubble_.setBubbleSize(a,b):(this.width_=a,this.height_=b)};Blockly.Comment.prototype.getText=function(){return this.textarea_?this.textarea_.value:this.text_};Blockly.Comment.prototype.setText=function(a){this.text_!=a&&(Blockly.Events.fire(new Blockly.Events.BlockChange(this.block_,"comment",null,this.text_,a)),this.text_=a);this.textarea_&&(this.textarea_.value=a)};
 Blockly.Comment.prototype.dispose=function(){Blockly.Events.isEnabled()&&this.setText("");this.block_.comment=null;Blockly.Icon.prototype.dispose.call(this)};Blockly.Connection=function(a,b){this.sourceBlock_=a;this.type=b;a.workspace.connectionDBList&&(this.db_=a.workspace.connectionDBList[b],this.dbOpposite_=a.workspace.connectionDBList[Blockly.OPPOSITE_TYPE[b]],this.hidden_=!this.db_)};Blockly.Connection.CAN_CONNECT=0;Blockly.Connection.REASON_SELF_CONNECTION=1;Blockly.Connection.REASON_WRONG_TYPE=2;Blockly.Connection.REASON_TARGET_NULL=3;Blockly.Connection.REASON_CHECKS_FAILED=4;Blockly.Connection.REASON_DIFFERENT_WORKSPACES=5;
 Blockly.Connection.REASON_SHADOW_PARENT=6;Blockly.Connection.prototype.targetConnection=null;Blockly.Connection.prototype.check_=null;Blockly.Connection.prototype.shadowDom_=null;Blockly.Connection.prototype.x_=0;Blockly.Connection.prototype.y_=0;Blockly.Connection.prototype.inDB_=!1;Blockly.Connection.prototype.db_=null;Blockly.Connection.prototype.dbOpposite_=null;Blockly.Connection.prototype.hidden_=null;
-Blockly.Connection.prototype.connect_=function(a){var b=this,c=b.getSourceBlock(),d=a.getSourceBlock();a.isConnected()&&a.disconnect();if(b.isConnected()){var e=b.targetBlock(),f=b.getShadowDom();b.setShadowDom(null);if(e.isShadow())f=Blockly.Xml.blockToDom(e),e.dispose(),e=null;else if(b.type==Blockly.INPUT_VALUE){if(!e.outputConnection)throw"Orphan block does not have an output connection.";var g=Blockly.Connection.lastConnectionInRow_(d,e);g&&(e.outputConnection.connect(g),e=null)}else if(b.type==
-Blockly.NEXT_STATEMENT){if(!e.previousConnection)throw"Orphan block does not have a previous connection.";for(g=d;g.nextConnection;){var h=g.getNextBlock();if(h&&!h.isShadow())g=h;else{e.previousConnection.checkType_(g.nextConnection)&&(g.nextConnection.connect(e.previousConnection),e=null);break}}}if(e&&(b.disconnect(),Blockly.Events.recordUndo)){var k=Blockly.Events.getGroup();setTimeout(function(){e.workspace&&!e.getParent()&&(Blockly.Events.setGroup(k),e.outputConnection?e.outputConnection.bumpAwayFrom_(b):
-e.previousConnection&&e.previousConnection.bumpAwayFrom_(b),Blockly.Events.setGroup(!1))},Blockly.BUMP_DELAY)}b.setShadowDom(f)}var n;Blockly.Events.isEnabled()&&(n=new Blockly.Events.BlockMove(d));Blockly.Connection.connectReciprocally_(b,a);d.setParent(c);n&&(n.recordNew(),Blockly.Events.fire(n))};Blockly.Connection.prototype.dispose=function(){if(this.isConnected())throw"Disconnect connection before disposing of it.";this.inDB_&&this.db_.removeConnection_(this);this.dbOpposite_=this.db_=null};
+
+Blockly.Connection.prototype.connect_=function(a){
+	var b=this,c=b.getSourceBlock(),d=a.getSourceBlock();
+	a.isConnected()&&a.disconnect();
+	if(b.isConnected()){
+		var e=b.targetBlock(),f=b.getShadowDom();
+		b.setShadowDom(null);
+		if(e.isShadow())f=Blockly.Xml.blockToDom(e),e.dispose(),e=null;
+	else if(b.type==Blockly.INPUT_VALUE){
+		if(!e.outputConnection)
+			throw"Orphan block does not have an output connection.";
+		var g=Blockly.Connection.lastConnectionInRow_(d,e);
+		g&&(e.outputConnection.connect(g),e=null)
+	}else if(b.type==Blockly.NEXT_STATEMENT){
+			if(!e.previousConnection)
+				throw"Orphan block does not have a previous connection.";
+			for(g=d;g.nextConnection;){
+				var h=g.getNextBlock();
+				if(h&&!h.isShadow())
+					g=h;
+				else{
+					e.previousConnection.checkType_(g.nextConnection)&&(g.nextConnection.connect(e.previousConnection),e=null);
+					break
+				}
+			}
+	}
+	if(e&&(b.disconnect(),Blockly.Events.recordUndo)){
+		var k=Blockly.Events.getGroup();
+		setTimeout(function(){
+			e.workspace&&!e.getParent()&&(Blockly.Events.setGroup(k),e.outputConnection?e.outputConnection.bumpAwayFrom_(b):e.previousConnection&&e.previousConnection.bumpAwayFrom_(b),Blockly.Events.setGroup(!1))
+		}
+		,Blockly.BUMP_DELAY)}b.setShadowDom(f)
+	}
+	var n;
+	Blockly.Events.isEnabled()&&(n=new Blockly.Events.BlockMove(d));
+	Blockly.Connection.connectReciprocally_(b,a);
+	d.setParent(c);
+	n&&(n.recordNew(),Blockly.Events.fire(n))
+
+	//ny connection
+};
+Blockly.Connection.prototype.dispose=function(){if(this.isConnected())throw"Disconnect connection before disposing of it.";this.inDB_&&this.db_.removeConnection_(this);this.dbOpposite_=this.db_=null};
 Blockly.Connection.prototype.getSourceBlock=function(){return this.sourceBlock_};Blockly.Connection.prototype.isSuperior=function(){return this.type==Blockly.INPUT_VALUE||this.type==Blockly.NEXT_STATEMENT};Blockly.Connection.prototype.isConnected=function(){return!!this.targetConnection};
 Blockly.Connection.prototype.canConnectWithReason_=function(a){if(!a)return Blockly.Connection.REASON_TARGET_NULL;if(this.isSuperior())var b=this.sourceBlock_,c=a.getSourceBlock();else c=this.sourceBlock_,b=a.getSourceBlock();return b&&b==c?Blockly.Connection.REASON_SELF_CONNECTION:a.type!=Blockly.OPPOSITE_TYPE[this.type]?Blockly.Connection.REASON_WRONG_TYPE:b&&c&&b.workspace!==c.workspace?Blockly.Connection.REASON_DIFFERENT_WORKSPACES:this.checkType_(a)?b.isShadow()&&!c.isShadow()?Blockly.Connection.REASON_SHADOW_PARENT:
 Blockly.Connection.CAN_CONNECT:Blockly.Connection.REASON_CHECKS_FAILED};
@@ -1068,12 +1107,42 @@ Blockly.RenderedConnection.prototype.onCheckChanged_=function(){this.isConnected
 Blockly.DraggedConnectionManager.prototype.wouldDeleteBlock=function(){return this.wouldDeleteBlock_};Blockly.DraggedConnectionManager.prototype.applyConnections=function(){this.closestConnection_&&(this.localConnection_.connect(this.closestConnection_),this.topBlock_.rendered&&((this.localConnection_.isSuperior()?this.closestConnection_:this.localConnection_).getSourceBlock().connectionUiEffect(),this.topBlock_.getRootBlock().bringToFront()),this.removeHighlighting_())};
 Blockly.DraggedConnectionManager.prototype.update=function(a,b){var c=this.closestConnection_,d=this.updateClosest_(a);d&&c&&c.unhighlight();c=!!this.closestConnection_&&b!=Blockly.DELETE_AREA_TOOLBOX;var e=!!b&&!this.topBlock_.getParent()&&this.topBlock_.isDeletable();this.wouldDeleteBlock_=e&&!c;e&&this.closestConnection_&&(this.closestConnection_.unhighlight(),this.closestConnection_=null);!this.wouldDeleteBlock_&&d&&this.closestConnection_&&this.addHighlighting_()};
 Blockly.DraggedConnectionManager.prototype.removeHighlighting_=function(){this.closestConnection_&&this.closestConnection_.unhighlight()};Blockly.DraggedConnectionManager.prototype.addHighlighting_=function(){this.closestConnection_&&this.closestConnection_.highlight()};Blockly.DraggedConnectionManager.prototype.initAvailableConnections_=function(){var a=this.topBlock_.getConnections_(!1),b=this.topBlock_.lastConnectionInStack_();b&&b!=this.topBlock_.nextConnection&&a.push(b);return a};
-Blockly.DraggedConnectionManager.prototype.updateClosest_=function(a){var b=this.closestConnection_;this.localConnection_=this.closestConnection_=null;this.radiusConnection_=Blockly.SNAP_RADIUS;for(var c=0;c<this.availableConnections_.length;c++){var d=this.availableConnections_[c],e=d.closest(this.radiusConnection_,a);e.connection&&(this.closestConnection_=e.connection,this.localConnection_=d,this.radiusConnection_=e.radius)}return b!=this.closestConnection_};Blockly.BlockDragger=function(a,b){this.draggingBlock_=a;this.workspace_=b;this.draggedConnectionManager_=new Blockly.DraggedConnectionManager(this.draggingBlock_);this.deleteArea_=null;this.wouldDeleteBlock_=!1;this.startXY_=this.draggingBlock_.getRelativeToSurfaceXY();this.dragIconData_=Blockly.BlockDragger.initIconData_(a)};
+Blockly.DraggedConnectionManager.prototype.updateClosest_=function(a){var b=this.closestConnection_;this.localConnection_=this.closestConnection_=null;this.radiusConnection_=Blockly.SNAP_RADIUS;for(var c=0;c<this.availableConnections_.length;c++){var d=this.availableConnections_[c],e=d.closest(this.radiusConnection_,a);e.connection&&(this.closestConnection_=e.connection,this.localConnection_=d,this.radiusConnection_=e.radius)}return b!=this.closestConnection_};
+
+Blockly.BlockDragger=function(a,b){
+	this.draggingBlock_=a;
+	this.workspace_=b;
+	this.draggedConnectionManager_=new Blockly.DraggedConnectionManager(this.draggingBlock_);
+	this.deleteArea_=null;
+	this.wouldDeleteBlock_=!1;
+	this.startXY_=this.draggingBlock_.getRelativeToSurfaceXY();
+	this.dragIconData_=Blockly.BlockDragger.initIconData_(a)
+};
 Blockly.BlockDragger.prototype.dispose=function(){this.startWorkspace_=this.workspace_=this.draggingBlock_=null;this.dragIconData_.length=0;this.draggedConnectionManager_&&(this.draggedConnectionManager_.dispose(),this.draggedConnectionManager_=null)};Blockly.BlockDragger.initIconData_=function(a){var b=[];a=a.getDescendants();for(var c=0,d;d=a[c];c++){d=d.getIcons();for(var e=0;e<d.length;e++){var f={location:d[e].getIconLocation(),icon:d[e]};b.push(f)}}return b};
 Blockly.BlockDragger.prototype.startBlockDrag=function(a){Blockly.Events.getGroup()||Blockly.Events.setGroup(!0);this.workspace_.setResizesEnabled(!1);Blockly.BlockSvg.disconnectUiStop_();this.draggingBlock_.getParent()&&(this.draggingBlock_.unplug(),a=this.pixelsToWorkspaceUnits_(a),a=goog.math.Coordinate.sum(this.startXY_,a),this.draggingBlock_.translate(a.x,a.y),this.draggingBlock_.disconnectUiEffect());this.draggingBlock_.setDragging(!0);this.draggingBlock_.moveToDragSurface_();this.workspace_.toolbox_&&
-this.workspace_.toolbox_.addDeleteStyle()};Blockly.BlockDragger.prototype.dragBlock=function(a,b){var c=this.pixelsToWorkspaceUnits_(b),d=goog.math.Coordinate.sum(this.startXY_,c);this.draggingBlock_.moveDuringDrag(d);this.dragIcons_(c);this.deleteArea_=this.workspace_.isDeleteArea(a);this.draggedConnectionManager_.update(c,this.deleteArea_);this.updateCursorDuringBlockDrag_()};
-Blockly.BlockDragger.prototype.endBlockDrag=function(a,b){this.dragBlock(a,b);this.dragIconData_=[];Blockly.BlockSvg.disconnectUiStop_();var c=this.pixelsToWorkspaceUnits_(b),d=goog.math.Coordinate.sum(this.startXY_,c);this.draggingBlock_.moveOffDragSurface_(d);this.maybeDeleteBlock_()||(this.draggingBlock_.moveConnections_(c.x,c.y),this.draggingBlock_.setDragging(!1),this.draggedConnectionManager_.applyConnections(),this.draggingBlock_.render(),this.fireMoveEvent_(),this.draggingBlock_.scheduleSnapAndBump());
-this.workspace_.setResizesEnabled(!0);this.workspace_.toolbox_&&this.workspace_.toolbox_.removeDeleteStyle();Blockly.Events.setGroup(!1)};Blockly.BlockDragger.prototype.fireMoveEvent_=function(){var a=new Blockly.Events.BlockMove(this.draggingBlock_);a.oldCoordinate=this.startXY_;a.recordNew();Blockly.Events.fire(a)};
+this.workspace_.toolbox_.addDeleteStyle()};
+
+Blockly.BlockDragger.prototype.dragBlock=function(a,b){
+	var c=this.pixelsToWorkspaceUnits_(b),d=goog.math.Coordinate.sum(this.startXY_,c);
+	this.draggingBlock_.moveDuringDrag(d);
+	this.dragIcons_(c);
+	this.deleteArea_=this.workspace_.isDeleteArea(a);
+	this.draggedConnectionManager_.update(c,this.deleteArea_);
+	this.updateCursorDuringBlockDrag_()
+};
+
+Blockly.BlockDragger.prototype.endBlockDrag=function(a,b){
+	this.dragBlock(a,b);
+	this.dragIconData_=[];
+	Blockly.BlockSvg.disconnectUiStop_();
+	var c=this.pixelsToWorkspaceUnits_(b),d=goog.math.Coordinate.sum(this.startXY_,c);
+	this.draggingBlock_.moveOffDragSurface_(d);
+	this.maybeDeleteBlock_()||(this.draggingBlock_.moveConnections_(c.x,c.y),this.draggingBlock_.setDragging(!1),this.draggedConnectionManager_.applyConnections(),this.draggingBlock_.render(),this.fireMoveEvent_(),this.draggingBlock_.scheduleSnapAndBump());
+	this.workspace_.setResizesEnabled(!0);
+	this.workspace_.toolbox_&&this.workspace_.toolbox_.removeDeleteStyle();
+	Blockly.Events.setGroup(!1)
+};
+Blockly.BlockDragger.prototype.fireMoveEvent_=function(){var a=new Blockly.Events.BlockMove(this.draggingBlock_);a.oldCoordinate=this.startXY_;a.recordNew();Blockly.Events.fire(a)};
 Blockly.BlockDragger.prototype.maybeDeleteBlock_=function(){var a=this.workspace_.trashcan;this.wouldDeleteBlock_?(a&&goog.Timer.callOnce(a.close,100,a),this.fireMoveEvent_(),this.draggingBlock_.dispose(!1,!0)):a&&a.close();return this.wouldDeleteBlock_};
 Blockly.BlockDragger.prototype.updateCursorDuringBlockDrag_=function(){this.wouldDeleteBlock_=this.draggedConnectionManager_.wouldDeleteBlock();var a=this.workspace_.trashcan;this.wouldDeleteBlock_?(this.draggingBlock_.setDeleteStyle(!0),this.deleteArea_==Blockly.DELETE_AREA_TRASH&&a&&a.setOpen_(!0)):(this.draggingBlock_.setDeleteStyle(!1),a&&a.setOpen_(!1))};
 Blockly.BlockDragger.prototype.pixelsToWorkspaceUnits_=function(a){a=new goog.math.Coordinate(a.x/this.workspace_.scale,a.y/this.workspace_.scale);this.workspace_.isMutator&&(a=a.scale(1/this.workspace_.options.parentWorkspace.scale));return a};Blockly.BlockDragger.prototype.dragIcons_=function(a){for(var b=0;b<this.dragIconData_.length;b++){var c=this.dragIconData_[b];c.icon.setIconLocation(goog.math.Coordinate.sum(c.location,a))}};Blockly.constants={};Blockly.DRAG_RADIUS=5;Blockly.FLYOUT_DRAG_RADIUS=10;Blockly.SNAP_RADIUS=20;Blockly.BUMP_DELAY=250;Blockly.COLLAPSE_CHARS=30;Blockly.LONGPRESS=750;Blockly.SOUND_LIMIT=100;Blockly.DRAG_STACK=!0;Blockly.HSV_SATURATION=.45;Blockly.HSV_VALUE=.65;Blockly.SPRITE={width:96,height:124,url:"sprites.png"};Blockly.SVG_NS="http://www.w3.org/2000/svg";Blockly.HTML_NS="http://www.w3.org/1999/xhtml";Blockly.INPUT_VALUE=1;Blockly.OUTPUT_VALUE=2;Blockly.NEXT_STATEMENT=3;
@@ -1392,13 +1461,20 @@ Blockly.Xml.domToBlock=function(a,b){
 		var d=Blockly.Xml.domToBlockHeadless_(a,b);
 		if(b.rendered){
 			d.setConnectionsHidden(!0);
-			for(var e=d.getDescendants(),f=e.length-1;0<=f;f--)e[f].initSvg();
-			for(f=e.length-1;0<=f;f--)e[f].render(!1);
+			for(var e=d.getDescendants(),f=e.length-1;0<=f;f--)
+				e[f].initSvg();
+			for(f=e.length-1;0<=f;f--)
+				e[f].render(!1);
 			setTimeout(function(){d.workspace&&d.setConnectionsHidden(!1)},1);
 			d.updateDisabled();
 			b.resizeContents()
 		}
-	}finally{Blockly.Events.enable()}Blockly.Events.isEnabled()&&Blockly.Events.fire(new Blockly.Events.BlockCreate(d));
+	}finally{
+		Blockly.Events.enable()
+	}
+	
+	Blockly.Events.isEnabled()
+		&&Blockly.Events.fire(new Blockly.Events.BlockCreate(d));
 	return d
 };
 	
@@ -1502,7 +1578,8 @@ Blockly.WorkspaceSvg.prototype.dispose=function(){this.rendered=!1;this.currentG
 this.scrollbar=null);this.zoomControls_&&(this.zoomControls_.dispose(),this.zoomControls_=null);this.audioManager_&&(this.audioManager_.dispose(),this.audioManager_=null);this.grid_&&(this.grid_.dispose(),this.grid_=null);this.toolboxCategoryCallbacks_&&(this.toolboxCategoryCallbacks_=null);this.flyoutButtonCallbacks_&&(this.flyoutButtonCallbacks_=null);this.options.parentWorkspace||goog.dom.removeNode(this.getParentSvg().parentNode);this.resizeHandlerWrapper_&&(Blockly.unbindEvent_(this.resizeHandlerWrapper_),
 this.resizeHandlerWrapper_=null)};
 
-Blockly.WorkspaceSvg.prototype.newBlock=function(a,b){return new Blockly.BlockSvg(this,a,b)
+Blockly.WorkspaceSvg.prototype.newBlock=function(a,b){
+	return new Blockly.BlockSvg(this,a,b)
 };
 	
 Blockly.WorkspaceSvg.prototype.addTrashcan_=function(a){this.trashcan=new Blockly.Trashcan(this);var b=this.trashcan.createDom();this.svgGroup_.insertBefore(b,this.svgBlockCanvas_);return this.trashcan.init(a)};
@@ -1730,7 +1807,14 @@ Blockly.Block.prototype.getCommentText=function(){return this.comment||""};Block
 Blockly.Block.prototype.getRelativeToSurfaceXY=function(){return this.xy_};Blockly.Block.prototype.moveBy=function(a,b){goog.asserts.assert(!this.parentBlock_,"Block has parent.");var c=new Blockly.Events.BlockMove(this);this.xy_.translate(a,b);c.recordNew();Blockly.Events.fire(c)};Blockly.Block.prototype.makeConnection_=function(a){return new Blockly.Connection(this,a)};
 Blockly.Block.prototype.allInputsFilled=function(a){void 0===a&&(a=!0);if(!a&&this.isShadow())return!1;for(var b=0,c;c=this.inputList[b];b++)if(c.connection&&(c=c.connection.targetBlock(),!c||!c.allInputsFilled(a)))return!1;return(b=this.getNextBlock())?b.allInputsFilled(a):!0};Blockly.Block.prototype.toDevString=function(){var a=this.type?'"'+this.type+'" block':"Block";this.id&&(a+=' (id="'+this.id+'")');return a};Blockly.BlockDragSurfaceSvg=function(a){this.container_=a;this.createDom()};Blockly.BlockDragSurfaceSvg.prototype.SVG_=null;Blockly.BlockDragSurfaceSvg.prototype.dragGroup_=null;Blockly.BlockDragSurfaceSvg.prototype.container_=null;Blockly.BlockDragSurfaceSvg.prototype.scale_=1;Blockly.BlockDragSurfaceSvg.prototype.surfaceXY_=null;
 Blockly.BlockDragSurfaceSvg.prototype.createDom=function(){this.SVG_||(this.SVG_=Blockly.utils.createSvgElement("svg",{xmlns:Blockly.SVG_NS,"xmlns:html":Blockly.HTML_NS,"xmlns:xlink":"http://www.w3.org/1999/xlink",version:"1.1","class":"blocklyBlockDragSurface"},this.container_),this.dragGroup_=Blockly.utils.createSvgElement("g",{},this.SVG_))};
-Blockly.BlockDragSurfaceSvg.prototype.setBlocksAndShow=function(a){goog.asserts.assert(0==this.dragGroup_.childNodes.length,"Already dragging a block.");this.dragGroup_.appendChild(a);this.SVG_.style.display="block";this.surfaceXY_=new goog.math.Coordinate(0,0)};Blockly.BlockDragSurfaceSvg.prototype.translateAndScaleGroup=function(a,b,c){this.scale_=c;a=a.toFixed(0);b=b.toFixed(0);this.dragGroup_.setAttribute("transform","translate("+a+","+b+") scale("+c+")")};
+
+Blockly.BlockDragSurfaceSvg.prototype.setBlocksAndShow=function(a){
+	goog.asserts.assert(0==this.dragGroup_.childNodes.length,"Already dragging a block.");
+	this.dragGroup_.appendChild(a);
+	this.SVG_.style.display="block";
+	this.surfaceXY_=new goog.math.Coordinate(0,0)
+};
+Blockly.BlockDragSurfaceSvg.prototype.translateAndScaleGroup=function(a,b,c){this.scale_=c;a=a.toFixed(0);b=b.toFixed(0);this.dragGroup_.setAttribute("transform","translate("+a+","+b+") scale("+c+")")};
 Blockly.BlockDragSurfaceSvg.prototype.translateSurfaceInternal_=function(){var a=this.surfaceXY_.x,b=this.surfaceXY_.y;a=a.toFixed(0);b=b.toFixed(0);this.SVG_.style.display="block";Blockly.utils.setCssTransform(this.SVG_,"translate3d("+a+"px, "+b+"px, 0px)")};Blockly.BlockDragSurfaceSvg.prototype.translateSurface=function(a,b){this.surfaceXY_=new goog.math.Coordinate(a*this.scale_,b*this.scale_);this.translateSurfaceInternal_()};
 Blockly.BlockDragSurfaceSvg.prototype.getSurfaceTranslation=function(){var a=Blockly.utils.getRelativeXY(this.SVG_);return new goog.math.Coordinate(a.x/this.scale_,a.y/this.scale_)};Blockly.BlockDragSurfaceSvg.prototype.getGroup=function(){return this.dragGroup_};Blockly.BlockDragSurfaceSvg.prototype.getCurrentBlock=function(){return this.dragGroup_.firstChild};
 Blockly.BlockDragSurfaceSvg.prototype.clearAndHide=function(a){a?a.appendChild(this.getCurrentBlock()):this.dragGroup_.removeChild(this.getCurrentBlock());this.SVG_.style.display="none";goog.asserts.assert(0==this.dragGroup_.childNodes.length,"Drag group was not cleared.");this.surfaceXY_=null};Blockly.utils.uiMenu={};Blockly.utils.uiMenu.getSize=function(a){a=a.getElement();var b=goog.style.getSize(a);b.height=a.scrollHeight;return b};Blockly.utils.uiMenu.adjustBBoxesForRTL=function(a,b,c){b.left+=c.width;b.right+=c.width;a.left+=c.width;a.right+=c.width};Blockly.ContextMenu={};Blockly.ContextMenu.currentBlock=null;Blockly.ContextMenu.eventWrapper_=null;Blockly.ContextMenu.show=function(a,b,c){Blockly.WidgetDiv.show(Blockly.ContextMenu,c,null);if(b.length){var d=Blockly.ContextMenu.populate_(b,c);goog.events.listen(d,goog.ui.Component.EventType.ACTION,Blockly.ContextMenu.hide);Blockly.ContextMenu.position_(d,a,c);setTimeout(function(){d.getElement().focus()},1);Blockly.ContextMenu.currentBlock=null}else Blockly.ContextMenu.hide()};
@@ -1749,7 +1833,8 @@ Blockly.BlockSvg=function(a,b,c){
 	this.svgPathLight_=Blockly.utils.createSvgElement("path",{"class":"blocklyPathLight"},this.svgGroup_);
 	this.svgPath_.tooltip=this;
 	this.rendered=!1;
-	this.useDragSurface_=Blockly.utils.is3dSupported()&&!!a.blockDragSurface_;Blockly.Tooltip.bindMouseEvents(this.svgPath_);
+	this.useDragSurface_=Blockly.utils.is3dSupported()&&!!a.blockDragSurface_;
+	Blockly.Tooltip.bindMouseEvents(this.svgPath_);
 	Blockly.BlockSvg.superClass_.constructor.call(this,a,b,c)
 };
 goog.inherits(Blockly.BlockSvg,Blockly.Block);Blockly.BlockSvg.prototype.height=0;Blockly.BlockSvg.prototype.width=0;Blockly.BlockSvg.prototype.dragStartXY_=null;Blockly.BlockSvg.prototype.warningTextDb_=null;Blockly.BlockSvg.INLINE=-1;
@@ -1768,7 +1853,16 @@ Blockly.BlockSvg.prototype.getIcons=function(){var a=[];this.mutator&&a.push(thi
 Blockly.BlockSvg.prototype.setParent=function(a){if(a!=this.parentBlock_){var b=this.getSvgRoot();if(this.parentBlock_&&b){var c=this.getRelativeToSurfaceXY();this.workspace.getCanvas().appendChild(b);b.setAttribute("transform","translate("+c.x+","+c.y+")")}Blockly.Field.startCache();Blockly.BlockSvg.superClass_.setParent.call(this,a);Blockly.Field.stopCache();a&&(c=this.getRelativeToSurfaceXY(),a.getSvgRoot().appendChild(b),a=this.getRelativeToSurfaceXY(),this.moveConnections_(a.x-c.x,a.y-c.y))}};
 Blockly.BlockSvg.prototype.getRelativeToSurfaceXY=function(){var a=0,b=0,c=this.useDragSurface_?this.workspace.blockDragSurface_.getGroup():null,d=this.getSvgRoot();if(d){do{var e=Blockly.utils.getRelativeXY(d);a+=e.x;b+=e.y;this.useDragSurface_&&this.workspace.blockDragSurface_.getCurrentBlock()==d&&(e=this.workspace.blockDragSurface_.getSurfaceTranslation(),a+=e.x,b+=e.y);d=d.parentNode}while(d&&d!=this.workspace.getCanvas()&&d!=c)}return new goog.math.Coordinate(a,b)};
 Blockly.BlockSvg.prototype.moveBy=function(a,b){goog.asserts.assert(!this.parentBlock_,"Block has parent.");var c=new Blockly.Events.BlockMove(this),d=this.getRelativeToSurfaceXY();this.translate(d.x+a,d.y+b);this.moveConnections_(a,b);c.recordNew();this.workspace.resizeContents();Blockly.Events.fire(c)};Blockly.BlockSvg.prototype.translate=function(a,b){this.getSvgRoot().setAttribute("transform","translate("+a+","+b+")")};
-Blockly.BlockSvg.prototype.moveToDragSurface_=function(){if(this.useDragSurface_){var a=this.getRelativeToSurfaceXY();this.clearTransformAttributes_();this.workspace.blockDragSurface_.translateSurface(a.x,a.y);this.workspace.blockDragSurface_.setBlocksAndShow(this.getSvgRoot())}};Blockly.BlockSvg.prototype.moveOffDragSurface_=function(a){this.useDragSurface_&&(this.translate(a.x,a.y),this.workspace.blockDragSurface_.clearAndHide(this.workspace.getCanvas()))};
+Blockly.BlockSvg.prototype.moveToDragSurface_=function(){
+	if(this.useDragSurface_){
+		var a=this.getRelativeToSurfaceXY();
+		this.clearTransformAttributes_();
+		this.workspace.blockDragSurface_.translateSurface(a.x,a.y);
+		this.workspace.blockDragSurface_.setBlocksAndShow(this.getSvgRoot())
+	}
+};
+
+Blockly.BlockSvg.prototype.moveOffDragSurface_=function(a){this.useDragSurface_&&(this.translate(a.x,a.y),this.workspace.blockDragSurface_.clearAndHide(this.workspace.getCanvas()))};
 Blockly.BlockSvg.prototype.moveDuringDrag=function(a){this.useDragSurface_?this.workspace.blockDragSurface_.translateSurface(a.x,a.y):(this.svgGroup_.translate_="translate("+a.x+","+a.y+")",this.svgGroup_.setAttribute("transform",this.svgGroup_.translate_+this.svgGroup_.skew_))};Blockly.BlockSvg.prototype.clearTransformAttributes_=function(){Blockly.utils.removeAttribute(this.getSvgRoot(),"transform")};
 Blockly.BlockSvg.prototype.snapToGrid=function(){if(this.workspace&&!this.workspace.isDragging()&&!this.getParent()&&!this.isInFlyout){var a=this.workspace.getGrid();if(a&&a.shouldSnap()){var b=a.getSpacing(),c=b/2,d=this.getRelativeToSurfaceXY();a=Math.round((d.x-c)/b)*b+c-d.x;b=Math.round((d.y-c)/b)*b+c-d.y;a=Math.round(a);b=Math.round(b);0==a&&0==b||this.moveBy(a,b)}}};
 Blockly.BlockSvg.prototype.getBoundingRectangle=function(){var a=this.getRelativeToSurfaceXY(this),b=this.outputConnection?Blockly.BlockSvg.TAB_WIDTH:0,c=this.getHeightWidth();if(this.RTL){var d=new goog.math.Coordinate(a.x-(c.width-b),a.y);a=new goog.math.Coordinate(a.x+b,a.y+c.height)}else d=new goog.math.Coordinate(a.x-b,a.y),a=new goog.math.Coordinate(a.x+c.width-b,a.y+c.height);return{topLeft:d,bottomRight:a}};
@@ -2124,12 +2218,9 @@ Blockly.Generator.prototype.blockToCode=function(a){
         return this.scrub_a(a,b);
 	else if(b.constructor == Page) 
         return this.scrub_page(a,b);
-	else if(b.constructor == Condition || b.constructor == inputc) 
-        return b;
-	else if(b.constructor == Device_attr) 
-        return b;
-    else if(b.constructor == Args)
-        return b;
+
+	if(isit(b))
+		return b;
 
 	if(goog.isArray(b)) return b; //ny
 	else if(goog.isString(b)){
@@ -2141,6 +2232,14 @@ Blockly.Generator.prototype.blockToCode=function(a){
 	goog.asserts.fail("Invalid code generated: %s",b)
 };
 
+function isit(b){
+	// ny
+	if(b.constructor == Condition || b.constructor == inputc ||b.constructor == Device_attr ||b.constructor == Args ||b.constructor == Event)
+		return true
+	else
+		return false
+
+}
 Blockly.Generator.prototype.valueToCode=function(a,b,c){
 	isNaN(c)&&goog.asserts.fail('Expecting valid order from block "%s".',a.type);
 
@@ -2150,9 +2249,8 @@ Blockly.Generator.prototype.valueToCode=function(a,b,c){
 
 	b=this.blockToCode(d);
 	
-	if(b.constructor == Condition || b.constructor == inputc ||b.constructor == Device_attr ||b.constructor == Args){ // ny
-        return b;
-    }
+	if(isit(b))
+		return b;
 
 	if(""===b)return"";
 
@@ -2185,14 +2283,6 @@ Blockly.Generator.prototype.statementToCode=function(a,b){
 		goog.asserts.assertFunction(b,'Language "%s" does not know how to generate code for block type "%s".',this.name_,a.type);
 		b=b.call(c,c);
 
-		var result
-		if(c.childBlocks_.length > 0){
-			var child = c.childBlocks_["0"]
-			result = this.blockToCode(child);
-			b.event_handler = true;
-			b.from = result.split('-')[0];
-			b.to = result.split('-')[1];
-		}
 		if(goog.isObject(c)){ 
 			return b
 		}

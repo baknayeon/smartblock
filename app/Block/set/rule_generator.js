@@ -84,6 +84,11 @@ function inpute(e) {
 	
 	var handler_name = "rule"+eca_num+"_handler";
 	this.handler = handler_name + "(evt)";
+
+	if(e.event_handler){
+		this.attr = e.event_handler.to
+	}
+
 	if(this.device == "battery")
 		this.subscribe = "subscribe("+this.name+', \"'+ this.device+'\", '+ handler_name+")";
 	else
@@ -108,9 +113,9 @@ function Event() {
     this.attr;
 	this.device;
 	this.option;
+	this.event_handler = false;
 	this.from;
 	this.to;
-	this.event_handler = false;
 }
 
 function Action() {

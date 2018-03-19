@@ -132,8 +132,10 @@ Blockly.Blocks['compare'] = {
 			if(blockA && blockB){
 				if(blockA.inputList.length > 0 && blockB.inputList.length > 0){
 					if(blockA.type.includes("c_")&& blockB.type == "dev_attr"){
-							var device = blockA.getFieldValue("type")
+						
+						var device = blockA.getFieldValue("type")
 						if(attrMap.isOnlyENUM(device)){
+							this.getInput('B').setCheck(["c_dev","attribute"]);
 							var newAttr = attrMap.getENUM_vaules(device);
 							var device_Name = blockA.inputList["0"].fieldRow[1].text_;
 							var device_type = blockA.inputList["0"].fieldRow[1].variableTypes;
@@ -145,6 +147,14 @@ Blockly.Blocks['compare'] = {
 							blockB.removeInput('dropDownField');
 							blockB.appendDummyInput('dropDownField')
 								  .appendField(new Blockly.FieldDropdown(newAttr), 'attribute');
+						}else if(attrMap.isOnlyNUMBER(device)){
+							this.getInput('B').setCheck(["number"]);
+
+							
+
+							blockB.removeInput('dropDownField');
+							blockB.appendDummyInput('dropDownField')
+								  .appendField(new Blockly.FieldTextInput(""), 'attribute');
 						}
 					}
 				}

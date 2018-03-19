@@ -23,9 +23,10 @@ function generat_codition_input(c){
 	return input
 }
 
-function smartApp(fileName){
+function smartApp(){
 		var code
 		eca_num = 0;
+		var fileName = document.getElementById("name").value;
 		if(fileName){
 			var ecaList = Blockly.SmartThings.workspaceToCode(demoWorkspace);
 			var prferences = null
@@ -37,7 +38,7 @@ function smartApp(fileName){
 				if(page_list){
 					prferences = 'preferences{';
 					  if(page_list.length === 1){
-						 var section = page[0].section
+						 var section = page_list[0].section
 						 prferences += section
 					  }else{
 						for(i in page_list){
@@ -116,10 +117,10 @@ function smartApp(fileName){
 			var updated = "def updated() {\n\tunsubscribe()\n" +subscribe +"}";
 			var predefined_callback= installed+"\n"+updated;
 
-			var name = document.getElementById("name").value;
+			var name = fileName;
 			var author = document.getElementById("author").value;
 			var category = document.getElementById("category").value;
-			var category_text =document.getElementById("category").value;
+			var category_text = document.getElementById("category").value;
 			var description = document.getElementById("description").value;
 
 			var definition ='definition( '+'\n'
@@ -132,6 +133,8 @@ function smartApp(fileName){
 			+'iconX2Url: \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlqp6tX_F2iTdI8cOTCroeBQEfEnXphwWN3KnyOfDt1I8rr9-APiuotKc\"'+"\n"+')';
 
 			code = definition +"\n\n"+ prferences +"\n\n"+ predefined_callback +"\n\n"+ generating_eventHandler(ecaList);
+		}else{
+			alert("plz write the App name");
 		}
 
 	return code;
@@ -254,15 +257,15 @@ function generating_condition(condition, devList){
 
 function generating_eventHandler_condition(event){
 	var from_condition = "true";
-	var to_condition = "true";
+	//var to_condition = "true";
 
 	if(event.event_handler){
-		if(event.from != ".")
-			from_condition = '(\"'+ event.from +'\" == ' + event.devname+".events(max: 2)[1].value)"
-		if(event.to != ".")
-			to_condition =  '(\"'+ event.to +'\" == evt.value)'
-			
-		return from_condition + " && " + to_condition;
+		handler = event.event_handler
+		if(handler.from != ".")
+			return from_condition = '(\"'+ handler.from +'\" == ' + event.devname+".events(max: 2)[1].value)"
+		//if(handler.to != ".")
+			//to_condition =  '(\"'+ handler.to +'\" == evt.value)'	
+		 //return from_condition;+ " && " + to_condition;
 
 	}else
 		return null
@@ -280,15 +283,15 @@ function generating_subscribe(ecaList){
 }
 
 Blockly.devicesFlyoutCallback_condition = function(workspace) {
-  var target = document.getElementById("select2");
+
   var xmlList = [];
 
-  for(var i = 0; i <target.length ; i++){
-	  var device = target[i].text.toLowerCase();
+  selected_dev.forEach(function(itme){
+		var device = itme;
 	  condition_block(device);
 	  xmlList.push(addXml("c_"+device));
-
-  }
+	});
+	
 
   add_logic_xml(xmlList)
 
@@ -297,32 +300,31 @@ Blockly.devicesFlyoutCallback_condition = function(workspace) {
 
 
 Blockly.devicesFlyoutCallback_event = function(workspace) {
-	var target = document.getElementById("select2");
 	var xmlList = [];
 
 	add_eventHander_xml(xmlList);
 
-	for(var i = 0; i <target.length; i++){
-		var device = target[i].text;
+
+	selected_dev.forEach(function(itme){
+		var device = itme
 		event_block(device);
 		xmlList.push(addXml("e_"+device))
-	}
-
+	});
+	
 	return xmlList;
 };
 
 Blockly.devicesFlyoutCallback_action = function(workspace) {
-	var target = document.getElementById("select2");
 	var xmlList = [];
 	
-	for(var i = 0; i <target.length ; i++){
-	  var device = target[i].text;
-	  if(commMap.makeBlock(device)){
+	selected_dev.forEach(function(itme){
+		var device = itme
+	   if(commMap.makeBlock(device)){
 			action_block(device);
 			xmlList.push(addXml("a_"+device));
-
-	  }
-	}
+		}
+	});
+	
 
 	add_action_method_xml(xmlList);
   return xmlList;
@@ -349,14 +351,14 @@ function add_eventHander_xml(xmlList){
 		  var block = Blockly.Xml.textToDom(blockText).firstChild;
 		 xmlList.push(block)
 	} 
-	if (Blockly.Blocks["e_schedule"]) {
+	/*if (Blockly.Blocks["e_schedule"]) {
 		  var blockText = '<xml>' +
 			  '<block type="e_schedule">' +
 			  '</block>' +
 			  '</xml>';
 		  var block = Blockly.Xml.textToDom(blockText).firstChild;
 		 xmlList.push(block)
-	}
+	}*/
 }
 
 function add_action_method_xml(xmlList){
@@ -400,14 +402,14 @@ function add_action_method_xml(xmlList){
 		var block = Blockly.Xml.textToDom(blockText).firstChild;
 		xmlList.push(block)
 	}
-	if (Blockly.Blocks["a_timer"]) {
+	/*if (Blockly.Blocks["a_timer"]) {
 		  var blockText = '<xml>' +
 			  '<block type="a_timer">' +
 			  '</block>' +
 			  '</xml>';
 		  var block = Blockly.Xml.textToDom(blockText).firstChild;
 		 xmlList.push(block)
-	}
+	}*/
 }
 
 function add_logic_xml(xmlList){
