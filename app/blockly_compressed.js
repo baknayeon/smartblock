@@ -1064,7 +1064,7 @@ Blockly.Connection.prototype.connect_=function(a){
 	d.setParent(c);
 	n&&(n.recordNew(),Blockly.Events.fire(n))
 
-	//ny connection
+	changeColour(d)//ny connection
 };
 Blockly.Connection.prototype.dispose=function(){if(this.isConnected())throw"Disconnect connection before disposing of it.";this.inDB_&&this.db_.removeConnection_(this);this.dbOpposite_=this.db_=null};
 Blockly.Connection.prototype.getSourceBlock=function(){return this.sourceBlock_};Blockly.Connection.prototype.isSuperior=function(){return this.type==Blockly.INPUT_VALUE||this.type==Blockly.NEXT_STATEMENT};Blockly.Connection.prototype.isConnected=function(){return!!this.targetConnection};
@@ -1074,8 +1074,31 @@ Blockly.Connection.prototype.checkConnection_=function(a){switch(this.canConnect
 Blockly.Connection.prototype.isConnectionAllowed=function(a){if(this.canConnectWithReason_(a)!=Blockly.Connection.CAN_CONNECT)return!1;if(a.type==Blockly.OUTPUT_VALUE||a.type==Blockly.PREVIOUS_STATEMENT)if(a.isConnected()||this.isConnected())return!1;return a.type==Blockly.INPUT_VALUE&&a.isConnected()&&!a.targetBlock().isMovable()&&!a.targetBlock().isShadow()||this.type==Blockly.PREVIOUS_STATEMENT&&a.isConnected()&&!this.sourceBlock_.nextConnection&&!a.targetBlock().isShadow()&&a.targetBlock().nextConnection||
 -1!=Blockly.draggingConnections_.indexOf(a)?!1:!0};Blockly.Connection.prototype.connect=function(a){this.targetConnection!=a&&(this.checkConnection_(a),this.isSuperior()?this.connect_(a):a.connect_(this))};Blockly.Connection.connectReciprocally_=function(a,b){goog.asserts.assert(a&&b,"Cannot connect null connections.");a.targetConnection=b;b.targetConnection=a};
 Blockly.Connection.singleConnection_=function(a,b){for(var c=!1,d=0;d<a.inputList.length;d++){var e=a.inputList[d].connection;if(e&&e.type==Blockly.INPUT_VALUE&&b.outputConnection.checkType_(e)){if(c)return null;c=e}}return c};Blockly.Connection.lastConnectionInRow_=function(a,b){for(var c=a,d;d=Blockly.Connection.singleConnection_(c,b);)if(c=d.targetBlock(),!c||c.isShadow())return d;return null};
-Blockly.Connection.prototype.disconnect=function(){var a=this.targetConnection;goog.asserts.assert(a,"Source connection not connected.");goog.asserts.assert(a.targetConnection==this,"Target connection not connected to source connection.");if(this.isSuperior()){var b=this.sourceBlock_;var c=a.getSourceBlock();a=this}else b=a.getSourceBlock(),c=this.sourceBlock_;this.disconnectInternal_(b,c);a.respawnShadow_()};
-Blockly.Connection.prototype.disconnectInternal_=function(a,b){var c;Blockly.Events.isEnabled()&&(c=new Blockly.Events.BlockMove(b));this.targetConnection=this.targetConnection.targetConnection=null;b.setParent(null);c&&(c.recordNew(),Blockly.Events.fire(c))};
+
+Blockly.Connection.prototype.disconnect=function(){
+	var a=this.targetConnection;
+	goog.asserts.assert(a,"Source connection not connected.");
+	goog.asserts.assert(a.targetConnection==this,"Target connection not connected to source connection.");
+	
+	if(this.isSuperior()){
+		var b=this.sourceBlock_;
+		var c=a.getSourceBlock();
+		a=this
+	}else 
+		b=a.getSourceBlock(),c=this.sourceBlock_;
+	this.disconnectInternal_(b,c);
+	a.respawnShadow_()
+		
+	changeColour(c)//ny connection
+};
+
+Blockly.Connection.prototype.disconnectInternal_=function(a,b){
+	var c;Blockly.Events.isEnabled()&&(c=new Blockly.Events.BlockMove(b));
+	this.targetConnection=this.targetConnection.targetConnection=null;
+	b.setParent(null);
+	c&&(c.recordNew(),Blockly.Events.fire(c))
+};
+
 Blockly.Connection.prototype.respawnShadow_=function(){var a=this.getSourceBlock(),b=this.getShadowDom();if(a.workspace&&b&&Blockly.Events.recordUndo)if(a=Blockly.Xml.domToBlock(b,a.workspace),a.outputConnection)this.connect(a.outputConnection);else if(a.previousConnection)this.connect(a.previousConnection);else throw"Child block does not have output or previous statement.";};Blockly.Connection.prototype.targetBlock=function(){return this.isConnected()?this.targetConnection.getSourceBlock():null};
 Blockly.Connection.prototype.checkType_=function(a){if(!this.check_||!a.check_)return!0;for(var b=0;b<this.check_.length;b++)if(-1!=a.check_.indexOf(this.check_[b]))return!0;return!1};Blockly.Connection.prototype.onCheckChanged_=function(){this.isConnected()&&!this.checkType_(this.targetConnection)&&(this.isSuperior()?this.targetBlock():this.sourceBlock_).unplug()};
 Blockly.Connection.prototype.setCheck=function(a){a?(goog.isArray(a)||(a=[a]),this.check_=a,this.onCheckChanged_()):this.check_=null;return this};Blockly.Connection.prototype.setShadowDom=function(a){this.shadowDom_=a};Blockly.Connection.prototype.getShadowDom=function(){return this.shadowDom_};Blockly.Connection.prototype.neighbours_=function(){return[]};
@@ -2397,7 +2420,7 @@ Blockly.Flyout.prototype.createBlock=function(a){
 			Blockly.Events.enable()
 	}
 
-	if(b.type.includes("e_") || b.type.includes("c_") || b.type.includes("a_")){ 
+	if(b.type.includes("e_") || b.type.includes("c_") || b.type.includes("a_")){ //ny
 		++event_num; 
 		++action_num;
 	}
@@ -2427,6 +2450,8 @@ Blockly.Flyout.prototype.placeNewBlock_=function(a){
 	a=a.getRelativeToSurfaceXY().scale(this.workspace_.scale);
 	a=goog.math.Coordinate.sum(e,a);
 	b=goog.math.Coordinate.difference(a,d).scale(1/b.scale);c.moveBy(b.x,b.y);
+	
+	changeColour(c)//ny connection
 	return c
 };
 

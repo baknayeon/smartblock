@@ -1,4 +1,5 @@
-var Block_colour_event = 195
+var Block_colour_event = "#"+"669ca9"
+var Block_colour_event_disconnted = "#"+"b6e2ed"
 
 Blockly.Blocks['event_handler'] = {
   init: function() {
@@ -8,6 +9,7 @@ Blockly.Blocks['event_handler'] = {
     this.appendDummyInput('to')
         .appendField("to")
         .appendField(new Blockly.FieldDropdown([[".","."]]), "dropDownTo");
+
     this.setOutput(true, "Event_Handler");
     this.setColour(Block_colour_event);
     this.setInputsInline(true);

@@ -43,15 +43,16 @@
     body {
 		border: solid 1px black;
 		width: 1515px;
-		height: 900px;
+		height: 950px;
 		font-family: sans-serif;
-		margin: 0px 20px 0px 20px ;
+		margin: 0 auto ;
 			
     }
 	#top{
-		margin: 30px 0px 10px 0px; 
-		text-align: center;
-		border: 1px solid #ddd;
+		margin: 0px 0px 30px 0px;
+		padding: 0px 40px 0px 45%;
+		border : 1px solid red;
+		
 	}
 	#main{ 
 		
@@ -68,7 +69,7 @@
 		float:left;
 	}
 	#bottom{
-		margin: 710px 0px 10px 0px; 
+		margin: 50% 0px 10px 0px; 
 		padding: 10px 0px 0px 0px; 
 		border: 1px solid #ddd;
 		text-align: center;
@@ -100,7 +101,110 @@
 	button:active {
 		background: #fff;
 	}
+	h2{ 
+	  text-align:center; 
+	  margin-bottom:10px; 
+	}
+	h2 small { 
+	  font-weight:normal; 
+	  color:#888; 
+	  display:block; 
+	}
 
+	/* form starting stylings ------------------------------- */
+	.info 		{ 
+	  position:relative; 
+	  margin-bottom: 13px; 
+	}
+	input {
+	  font-size:19px;
+	  padding:5px 5px 5px 5px;
+	  display:block;
+	  width:300px;
+	  border:none;
+	  border-bottom:1px solid #757575;
+	}
+	input:focus 		{ outline:none; }
+
+	/* LABEL ======================================= */
+	label 				 {
+	  color:#999; 
+	  font-size:20px;
+	  font-weight:normal;
+	  position:absolute;
+	  pointer-events:none;
+	  left:5px;
+	  top:5px;
+	  transition:0.2s ease all; 
+	  -moz-transition:0.2s ease all; 
+	  -webkit-transition:0.2s ease all;
+	}
+
+	/* active state */
+	#author:focus ~ label, #author:valid ~ label 		{
+	  left:-60px;
+	  font-size:18px;
+	  color:#5264AE;
+	}
+	#name:focus ~ label, #name:valid ~ label 		{
+	  left:-100px;
+	  font-size:18px;
+	  color:#5264AE;
+	}
+	/* BOTTOM BARS ================================= */
+	.bar 	{ position:relative; display:block; width:300px; }
+	.bar:before, .bar:after 	{
+	  content:'';
+	  height:2px; 
+	  width:0;
+	  bottom:1px; 
+	  position:absolute;
+	  background:#5264AE; 
+	  transition:0.2s ease all; 
+	  -moz-transition:0.2s ease all; 
+	  -webkit-transition:0.2s ease all;
+	}
+	.bar:before {
+	  left:50%;
+	}
+	.bar:after {
+	  right:50%; 
+	}
+
+	/* active state */
+	input:focus ~ .bar:before, input:focus ~ .bar:after {
+	  width:50%;
+	}
+	/* HIGHLIGHTER ================================== */
+	.highlight {
+	  position:absolute;
+	  height:60%; 
+	  width:100px; 
+	  top:25%; 
+	  left:0;
+	  pointer-events:none;
+	  opacity:0.5;
+	}
+
+	/* active state */
+	input:focus ~ .highlight {
+	  -webkit-animation:inputHighlighter 0.3s ease;
+	  -moz-animation:inputHighlighter 0.3s ease;
+	  animation:inputHighlighter 0.3s ease;
+	}
+	/* ANIMATIONS ================ */
+	@-webkit-keyframes inputHighlighter {
+		from { background:#5264AE; }
+	  to 	{ width:0; background:transparent; }
+	}
+	@-moz-keyframes inputHighlighter {
+		from { background:#5264AE; }
+	  to 	{ width:0; background:transparent; }
+	}
+	@keyframes inputHighlighter {
+		from { background:#5264AE; }
+	  to 	{ width:0; background:transparent; }
+	}
   </style>
 </head>
   
@@ -116,28 +220,19 @@
 
 <body onload="all()">
 	<div id="top">
-		<label for="name">App Name</label>
-		<input type="text" id="name" maxlength="20" value = "sookmyung"></input>
-		<br>
-		<label for="author">Author</label>
-		<input type="text" id="author" maxlength="20" value="snow"></input>
-		<br>
-		<label for="category">Category</label>
-		<select id = "category">
-			  <option value="My Apps">My Apps</option>
-			  <option value="Convenience">Convenience</option>
-			  <option value="Family">Family</option>
-			  <option value="Fun & Social">Fun & Social</option>
-			  <option value="Green Living">Green Living</option>
-			  <option value="Health & Wellness">Health & Wellness</option>
-			  <option value="Mode Magic">Mode Magic</option>
-			  <option value="Pets">Pets</option>
-			  <option value="Safety & Securit">Safety & Security</option>
-			  <option value="SmartThings Labs">SmartThings Labs</option>
-		</select>
-		<br>
-		<label for="description">Description</label>
-		<textarea id="description" rows="3" cols="30">made by snow :)</textarea>
+		<h1>SM Block</h1>
+		<div class="info">      
+			<input type="text" id="name" required>
+			<span class="highlight"></span>
+			<span class="bar"></span>
+			<label>App Name</label>
+		</div>
+		<div class="info">  
+			<input type="text" id="author" required>
+			<span class="highlight"></span>
+			<span class="bar"></span>
+			<label>Author</label>
+		</div>    
 					
 	</div>
 	<div id="main">
@@ -179,9 +274,7 @@
 		</div>
 	</div>
 	<div id="bottom">
-		<b >Visual Language For SmartThings 	
-		<i>at <a href="http://cs.sookmyung.ac.kr/~uslab/sites/index.html">Software Language Lab</a>, SWU</i>
-		</b>
+		<h2>Visual Language For SmartThings	<i>at <a href="http://cs.sookmyung.ac.kr/~uslab/sites/index.html">Software Language Lab</a>, SWU</i></h2>
 	</div>
 <script>
 	var demoWorkspace = Blockly.inject('blocklyDiv', {media: '../media/',toolbox: document.getElementById('toolbox')});

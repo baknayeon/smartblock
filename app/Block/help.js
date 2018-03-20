@@ -119,16 +119,11 @@ function smartApp(){
 
 			var name = fileName;
 			var author = document.getElementById("author").value;
-			var category = document.getElementById("category").value;
-			var category_text = document.getElementById("category").value;
-			var description = document.getElementById("description").value;
 
 			var definition ='definition( '+'\n'
 			+'name: \"'+name+'\",'+"\n"
 			+'namespace: \"Blockly\",'+"\n"
 			+'author: \"'+author+'\",'+"\n"
-			+'description: \"'+description+'\",'+"\n"
-			+'category: \"'+category_text+'\",'+"\n"
 			+'iconUrl: \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlqp6tX_F2iTdI8cOTCroeBQEfEnXphwWN3KnyOfDt1I8rr9-APiuotKc\",'+"\n"
 			+'iconX2Url: \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlqp6tX_F2iTdI8cOTCroeBQEfEnXphwWN3KnyOfDt1I8rr9-APiuotKc\"'+"\n"+')';
 
@@ -281,6 +276,17 @@ function generating_subscribe(ecaList){
 	}
 	return subscribe;
 }
+
+
+function changeColour(block){
+
+	if(block.colour_ == Block_colour_event)
+		block.setColour(Block_colour_event_disconnted)
+	else if(block.colour_ == Block_colour_event_disconnted)
+		block.setColour(Block_colour_event)
+
+}
+
 
 Blockly.devicesFlyoutCallback_condition = function(workspace) {
 

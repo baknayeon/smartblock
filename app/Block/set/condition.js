@@ -28,7 +28,7 @@ goog.provide('Blockly.Blocks.logic');
 
 goog.require('Blockly.Blocks');
 
-var Block_colour_condition = "#"+"BCBC01"
+var Block_colour_condition = "#"+"28398F"
 
 
 /**

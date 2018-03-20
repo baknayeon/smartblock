@@ -1,4 +1,6 @@
-var Block_colour_action = 330
+
+var Block_colour_action = "#"+"61abcb"
+
 
 function action_block(devname){
 	Blockly.SmartThings['a_'+devname] = function(block) {
@@ -31,6 +33,7 @@ function action_block(devname){
 				block.appendField(new Blockly.FieldDropdown(commMap.getMultiType(devname)), "Command_id");
 				setMethodField(block, devname);
 			}
+
 			this.setOutput(true, "Action");
 			this.setColour(Block_colour_action);
 			this.setTooltip("");
