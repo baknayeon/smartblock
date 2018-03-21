@@ -46,6 +46,7 @@ function inputc(){
 
 function Device_attr(){
 	this.dev;
+	this.attr_id;
 	this.attr;
 }
 

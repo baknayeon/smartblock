@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Visual Language For SmartThings</title>
+  <title>Snow Block for SmartThings</title>
   <script src="../blockly_compressed.js"></script>
   <script src="../blocks_compressed.js"></script>
   <script src="../smartthings_compressed.js"></script>
@@ -70,13 +70,13 @@
 	}
 	#bottom{
 		margin: 50% 0px 10px 0px; 
-		padding: 10px 0px 0px 0px; 
+		padding: 0px 0px 0px 0px; 
 		border: 1px solid #ddd;
 		text-align: center;
-		font-size: 1.0em;
-		line-height: 1.0em;
-		color: navy;
+	    color:#999;
+	    font-size:13px; 
 	}
+	a{color:#999;}
 	ul{
 		padding: 0px;
 		margin : 0px;
@@ -101,16 +101,6 @@
 	button:active {
 		background: #fff;
 	}
-	h2{ 
-	  text-align:center; 
-	  margin-bottom:10px; 
-	}
-	h2 small { 
-	  font-weight:normal; 
-	  color:#888; 
-	  display:block; 
-	}
-
 	/* form starting stylings ------------------------------- */
 	.info 		{ 
 	  position:relative; 
@@ -144,22 +134,23 @@
 	#author:focus ~ label, #author:valid ~ label 		{
 	  left:-60px;
 	  font-size:18px;
-	  color:#5264AE;
+	  color:#000000;
 	}
 	#name:focus ~ label, #name:valid ~ label 		{
 	  left:-100px;
 	  font-size:18px;
-	  color:#5264AE;
+	  color:#000000;
 	}
-	/* BOTTOM BARS ================================= */
-	.bar 	{ position:relative; display:block; width:300px; }
+	/* BOTTOM BARS ================================= 
+	.bar 	{ position:relative; display:block; width:300px; 
+	  color:red;}
 	.bar:before, .bar:after 	{
 	  content:'';
 	  height:2px; 
 	  width:0;
 	  bottom:1px; 
 	  position:absolute;
-	  background:#5264AE; 
+	  background:#000000; 
 	  transition:0.2s ease all; 
 	  -moz-transition:0.2s ease all; 
 	  -webkit-transition:0.2s ease all;
@@ -170,7 +161,7 @@
 	.bar:after {
 	  right:50%; 
 	}
-
+	*/
 	/* active state */
 	input:focus ~ .bar:before, input:focus ~ .bar:after {
 	  width:50%;
@@ -186,25 +177,25 @@
 	  opacity:0.5;
 	}
 
-	/* active state */
+	/* active state 
 	input:focus ~ .highlight {
 	  -webkit-animation:inputHighlighter 0.3s ease;
 	  -moz-animation:inputHighlighter 0.3s ease;
 	  animation:inputHighlighter 0.3s ease;
 	}
-	/* ANIMATIONS ================ */
+	/* ANIMATIONS ================
 	@-webkit-keyframes inputHighlighter {
-		from { background:#5264AE; }
+		from { background:#000000; }
 	  to 	{ width:0; background:transparent; }
 	}
 	@-moz-keyframes inputHighlighter {
-		from { background:#5264AE; }
+		from { background:#000000; }
 	  to 	{ width:0; background:transparent; }
 	}
 	@keyframes inputHighlighter {
-		from { background:#5264AE; }
+		from { background:#000000; }
 	  to 	{ width:0; background:transparent; }
-	}
+	} */
   </style>
 </head>
   
@@ -220,7 +211,7 @@
 
 <body onload="all()">
 	<div id="top">
-		<h1>SM Block</h1>
+		<h1>Snow Block</h1>
 		<div class="info">      
 			<input type="text" id="name" required>
 			<span class="highlight"></span>
@@ -274,7 +265,7 @@
 		</div>
 	</div>
 	<div id="bottom">
-		<h2>Visual Language For SmartThings	<i>at <a href="http://cs.sookmyung.ac.kr/~uslab/sites/index.html">Software Language Lab</a>, SWU</i></h2>
+		<p><a href="http://cs.sookmyung.ac.kr/~uslab/sites/index.html">Software Language Lab</a> at Sookmyung Women's University</p>
 	</div>
 <script>
 	var demoWorkspace = Blockly.inject('blocklyDiv', {media: '../media/',toolbox: document.getElementById('toolbox')});
