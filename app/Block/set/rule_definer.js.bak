@@ -1,4 +1,6 @@
 
+var Block_colour_eca = "#"+"1f215a"
+
 Blockly.Blocks['eca'] = {
   init: function() {
     this.appendValueInput("Event")

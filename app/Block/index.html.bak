@@ -208,7 +208,7 @@
   </style>
 </head>
   
-<xml id="toolbox" style="background:powderblue;">
+<xml id="toolbox" style="background-color:powderblue;">
 	<category name="Rule" colour="240">
 		<block type="eca"></block>
 		<block type="ea"></block>

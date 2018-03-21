@@ -1,3 +1,7 @@
+
+var Block_colour_action = "#"+"61abcb"
+
+
 function action_block(devname){
 	Blockly.SmartThings['a_'+devname] = function(block) {
 		var variable_name = Blockly.SmartThings.variableDB_.getName(block.getFieldValue('name'), Blockly.Variables.NAME_TYPE);

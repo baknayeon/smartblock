@@ -1,3 +1,6 @@
+var Block_colour_event = "#"+"669ca9"
+var Block_colour_event_disconnted = "#"+"b6e2ed"
+
 Blockly.Blocks['event_handler'] = {
   init: function() {
     this.appendDummyInput('from')
