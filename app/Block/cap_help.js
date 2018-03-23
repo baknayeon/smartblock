@@ -6,7 +6,7 @@ AttributeMap = function(){
 };   
 AttributeMap.prototype = {  
 	generateGroup : function(){ 
-		var list = Array.from(deviceList)
+		var list = Array.from(deviceMap)
 		for( i in list){
 			var key = list[i][0];
 			var e = this.ENUM[key];
@@ -205,5 +205,5 @@ function Command_method(i, t, v){
 }
 
 function setDevice(device){
-		deviceList.set(device, device)
+		deviceMap.set(device, device)
 }

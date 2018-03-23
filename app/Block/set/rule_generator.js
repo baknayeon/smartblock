@@ -59,6 +59,10 @@ function ECA(statements_event, value_condition, statements_action) {
 
     this.input_e_make = new inpute(this.event);
     this.input_a_make = new Array();
+    this.input_c_make = new Array();
+
+	var coditionList = new Array();
+	condition_input(value_condition, coditionList);
 
 	for(i in this.actionList){ // input for action generate
 		if(this.actionList[i].devname){
@@ -73,6 +77,13 @@ function ECA(statements_event, value_condition, statements_action) {
 					this.input_a_make.push(a);
 				}
 			}
+		}
+	}
+
+	for(i in coditionList){ // input for action generate
+		if(coditionList[i].devname){
+			var c = new inputa(coditionList[i]);
+			this.input_c_make.push(c);
 		}
 	}
 }  
@@ -127,6 +138,12 @@ function Action() {
 
 	this.method;
 	this.args = new Array();
+}
+
+
+function Condition(name, device) {
+	this.devname = name;
+ 	this.device = device;
 }
 
 

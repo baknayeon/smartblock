@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Appilcation Configuration</title>
+	<meta charset="UTF-8">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="css/app_info.css">
+<!--===============================================================================================-->
+</head>
+<body>
+
+
+	<div class="container-contact100">
+
+		<div>
+			<form>
+				<span class="contact100-form-title">
+					Appilcation Configuration
+				</span>
+
+				<div class="wrap-input100 validate-input" >
+					<span class="focus-input100"></span>
+					<input class="input100" type="text" name="author" placeholder="author">
+					<span class="focus-input100"></span>
+				</div>
+
+				<div class="wrap-input100 validate-input" >
+					<span class="focus-input100"></span>
+					<input class="input100" type="text" name="namespace" placeholder="namespace">
+					<span class="focus-input100"></span>
+				</div>
+				<div class="wrap-input100 validate-input" >
+					<textarea class="input100" name="description" placeholder="description"></textarea>
+					<span class="focus-input100"></span>
+				</div>
+				
+				<div class="wrap-input100 validate-input" >
+					<span class="focus-input100"></span>
+					<input class="input100" type="url" name="iconUrl" placeholder="iconUrl">
+					<span class="focus-input100"></span>
+				</div>
+
+
+				<div class="container-contact100-form-btn">
+					<button class="contact100-form-btn" onClick = "close()">
+						<span>
+							<i class="fa fa-paper-plane-o m-r-6" aria-hidden="true"></i>
+							Save
+						</span>
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-23581568-13"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-23581568-13');
+
+
+  function close(){
+	self.close()
+  }
+</script>
+
+</body>
+</html>

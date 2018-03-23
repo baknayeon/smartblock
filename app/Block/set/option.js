@@ -5,10 +5,13 @@ Blockly.Blocks['option_required'] = {
         .appendField("required")
 	this.setInputsInline(false);
     this.setOutput(true, "Option_input");
-    this.setColour(220);
+    this.setColour(Block_colour_option);
  this.setTooltip("");
  this.setHelpUrl("");
-  }
+  },
+	onchange: function(event) {
+		change(event,this)
+	}
 };
 
 Blockly.Blocks['option_multiple'] = {
@@ -18,10 +21,13 @@ Blockly.Blocks['option_multiple'] = {
         .appendField("multiple");
 	this.setInputsInline(false);
     this.setOutput(true, "Option_input");
-    this.setColour(220);
+    this.setColour(Block_colour_option);
  this.setTooltip("");
  this.setHelpUrl("");
-  }
+  },
+	onchange: function(event) {
+		change(event,this)
+	}
 };
 
 Blockly.Blocks['option_title'] = {
@@ -32,10 +38,13 @@ Blockly.Blocks['option_title'] = {
         .appendField(new Blockly.FieldTextInput(""), "title");
 	 this.setInputsInline(false);
     this.setOutput(true, ["Option_input", "Option"]);
-   this.setColour(220);
+   this.setColour(Block_colour_option);
  this.setTooltip("");
  this.setHelpUrl("");
-  }
+  },
+	onchange: function(event) {
+		change(event,this)
+	}
 };
 
 Blockly.Blocks['option_name'] = {
@@ -46,10 +55,13 @@ Blockly.Blocks['option_name'] = {
         .appendField(new Blockly.FieldTextInput(""), "name");
     this.setInputsInline(false);
     this.setOutput(true, "Option_input");
-    this.setColour(220);
+    this.setColour(Block_colour_option);
  this.setTooltip("");
  this.setHelpUrl("");
-  }
+  },
+	onchange: function(event) {
+		change(event,this)
+	}
 };
 
 
@@ -62,10 +74,13 @@ Blockly.Blocks['option_nextpage'] = {
         .appendField(new Blockly.FieldTextInput(""), "nextPage");
     this.setInputsInline(false);
     this.setOutput(true, "Option");
-    this.setColour(220);
+    this.setColour(Block_colour_option);
  this.setTooltip("");
  this.setHelpUrl("");
-  }
+  },
+	onchange: function(event) {
+		change(event,this)
+	}
 };
 
 Blockly.Blocks['option_install'] = {
@@ -76,10 +91,13 @@ Blockly.Blocks['option_install'] = {
         .appendField(new Blockly.FieldCheckbox("TRUE"), "true");
     this.setInputsInline(false);
     this.setOutput(true, "Option");
-    this.setColour(220);
+    this.setColour(Block_colour_option);
  this.setTooltip("");
  this.setHelpUrl("");
-  }
+  },
+	onchange: function(event) {
+		change(event,this)
+	}
 };
 
 Blockly.Blocks['option_uninstall'] = {
@@ -90,10 +108,13 @@ Blockly.Blocks['option_uninstall'] = {
         .appendField(new Blockly.FieldCheckbox("TRUE"), "true");
     this.setInputsInline(false);
     this.setOutput(true, "Option");
-    this.setColour(220);
+    this.setColour(Block_colour_option);
  this.setTooltip("");
  this.setHelpUrl("");
-  }
+  },
+	onchange: function(event) {
+		change(event,this)
+	}
 };
 
 Blockly.SmartThings['option_required'] = function(block) {

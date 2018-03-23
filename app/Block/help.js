@@ -116,13 +116,13 @@ function smartApp(){
 			var ecaList = Blockly.SmartThings.workspaceToCode(demoWorkspace);
 			
 			var name = fileName;
-			var author = document.getElementById("author").value;
+			//var author = document.getElementById("author").value;
 
 			//definition
 			var definition ='definition( '+'\n'
 			+'name: \"'+name+'\",'+"\n"
-			+'namespace: \"Blockly\",'+"\n"
-			+'author: \"'+author+'\",'+"\n"
+			//+'namespace: \"Blockly\",'+"\n"
+			//+'author: \"'+author+'\",'+"\n"
 			+'iconUrl: \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlqp6tX_F2iTdI8cOTCroeBQEfEnXphwWN3KnyOfDt1I8rr9-APiuotKc\",'+"\n"
 			+'iconX2Url: \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlqp6tX_F2iTdI8cOTCroeBQEfEnXphwWN3KnyOfDt1I8rr9-APiuotKc\"'+"\n"+')';
 
@@ -305,11 +305,83 @@ function generating_subscribe(ecaList){
 
 function changeColour(block){
 
-	if(block.colour_ == Block_colour_event)
-		block.setColour(Block_colour_event_disconnted)
-	else if(block.colour_ == Block_colour_event_disconnted)
-		block.setColour(Block_colour_event)
 
+	if(block.type != "eca" && block.type != "ea"){
+		if(colour)
+			if(block.colour_ == Block_colour_event)
+				block.setColour(Block_colour_event_disconnted)
+			else if(block.colour_ == Block_colour_event_disconnted)
+				block.setColour(Block_colour_event)
+			else if(block.colour_ == Block_colour_condition)
+				block.setColour(Block_colour_condition_disconnted)
+			else if(block.colour_ == Block_colour_condition_disconnted)
+				block.setColour(Block_colour_condition)
+
+			else if(block.colour_ == Block_colour_action)
+				block.setColour(Block_colour_action_disconnted)
+			else if(block.colour_ == Block_colour_action_disconnted)
+				block.setColour(Block_colour_action)
+
+				
+			else if(block.colour_ == Block_colour_section)
+				block.setColour(Block_colour_section_disconnted)
+			else if(block.colour_ == Block_colour_section_disconnted)
+				block.setColour(Block_colour_section)
+
+				
+			else if(block.colour_ == Block_colour_option)
+				block.setColour(Block_colour_option_disconnted)
+			else if(block.colour_ == Block_colour_option_disconnted)
+				block.setColour(Block_colour_option)
+		console.log("changeColour")
+	}
+}
+
+function change(event, block){
+	if(event.type == Blockly.Events.BLOCK_CREATE && event.group){
+		if(event.ids.length > 1){
+			var block_array = event.ids
+			var length = block_array.length
+			for(var i =0; i < length; i++){
+				if(block.id == block_array[i]){
+					changeColour(block)
+					break;
+				}
+			}
+		
+		}
+	}
+}
+
+
+function condition_input(condition, array){
+	
+	if(condition.result){ //true, false, !p
+		if(condition.result != 'true' && condition.result != 'false')
+			condition_input(condition, array)
+			
+	}else{ // p&&p, p||p, f <= fn, m <= n, fϵd  
+		var operator = condition.operator
+		var right = condition.right;
+		var left = condition.left;
+
+		if(operator == '&&' || operator == '||'){
+			condition_input(right, array)
+			condition_input(left, array)
+		}
+		else if(operator == '==' || operator == '<'|| operator == '>' || operator == 'ϵ'){
+			//smartDevice
+			
+			var field_right = right
+			array.push(new Condition(field_right.devname, field_right.device));
+			
+			if(left.constructor == inputc){ // field =< field
+				var field_left = left
+				array.push(new Condition(field_right.devname, field_right.device));
+			}
+
+		}
+	}
 }
 
 
@@ -505,4 +577,131 @@ function add_logic_xml(xmlList){
 	}*/
 }
 
+function device_table(){
 
+	var alphabet = ["Things", "A","B","C","D", "E","FG","H","IJ","KL","M","NO","P","QR","S", "T", "UV","WXYZ"]
+	var comman_uesed = ["alarm", "button", "light", "lock", "motion", "outlet", "presenceSensor",
+	"smokeDetector",  "switch"]
+	
+	var index = 0;
+	var deviceList = Array.from(deviceMap.keys()).sort();
+	var table = ""
+
+	for(var i =0; i < alphabet.length; i++){	
+		var alphabet_i = alphabet[i]
+			
+		table += '<div class="share-btn" id = "'+alphabet_i +'" >'+
+				'<strong><p class="cta">'+ alphabet_i +'</p></strong>'+
+				'<button class= "close"></button> '+
+				'<div class="social">';
+
+		if(alphabet_i == "Things")
+			for(var c = 0; c < comman_uesed.length; c++)
+				table += '<button onClick = change_color(this) id ="'+comman_uesed[c]+'">'+ comman_uesed[c]+'</button>'
+		else{
+			for(var s = 0; s < alphabet_i.length; s++ ){
+				var word = alphabet_i.charAt(s).toLowerCase()
+					
+ 						while(index < deviceList.length){
+					var device =  deviceList[index];
+					if(device.startsWith(word)){
+						table += '<button onClick = change_color(this) id ="'+device+'">'+ device+'</button>';
+						index++;
+					}else
+						break;
+
+				}
+			}
+		}
+		table += '</div>'+
+				 '</div>\n';
+
+	}
+
+	return table;
+}
+
+function toolbox_pre(){
+		
+	var toolbox_pre = '<xml>\n';
+	toolbox_pre += sample();
+	toolbox_pre += preference();
+	toolbox_pre += preference_option();
+
+	var ecaList = Blockly.SmartThings.workspaceToCode(demoWorkspace);
+	var event_block ="";
+	var action_block ="";
+	var condition_block ="";
+	
+	toolbox_pre += '  <category name="input">\n';
+	if(ecaList){
+		for(i in ecaList){
+			var event = ecaList[i].event;
+			var actionList = ecaList[i].actionList;
+			var coditionList = new Array();
+
+			var e_devname = event.devname;
+			
+			//eliminate dutulicate
+			var eSt_e = event_block.indexOf(e_devname);
+			var aSt_e = action_block.indexOf(e_devname);
+			var cSt_e = condition_block.indexOf(e_devname);
+
+			if(eSt_e == -1 && aSt_e == -1 && cSt_e == -1){
+				pre_block(e_devname, Block_colour_event)
+				event_block += '    <block type="input '+e_devname+'">'+ ' </block> \n';
+			}
+
+
+			condition_input(ecaList[i].condition, coditionList);
+
+			for(c in coditionList){
+				var c_devname = coditionList[c].devname
+				if(c_devname){
+					var eSt_a = event_block.indexOf(c_devname);
+					var aSt_a = action_block.indexOf(c_devname);
+					var cSt_e = condition_block.indexOf(c_devname);
+					if(eSt_a == -1 && aSt_a == -1 && cSt_e == -1){
+						pre_block(c_devname, Block_colour_condition)
+						condition_block += '    <block type="input '+c_devname+'">'+ ' </block> \n';
+					}
+				}
+			}
+
+			for(a in actionList){
+				var a_devname = actionList[a].devname
+				if(a_devname){
+					var eSt_a = event_block.indexOf(a_devname);
+					var aSt_a = action_block.indexOf(a_devname);
+					var cSt_e = condition_block.indexOf(a_devname);
+					if(eSt_a == -1 && aSt_a == -1 && cSt_e == -1){
+						pre_block(a_devname, Block_colour_action)
+						action_block += '    <block type="input '+a_devname+'">'+ ' </block> \n';
+					}
+				}
+			}
+		}
+	}
+
+	toolbox_pre += event_block + condition_block + action_block;
+	toolbox_pre += '  </category>\n';
+	toolbox_pre += '</xml>\n';
+
+	return toolbox_pre;
+
+}
+
+function change_color(x){
+
+	if( x.style.background == 'rgb(255, 255, 255)' || x.style.background == '' ){
+		selected_dev.set(x.id, x.id)
+		x.style.background = 'rgb(227, 233, 242)';
+	}else if(x.style.background == 'rgb(227, 233, 242)'){
+		selected_dev.delete(x.id)
+		x.style.background = 'rgb(255, 255, 255)';
+	}
+}
+
+function app_info(x){
+	var myWindow = window.open("./app_info.html", 'myWindow', 'scrollbars=no,toolbar=no,resizable=no,width=450px,height=550px,left=400,top=100');
+}

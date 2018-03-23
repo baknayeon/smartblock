@@ -16,10 +16,12 @@ function mapInit(){
         attrMap.putENUM("smokeDetector", new Attribute("smoke",  ["clear", "detected", "tested"])); 
 		attrMap.putNUMBER("switchLevel", new Attribute("level"), null);
         attrMap.putENUM("switch", new Attribute("switch",["off", "on"])); 
+		 attrMap.putNUMBER("stepSensor", [new Attribute("goal"), new Attribute("steps")], null);
+        
+		
 		attrMap.putENUM("water", new Attribute("water",  ["dry", "wet"])); 
        
-        attrMap.putNUMBER("stepSensor", [new Attribute("goal"), new Attribute("steps")], null);
-        attrMap.putENUM("thermostat", 
+       attrMap.putENUM("thermostat", 
 									[new Attribute("thermostatFanMode",["auto", "circulate", "on"]), 
 										new Attribute("thermostatMode",["auto", "cool", "emergency", "heat", "heat", "off"]),  
 										new Attribute("thermostatOperatingState",["cooling", "fan only", "heating", "idle", "pending cool", "pending heat", "vent economizer"])
@@ -46,5 +48,5 @@ function mapInit(){
 			new Command_method("setThermostatMode", ["ENUM"], [["auto", "cool",  "emergency heat", "heat", "off"]])
 			]);
 
-    }catch(e){alert(e);} 
+    }catch(e){alert(e);}
 } 

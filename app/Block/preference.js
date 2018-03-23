@@ -8,9 +8,8 @@ function pre_block(devname, colour){
 	  for(i in ecaList_g){
 	  	if(input ==""){
 	  		var input_e = ecaList_g[i].input_e_make;
-			var input_a_list = ecaList_g[i].input_a_make;
-			var input_c_list = ecaList_g[i].input_c_make;
-			
+			var input_a = ecaList_g[i].input_a_make;
+
 			if(text_name === input_e.name){
 				if(value_name)
 					input += "\n\t\t\t"+input_e.input+", "+value_name;
@@ -19,22 +18,12 @@ function pre_block(devname, colour){
 				break
 			}
 
-			for(a in input_a_list){
-				if(text_name === input_a_list[a].name){
+			for(j in input_a){
+				if(text_name === input_a[j].name){
 					if(value_name)
-						input += "\n\t\t\t"+input_a_list[a].input+", "+value_name;
+						input += "\n\t\t\t"+input_a[j].input+", "+value_name;
 					else
-						input += "\n\t\t\t"+input_a_list[a].input;
-				}
-
-			 }
-
-			for(c in input_c_list){
-				if(text_name === input_c_list[c].name){
-					if(value_name)
-						input += "\n\t\t\t"+input_c_list[c].input+", "+value_name;
-					else
-						input += "\n\t\t\t"+input_c_list[c].input;
+						input += "\n\t\t\t"+input_a[j].input;
 				}
 
 			 }
@@ -75,7 +64,10 @@ Blockly.Blocks['page'] = {
     this.setColour(Block_colour_page);
  this.setTooltip("");
  this.setHelpUrl("");
-  }
+ },
+	onchange: function(event) {
+		event
+	}
 };
 
 Blockly.Blocks['section'] = {
@@ -91,10 +83,7 @@ Blockly.Blocks['section'] = {
     this.setColour(Block_colour_section);
  this.setTooltip("");
  this.setHelpUrl("");
-  },
-	onchange: function(event) {
-		change(event,this)
-	}
+  }
 };
 
 Blockly.Blocks['dynamicpage'] = {

@@ -28,13 +28,10 @@ goog.provide('Blockly.Blocks.logic');
 
 goog.require('Blockly.Blocks');
 
-var Block_colour_condition = "#"+"28398F"
-
 
 /**
  * Common HSV hue for all blocks in this category.
  */
-Blockly.Blocks.logic.HUE = 210;
 
 Blockly.Blocks['operation'] = {
   /**
@@ -46,7 +43,6 @@ Blockly.Blocks['operation'] = {
         [[Blockly.Msg.LOGIC_OPERATION_AND, 'AND'],
          [Blockly.Msg.LOGIC_OPERATION_OR, 'OR']];
     this.setHelpUrl(Blockly.Msg.LOGIC_OPERATION_HELPURL);
-    this.setColour(Blockly.Blocks.logic.HUE);
     this.setOutput(true, 'Boolean');
     this.appendValueInput('A')
 		.setCheck("Condition");
@@ -97,9 +93,9 @@ Blockly.Blocks['compare'] = {
     var thisBlock = this;
     this.prevBlocks_ = [null, null];
     this.setOutput(true, "Condition");
-    this.setColour(Block_colour_condition);
 	this.setTooltip("");
 	this.setHelpUrl("");
+    this.setColour(Block_colour_condition);
     this.setTooltip(function() {
       var op = thisBlock.getFieldValue('OP');
       var TOOLTIPS = {
@@ -130,7 +126,8 @@ Blockly.Blocks['compare'] = {
 		if(typeof event.element == "string"){
 		}else{
 			if(blockA && blockB){
-				if(blockA.inputList.length > 0 && blockB.inputList.length > 0){
+				var device = blockB.getFieldValue("device")
+				if(device === "device."){
 					if(blockA.type.includes("c_")&& blockB.type == "dev_attr"){
 						
 						var device = blockA.getFieldValue("type")
@@ -186,9 +183,9 @@ Blockly.Blocks['compare'] = {
     }
     this.prevBlocks_[0] = blockA;
     this.prevBlocks_[1] = blockB;
-    this.setColour(Block_colour_condition);
     this.setOutput(true, "Condition");
-  }
+  
+ }
 };
 
 
@@ -253,7 +250,6 @@ Blockly.Blocks['boolean'] = {
         [[Blockly.Msg.LOGIC_BOOLEAN_TRUE, 'TRUE'],
          [Blockly.Msg.LOGIC_BOOLEAN_FALSE, 'FALSE']];
     this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
-    this.setColour(Blockly.Blocks.logic.HUE);
     this.appendDummyInput()
         .appendField(new Blockly.FieldDropdown(BOOLEANS), 'BOOL');
     this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
@@ -280,7 +276,7 @@ Blockly.Blocks['negate'] = {
 Blockly.Blocks['device_list'] = {
     init : function() {
         this.appendDummyInput('device_list')
-		.appendField(new Blockly.FieldDropdown(deviceList), 'device')
+		.appendField(new Blockly.FieldDropdown(setDeviceField()), 'device')
         .appendField("Device");
 		this.setInputsInline(true);
 		this.setColour(Block_colour_condition);
