@@ -106,25 +106,35 @@ function generating_pref(ecaList){
 	}
 	return prferences;
 }
-
 function smartApp(){
 		var code
 		eca_num = 0;
-		var fileName = document.getElementById("name").value;
-		if(fileName){
+		var name = document.getElementById("name").value;
+		if(name){
 
 			var ecaList = Blockly.SmartThings.workspaceToCode(demoWorkspace);
 			
-			var name = fileName;
-			//var author = document.getElementById("author").value;
-
 			//definition
-			var definition ='definition( '+'\n'
-			+'name: \"'+name+'\",'+"\n"
-			//+'namespace: \"Blockly\",'+"\n"
-			//+'author: \"'+author+'\",'+"\n"
-			+'iconUrl: \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlqp6tX_F2iTdI8cOTCroeBQEfEnXphwWN3KnyOfDt1I8rr9-APiuotKc\",'+"\n"
-			+'iconX2Url: \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlqp6tX_F2iTdI8cOTCroeBQEfEnXphwWN3KnyOfDt1I8rr9-APiuotKc\"'+"\n"+')';
+
+			var definition ='definition( '+'\n'+'name: \"'+name+'\",'+"\n"
+			
+			var author = document.getElementById("author").value;
+			var namespace = document.getElementById("namespace").value
+			var description = document.getElementById("description").value
+			var iconUrl = document.getElementById("iconUrl").value
+
+			if(author)
+				definition +=  'author: "'+ author +'",'+"\n"
+			if(namespace)
+				definition += 'namespace: "'+ namespace +'",'+"\n"
+			if(description)
+				definition += 'description: "'+ description +'",'+"\n"
+			if(iconUrl)
+				definition +='iconUrl: \"'+iconUrl+'",'+"\n"
+				+'iconX2Url: \"'+iconUrl+'"'+"\n"+')';
+			else
+				definition +='iconUrl: \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlqp6tX_F2iTdI8cOTCroeBQEfEnXphwWN3KnyOfDt1I8rr9-APiuotKc\",'+"\n"
+				+'iconX2Url: \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlqp6tX_F2iTdI8cOTCroeBQEfEnXphwWN3KnyOfDt1I8rr9-APiuotKc\"'+"\n"+')';
 
 			//prferences
 			var prferences = generating_pref(ecaList)
@@ -303,8 +313,7 @@ function generating_subscribe(ecaList){
 }
 
 
-function changeColour(block){
-
+function change_block_color(block){
 
 	if(block.type != "eca" && block.type != "ea"){
 		if(colour)
@@ -333,7 +342,6 @@ function changeColour(block){
 				block.setColour(Block_colour_option_disconnted)
 			else if(block.colour_ == Block_colour_option_disconnted)
 				block.setColour(Block_colour_option)
-		console.log("changeColour")
 	}
 }
 
@@ -344,7 +352,7 @@ function change(event, block){
 			var length = block_array.length
 			for(var i =0; i < length; i++){
 				if(block.id == block_array[i]){
-					changeColour(block)
+					change_block_color(block)
 					break;
 				}
 			}
@@ -577,6 +585,7 @@ function add_logic_xml(xmlList){
 	}*/
 }
 
+
 function device_table(){
 
 	var alphabet = ["Things", "A","B","C","D", "E","FG","H","IJ","KL","M","NO","P","QR","S", "T", "UV","WXYZ"]
@@ -584,7 +593,22 @@ function device_table(){
 	"smokeDetector",  "switch"]
 	
 	var index = 0;
-	var deviceList = Array.from(deviceMap.keys()).sort();
+	if (!deviceMap.keys) {
+	  deviceMap.keys = function(obj) {
+		var keys = [];
+
+		for (var i in obj) {
+		  if (obj.hasOwnProperty(i)) {
+			keys.push(i);
+		  }
+		}
+
+		return keys;
+	  };
+	}
+
+	var deviceList = Array.from(deviceMap.keys());
+
 	var table = ""
 
 	for(var i =0; i < alphabet.length; i++){	
@@ -597,15 +621,15 @@ function device_table(){
 
 		if(alphabet_i == "Things")
 			for(var c = 0; c < comman_uesed.length; c++)
-				table += '<button onClick = change_color(this) id ="'+comman_uesed[c]+'">'+ comman_uesed[c]+'</button>'
+				table += '<button onClick = change_button_color(this) id ="'+comman_uesed[c]+'">'+ comman_uesed[c]+'</button>'
 		else{
 			for(var s = 0; s < alphabet_i.length; s++ ){
 				var word = alphabet_i.charAt(s).toLowerCase()
 					
- 						while(index < deviceList.length){
+ 				while(index < deviceList.length){
 					var device =  deviceList[index];
 					if(device.startsWith(word)){
-						table += '<button onClick = change_color(this) id ="'+device+'">'+ device+'</button>';
+						table += '<button onClick = change_button_color(this) id ="'+device+'">'+ device+'</button>';
 						index++;
 					}else
 						break;
@@ -691,7 +715,7 @@ function toolbox_pre(){
 
 }
 
-function change_color(x){
+function change_button_color(x){
 
 	if( x.style.background == 'rgb(255, 255, 255)' || x.style.background == '' ){
 		selected_dev.set(x.id, x.id)
@@ -702,6 +726,8 @@ function change_color(x){
 	}
 }
 
+
+var openWin;
 function app_info(x){
-	var myWindow = window.open("./app_info.html", 'myWindow', 'scrollbars=no,toolbar=no,resizable=no,width=450px,height=550px,left=400,top=100');
+	openWin = window.open("./app_info.html", 'myWindow', 'scrollbars=no,toolbar=no,resizable=no,width=500px,height=600px,left=400,top=100');
 }

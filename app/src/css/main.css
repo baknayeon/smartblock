@@ -162,6 +162,12 @@ body {
 #box{
 	float:left;
 }
+.blocklyMainBackground { 
+  fill: #fff !important; 
+} 
+.blocklyToolboxDiv {
+    background-color: #fff;
+}
 /*right bar */
 .tab {
 	position: relative; 

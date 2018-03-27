@@ -1,20 +1,25 @@
-
-var Block_colour_action = "#"+"61abcb"
-
-
 function action_block(devname){
 	Blockly.SmartThings['a_'+devname] = function(block) {
 		var variable_name = Blockly.SmartThings.variableDB_.getName(block.getFieldValue('name'), Blockly.Variables.NAME_TYPE);
 		var dropdown_commands = block.getFieldValue('Command');
-		var value = Blockly.SmartThings.valueToCode(block, devname, Blockly.SmartThings.ORDER_ATOMIC);
+		var actionList = Blockly.SmartThings.valueToCode(block, devname, Blockly.SmartThings.ORDER_ATOMIC);
 		// TODO: Assemble SmartThings into code variable.
 		
+
 		var smartAction = new Action();
 		smartAction.devname = variable_name;
 		smartAction.command= smartAction.devname+'.'+dropdown_commands+'()';
 		smartAction.device = devname;
 
-		return smartAction;
+		if(goog.isArray(actionList)){
+			var result = actionList.concat(smartAction);
+		}else{
+			var result = [smartAction];
+	
+		}
+		
+		
+		return result;
 	};
 	
 	Blockly.Blocks['a_'+devname] = {

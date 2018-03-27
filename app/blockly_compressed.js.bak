@@ -2590,10 +2590,10 @@ Blockly.Toolbox.TreeNode.prototype.getExpandIconSafeHtml=function(){return goog.
 var colour
 Blockly.Toolbox.TreeNode.prototype.onClick_=function(a){
 
-	colour=setfalse();
+	colour=false;
 	this.hasChildren()&&this.isUserCollapsible_?(this.toggle(),this.select()):this.isSelected()?this.getTree().setSelectedItem(null):this.select();this.updateRow()
 
-	colour=setTrue();
+	colour=true;
 };
 
 Blockly.Toolbox.TreeNode.prototype.onMouseDown=function(a){};Blockly.Toolbox.TreeNode.prototype.onDoubleClick_=function(a){};
@@ -2651,6 +2651,7 @@ Blockly.inject=function(a,b){
 Blockly.createDom_=function(a,b){a.setAttribute("dir","LTR");goog.ui.Component.setDefaultRightToLeft(b.RTL);Blockly.Css.inject(b.hasCss,b.pathToMedia);var c=Blockly.utils.createSvgElement("svg",{xmlns:"http://www.w3.org/2000/svg","xmlns:html":"http://www.w3.org/1999/xhtml","xmlns:xlink":"http://www.w3.org/1999/xlink",version:"1.1","class":"blocklySvg"},a),d=Blockly.utils.createSvgElement("defs",{},c),e=String(Math.random()).substring(2),f=Blockly.utils.createSvgElement("filter",{id:"blocklyEmbossFilter"+
 e},d);Blockly.utils.createSvgElement("feGaussianBlur",{"in":"SourceAlpha",stdDeviation:1,result:"blur"},f);var g=Blockly.utils.createSvgElement("feSpecularLighting",{"in":"blur",surfaceScale:1,specularConstant:.5,specularExponent:10,"lighting-color":"white",result:"specOut"},f);Blockly.utils.createSvgElement("fePointLight",{x:-5E3,y:-1E4,z:2E4},g);Blockly.utils.createSvgElement("feComposite",{"in":"specOut",in2:"SourceAlpha",operator:"in",result:"specOut"},f);Blockly.utils.createSvgElement("feComposite",
 {"in":"SourceGraphic",in2:"specOut",operator:"arithmetic",k1:0,k2:1,k3:1,k4:0},f);b.embossFilterId=f.id;f=Blockly.utils.createSvgElement("pattern",{id:"blocklyDisabledPattern"+e,patternUnits:"userSpaceOnUse",width:10,height:10},d);Blockly.utils.createSvgElement("rect",{width:10,height:10,fill:"#aaa"},f);Blockly.utils.createSvgElement("path",{d:"M 0 0 L 10 10 M 10 0 L 0 10",stroke:"#cc0"},f);b.disabledPatternId=f.id;b.gridPattern=Blockly.Grid.createDom(e,b.gridOptions,d);return c};
+
 Blockly.createMainWorkspace_=function(a,b,c,d){
 	b.parentWorkspace=null;
 	var e=new Blockly.WorkspaceSvg(b,c,d);
@@ -2658,9 +2659,27 @@ Blockly.createMainWorkspace_=function(a,b,c,d){
 	a.appendChild(e.createDom("blocklyMainBackground"));
 	!b.hasCategories&&b.languageTree&&(c=e.addFlyout_("svg"),Blockly.utils.insertAfter_(c,a));
 	e.translate(0,0);
-	Blockly.mainWorkspace=e;b.readOnly||b.hasScrollbars||e.addChangeListener(function(){if(!e.isDragging()){var a=e.getMetrics(),c=a.viewLeft+a.absoluteLeft,d=a.viewTop+a.absoluteTop;if(a.contentTop<d||a.contentTop+
-a.contentHeight>a.viewHeight+d||a.contentLeft<(b.RTL?a.viewLeft:c)||a.contentLeft+a.contentWidth>(b.RTL?a.viewWidth:a.viewWidth+c))for(var k=e.getTopBlocks(!1),n=0,p;p=k[n];n++){var l=p.getRelativeToSurfaceXY(),m=p.getHeightWidth(),q=d+25-m.height-l.y;0<q&&p.moveBy(0,q);q=d+a.viewHeight-25-l.y;0>q&&p.moveBy(0,q);q=25+c-l.x-(b.RTL?0:m.width);0<q&&p.moveBy(q,0);l=c+a.viewWidth-25-l.x+(b.RTL?m.width:0);0>l&&p.moveBy(l,0)}}});Blockly.svgResize(e);Blockly.WidgetDiv.createDom();Blockly.Tooltip.createDom();
-return e};
+	Blockly.mainWorkspace=e;b.readOnly||b.hasScrollbars||e.addChangeListener(function(){
+		if(!e.isDragging()){
+			var a=e.getMetrics(),c=a.viewLeft+a.absoluteLeft,d=a.viewTop+a.absoluteTop;
+			if(a.contentTop<d||a.contentTop+a.contentHeight>a.viewHeight+d||a.contentLeft<(b.RTL?a.viewLeft:c)||a.contentLeft+a.contentWidth>(b.RTL?a.viewWidth:a.viewWidth+c))
+				for(var k=e.getTopBlocks(!1),n=0,p;p=k[n];n++){
+					var l=p.getRelativeToSurfaceXY(),m=p.getHeightWidth(),q=d+25-m.height-l.y;
+					0<q&&p.moveBy(0,q);
+					q=d+a.viewHeight-25-l.y;
+					0>q&&p.moveBy(0,q);
+					q=25+c-l.x-(b.RTL?0:m.width);
+					0<q&&p.moveBy(q,0);
+					l=c+a.viewWidth-25-l.x+(b.RTL?m.width:0);0>l&&p.moveBy(l,0)
+				}
+			}
+		});
+	Blockly.svgResize(e);
+	Blockly.WidgetDiv.createDom();
+	Blockly.Tooltip.createDom();
+	return e
+};
+
 Blockly.init_=function(a){var b=a.options,c=a.getParentSvg();Blockly.bindEventWithChecks_(c.parentNode,"contextmenu",null,function(a){Blockly.utils.isTargetInput(a)||a.preventDefault()});c=Blockly.bindEventWithChecks_(window,"resize",null,function(){Blockly.hideChaff(!0);Blockly.svgResize(a)});a.setResizeHandlerWrapper(c);Blockly.inject.bindDocumentEvents_();b.languageTree&&(a.toolbox_?a.toolbox_.init(a):a.flyout_&&(a.flyout_.init(a),a.flyout_.show(b.languageTree.childNodes),a.flyout_.scrollToStart(),a.scrollX=
 a.flyout_.width_,b.toolboxPosition==Blockly.TOOLBOX_AT_RIGHT&&(a.scrollX*=-1),a.translate(a.scrollX,0)));b.hasScrollbars&&(a.scrollbar=new Blockly.ScrollbarPair(a),a.scrollbar.resize());b.hasSounds&&Blockly.inject.loadSounds_(b.pathToMedia,a)};
 Blockly.inject.bindDocumentEvents_=function(){Blockly.documentEventsBound_||(Blockly.bindEventWithChecks_(document,"keydown",null,Blockly.onKeyDown_),Blockly.bindEvent_(document,"touchend",null,Blockly.longStop_),Blockly.bindEvent_(document,"touchcancel",null,Blockly.longStop_),goog.userAgent.IPAD&&Blockly.bindEventWithChecks_(window,"orientationchange",document,function(){Blockly.svgResize(Blockly.getMainWorkspace())}));Blockly.documentEventsBound_=!0};

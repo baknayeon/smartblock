@@ -49,21 +49,6 @@ Blockly.SmartThings.scrub_=function(a,b){
 		e=Blockly.SmartThings.blockToCode(e);
 		return c+b+e
 };
-
-Blockly.SmartThings.scrub_a=function(a,b){
-	if(!a.outputConnection||!a.outputConnection.targetConnection)
-		{
-		var d=a.getCommentText();
-		(d=Blockly.utils.wrap(d,Blockly.SmartThings.COMMENT_WRAP-3))&&(c=a.getProcedureDef?c+("/**\n"+Blockly.SmartThings.prefixLines(d+"\n"," * ")+" */\n"):c+Blockly.SmartThings.prefixLines(d+"\n","// "));
-		for(var e=0;e<a.inputList.length;e++)
-			a.inputList[e].type==Blockly.INPUT_VALUE&&(d=a.inputList[e].connection.targetBlock())&&(d=Blockly.SmartThings.allNestedComments(d))&&(c+=Blockly.SmartThings.prefixLines(d,"// "))
-		}
-		e=a.nextConnection&&a.nextConnection.targetBlock();
-		e=Blockly.SmartThings.blockToCode(e);
-		scru_a.push(b);
-		return scru_a;
-};
-
 Blockly.SmartThings.scrub_rule=function(a,b){
 	if(!a.outputConnection||!a.outputConnection.targetConnection)
 		{

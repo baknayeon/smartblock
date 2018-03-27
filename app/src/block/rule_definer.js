@@ -1,4 +1,3 @@
-
 Blockly.Blocks['eca'] = {
   init: function() {
     this.appendValueInput("Event")
@@ -15,8 +14,6 @@ Blockly.Blocks['eca'] = {
     this.setColour(Block_colour_eca);
  this.setTooltip("");
  this.setHelpUrl("");
-  },onchange: function(event) {
-    event
   }
 };
 

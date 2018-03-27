@@ -47,6 +47,7 @@ function mapInit(){
 			new Command_method("setThermostatFanMode", ["ENUM"], [["auto", "circulate", "on"]]),
 			new Command_method("setThermostatMode", ["ENUM"], [["auto", "cool",  "emergency heat", "heat", "off"]])
 			]);
+		
 
     }catch(e){alert(e);}
 } 

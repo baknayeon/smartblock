@@ -1,25 +1,24 @@
 Blockly.SmartThings['eca'] = function(block) {
-	var statements_event = Blockly.SmartThings.statementToCode(block, 'Event');
+	var value_event = Blockly.SmartThings.valueToCode(block, 'Event', Blockly.SmartThings.ORDER_ATOMIC);
 	var value_condition = Blockly.SmartThings.valueToCode(block, 'Condition', Blockly.SmartThings.ORDER_ATOMIC);
-	var statements_action = Blockly.SmartThings.statementToCode(block, 'Action');
+	var value_action = Blockly.SmartThings.valueToCode(block, 'Action', Blockly.SmartThings.ORDER_ATOMIC);
   // TODO: Assemble SmartThings into code variable.
 		
-	var rule = new ECA(statements_event, value_condition, statements_action);
+	var rule = new ECA(value_event, value_condition, value_action);
 	
 	return rule;
 };
 
 Blockly.SmartThings['ea'] = function(block) {
-  var statements_event = Blockly.SmartThings.statementToCode(block, 'Event');
-  var statements_action = Blockly.SmartThings.statementToCode(block, 'Action');
+	var value_event = Blockly.SmartThings.valueToCode(block, 'Event', Blockly.SmartThings.ORDER_ATOMIC);
+	var value_action = Blockly.SmartThings.valueToCode(block, 'Action', Blockly.SmartThings.ORDER_ATOMIC);
 
   // TODO: Assemble SmartThings into code variable.
-	console.log("ea^^");
 
-	var c = new Condition()
-	c.result = 'true'
+	var condition = new Condition()
+	condition.result = 'true'
 
-	var rule = new ECA(statements_event, c,statements_action);
+	var rule = new ECA(value_event, condition, value_action);
 	
 	return rule;
 };
