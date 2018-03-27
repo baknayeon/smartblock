@@ -80,9 +80,9 @@
 </xml>
 
 <body onload="all()">
-	<center>
+	<div id = "top">
 		<img src="./css/snowblock_logo.png" id ="logo">
-	</center>
+	</div>
 	<div id="app">
 		<div id="app_name">      
 			<input type="text" id="name" required>

@@ -2730,7 +2730,7 @@ Blockly.Css.CONTENT = [
   '}',
 
   '.blocklyTooltipDiv {',
-    'background-color: #ffffc7;',
+    'background-color: #f000;',
     'border: 1px solid #ddc;',
     'box-shadow: 4px 4px 20px 1px rgba(0,0,0,.15);',
     'color: #000;',
@@ -2969,17 +2969,17 @@ Blockly.Css.CONTENT = [
 
   '.blocklyMainBackground {',
     'stroke-width: 1;',
-    'stroke: #c6c6c6;',  /* Equates to #ddd due to border being off-pixel. */
+    'stroke: #f00;',  /* Equates to #ddd due to border being off-pixel. */
   '}',
 
   '.blocklyMutatorBackground {',
     'fill: #fff;',
-    'stroke: #ddd;',
+    'stroke: #000;',
     'stroke-width: 1;',
   '}',
 
   '.blocklyFlyoutBackground {',
-    'fill: #ddd;',
+    'fill: #000;',//ny
     'fill-opacity: .8;',
   '}',
 
