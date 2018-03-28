@@ -9,49 +9,35 @@
 </head>
 <body>
 
+	<h1>
+		Appilcation Configuration
+	</h1>
 
-	<div class="container-contact100">
+	<div id = "main">
+		<div class = "set">
+			<input type="text" id="author" required>
+			<label>author</label>
+		</div>
 
-		<div>
-			<form name="frm1" id="frm1">
-				<span class="contact100-form-title">
-					Appilcation Configuration
-				</span>
-
-				<div class="wrap-input100 validate-input" >
-					<span class="focus-input100"></span>
-					<input class="input100" type="text" id="author" placeholder="author">
-					<span class="focus-input100"></span>
-				</div>
-
-				<div class="wrap-input100 validate-input" >
-					<span class="focus-input100"></span>
-					<input class="input100" type="text" id="namespace" placeholder="namespace">
-					<span class="focus-input100"></span>
-				</div>
-				<div class="wrap-input100 validate-input" >
-					<textarea class="input100" id="description" placeholder="description"></textarea>
-					<span class="focus-input100"></span>
-				</div>
-				
-				<div class="wrap-input100 validate-input" >
-					<span class="focus-input100"></span>
-					<input class="input100" type="url" id="iconUrl" placeholder="iconUrl">
-					<span class="focus-input100"></span>
-				</div>
-
-
-				<div class="container-contact100-form-btn">
-					<button class="contact100-form-btn" onClick = "save_info()">
-						<span>
-							<i class="fa fa-paper-plane-o m-r-6" aria-hidden="true"></i>
-							Save
-						</span>
-					</button>
-				</div>
-			</form>
+		<div class = "set">
+			<input type="text" id="namespace" required>
+			<label>namespace</label>
+		</div>
+		<div class = "set">
+			<textarea id="description" required></textarea>
+			<label>description</label>
+		</div>
+		
+		<div class = "set">
+			<input type="url" id="iconUrl" required>
+			<label>iconUrl</label>
 		</div>
 	</div>
+	<button class="btn" onClick = "save_info()">
+		<span>
+			Save
+		</span>
+	</button>
 
 
 <!-- Global site tag (gtag.js) - Google Analytics -->

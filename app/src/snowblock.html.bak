@@ -70,7 +70,7 @@
 </head>
   
 <xml id="toolbox" style="display: none" >
-	<category name="Rule"  colour="240">
+	<category name="Rule">
 		<block type="eca"></block>
 		<block type="ea"></block>
 	</category>
@@ -80,17 +80,17 @@
 </xml>
 
 <body onload="all()">
-	<div id = "top">
-		<img src="./css/snowblock_logo.png" id ="logo">
-	</div>
-	<div id="app">
+	<center>
+		<img src="./css/snowblock_logo_s.png" id ="logo">
+	</center>
+	<div id="top">
+		<div id="app">  
 		<div id="app_name">      
 			<input type="text" id="name" required>
 			<label id="label">App Name</label>
-		</div>
-		<div >      
-			<button onclick="app_info(this)" id = "app_info" title="Write specific info of SmartApp"></button>
-		</div>
+		</div>  
+		<button onclick="app_info(this)" id = "app_info" title="Write specific info of SmartApp"></button>
+		</div>  
 	</div>
 	<div>
 		<div id="device_tab" >
@@ -107,7 +107,7 @@
 				<div id="blocklyDiv2" style="height: 701px; width: 1000px;"></div>
 			</div>
 
-			<div id="in_box3" style="height: 701px; width: 1000px; background: #f0f0f0;">
+			<div id="in_box3" style="height: 701px; width: 1000px; background: #f4f4f4;">
 				<pre style="margin:0px;">
 					<code style="padding: 0px 8px 8px 8px;" class="groovy" id="smartApp_code"></code>
 				</pre>
@@ -116,7 +116,7 @@
 		<div class="tab">
 		  <button id="click1" onClick="click1()" >Rule</button>
 		  <button id="click2" onClick="click2()">Pref</button>
-		  <button id="click3" onClick="click3()"">Code</button>
+		  <button id="click3" onClick="click3()">Code</button>
 		</div>
 	</div>
 	<div id="bottom">
@@ -161,9 +161,9 @@
 		_("in_box2").style.display = "none"
 		_("in_box3").style.display = "block"
 	
-		_("click1").style.background = "#eee"
-		_("click2").style.background = "#eee"
-		_("click3").style.background = "#fff"
+		_("click1").style.background = "#fff"
+		_("click2").style.background = "#fff"
+		_("click3").style.background = "#eee"
 
 		var code = smartApp('SamrtApp');
 		_("smartApp_code").textContent = code;
@@ -191,9 +191,9 @@
 		_("in_box2").style.display = "block"
 		_("in_box3").style.display = "none"
 		
-		_("click1").style.background = "#eee"
-		_("click2").style.background = "#fff"
-		_("click3").style.background = "#eee"
+		_("click1").style.background = "#fff"
+		_("click2").style.background = "#f2fbfc"
+		_("click3").style.background = "#fff"
 		
 		var toolbox = toolbox_pre();
 
@@ -210,9 +210,9 @@
 		_("in_box2").style.display = "none"
 		_("in_box3").style.display = "none"
 		
-		_("click1").style.background = "#fff"
-		_("click2").style.background = "#eee"
-		_("click3").style.background = "#eee"
+		_("click1").style.background = "#f2fbfc"
+		_("click2").style.background = "#fff"
+		_("click3").style.background = "#fff"
 	}
 
 	function all(){
@@ -223,9 +223,9 @@
 		//_("author").style.display = "none"
 		//_("namespace").style.display = "none"
 
-		_("click1").style.background = "#fff"
-		_("click2").style.background = "#eee"
-		_("click3").style.background = "#eee"
+		_("click1").style.background = "#f2fbfc"
+		_("click2").style.background = "#fff"
+		_("click3").style.background = "#fff"
 	}
 
 

@@ -1,256 +1,83 @@
-
-/*//////////////////////////////////////////////////////////////////
-[ RESTYLE TAG ]*/
-
-* {
-	margin: 0px; 
-	padding: 0px; 
-	box-sizing: border-box;
+h1{
+	text-align:center;
+	font-size:23px;
+	color: #83d8e5;  
+	margin:30px 0 15px 0;
 }
-
-body, html {
-	height: 100%;
-	font-family: Ubuntu-Bold, sans-serif;
+#main{
+	margin:10px 0px 0px 50px;
+	font-size:16px;
 }
-
-/*---------------------------------------------*/
-a {
-	font-family: Ubuntu-Bold;
-	font-size: 14px;
-	line-height: 1.7;
-	color: #666666;
-	margin: 0px;
-	transition: all 0.4s;
-	-webkit-transition: all 0.4s;
-  -o-transition: all 0.4s;
-  -moz-transition: all 0.4s;
+.set { 
+  position:relative; 
+  margin: 30px 0px 10px 0px;
 }
-
-a:focus {
-	outline: none !important;
-}
-
-a:hover {
-	text-decoration: none;
-}
-
-/*---------------------------------------------*/
-h1,h2,h3,h4,h5,h6 {
-	margin: 0px;
-}
-
-p {
-	font-family: Ubuntu-Bold;
-	font-size: 14px;
-	line-height: 1.7;
-	color: #666666;
-	margin: 0px;
-}
-
-ul, li {
-	margin: 0px;
-	list-style-type: none;
-}
-
-
-/*---------------------------------------------*/
-input {
-	outline: none;
-	border: none;
-}
-
-input[type="number"] {
-    -moz-appearance: textfield;
-    appearance: none;
-    -webkit-appearance: none;
-}
-
-input[type="number"]::-webkit-outer-spin-button,
-input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-}
-
 textarea {
-  outline: none;
-  border: none;
+  font-family: NotoSansCJKkr-Thin;
+  color: #aaaaaa;
+  padding:5px 5px 3px 5px;
+  display:block;
+  width:300px;
+  border:none;
+  border-bottom: 2px solid #d6d6d6;
+}
+textarea:focus 		
+{ outline:none; }
+
+textarea:focus ~ label, textarea:valid ~ label{
+  color:#606060;
+  font-size:19px;
+  font-weight:normal;
+  top:-20px;
+}
+input {
+  font-family: NotoSansCJKkr-Thin;
+  color: #aaaaaa;
+  padding:5px 5px 3px 5px;
+  display:block;
+  width:300px;
+  border:none;
+  border-bottom: 2px solid #d6d6d6;
+}
+input:focus 		
+{ outline:none; }
+
+input:focus ~ label, input:valid ~ label{
+  color:#606060;
+  font-size:19px;
+  font-weight:normal;
+  top:-20px;
+}
+label {
+  font-family: NotoSansCJKkr-Thin;
+  color:#b7b7b7; 
+  font-weight:normal;
+  position:absolute;
+  pointer-events:none;
+  left:px;
+  top:5px;
+  transition:0.2s ease all; 
+  -moz-transition:0.2s ease all; 
+  -webkit-transition:0.2s ease all;
 }
 
-textarea:focus, input:focus {
-  border-color: transparent !important;
-}
-
-input::-webkit-input-placeholder { color: #bdbdd3;}
-input:-moz-placeholder { color: #bdbdd3;}
-input::-moz-placeholder { color: #bdbdd3;}
-input:-ms-input-placeholder { color: #bdbdd3;}
-
-textarea::-webkit-input-placeholder { color: #bdbdd3;}
-textarea:-moz-placeholder { color: #bdbdd3;}
-textarea::-moz-placeholder { color: #bdbdd3;}
-textarea:-ms-input-placeholder { color: #bdbdd3;}
-
-/*---------------------------------------------*/
-button {
-	outline: none !important;
-	border: none;
-	background: transparent;
-}
-
-button:hover {
-	cursor: pointer;
-}
-
-iframe {
-	border: none !important;
-}
-
-
-/*---------------------------------------------*/
-.container {
-	max-width: 1200px;
-}
-
-
-
-
-/*//////////////////////////////////////////////////////////////////
-[ Contact ]*/
-
-.container-contact100 {
-  width: 100%;  
-  min-height: 100vh;
+.btn {
+	margin: 0 auto;
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-box;
   display: -ms-flexbox;
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  padding: 15px;
-  position: relative;
-  background-color: #f2f2f2;
-}
 
-.wrap-contact100 {
-  width: 500px;
-  background: transparent;
-  padding: 50px 0px 160px 0px;
-}
-
-
-/*==================================================================
-[ Form ]*/
-
-.contact100-form {
-  width: 100%;
-}
-
-.contact100-form-title {
-  display: block;
-  font-size: 20px;
-  color: #403866;
-  line-height: 1.2;
-  text-align: center;
-  padding-bottom: 30px;
-}
-
-/*------------------------------------------------------------------
-[ Input ]*/
-
-.wrap-input100 {
-  width: 100%;
-  background-color: #fff;
-  border-radius: 31px;
-  margin-bottom: 16px;
-  position: relative;
-  z-index: 1;
-}
-
-.input100 {
-  position: relative;
-  display: block;
-  width: 100%;
-  background: #fff;
-  border-radius: 31px;
-  font-family: Ubuntu-Bold;
-  font-size: 15px;
-  color: #8f8fa1;
-  line-height: 1.2;
-}
-
-
-/*---------------------------------------------*/
-input.input100 {
-  height: 52px;
-  padding: 0 30px 0 30px;
-}
-
-
-textarea.input100 {
-  min-height: 169px;
-  padding: 19px 30px 0 30px;
-}
-
-/*------------------------------------------------------------------
-[ Focus Input ]*/
-
-.focus-input100 {
-  display: block;
-  position: absolute;
-  z-index: -1;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 50%;
-  -webkit-transform: translateX(-50%);
-  -moz-transform: translateX(-50%);
-  -ms-transform: translateX(-50%);
-  -o-transform: translateX(-50%);
-  transform: translateX(-50%);
-  border-radius: 31px;
-  background-color: #fff;
-  pointer-events: none;
-  
-  -webkit-transition: all 0.4s;
-  -o-transition: all 0.4s;
-  -moz-transition: all 0.4s;
-  transition: all 0.4s;
-}
-
-.input100:focus + .focus-input100 {
-  width: calc(100% + 20px);
-}
-
-/*------------------------------------------------------------------
-[ Button ]*/
-.container-contact100-form-btn {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -moz-box;
-  display: -ms-flexbox;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  padding-top: 10px;
-}
-
-.contact100-form-btn {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -moz-box;
-  display: -ms-flexbox;
-  display: flex;
   justify-content: center;
   align-items: center;
   padding: 0 20px;
-  min-width: 150px;
-  height: 42px;
+  min-width: 100px;
+  height: 35px;
   background-color: transparent;
-  border-radius: 31px;
+  border:none;
+  border-radius: 10px;
 
-  font-family: Ubuntu-Bold;
-  font-size: 16px;
   color: #fff;
   line-height: 1.2;
   text-transform: uppercase;
@@ -263,22 +90,26 @@ textarea.input100 {
   z-index: 1;
 }
 
-.contact100-form-btn::before {
+.btn::before {
   content: "";
   display: block;
   position: absolute;
   z-index: -1;
+
   width: 100%;
   height: 100%;
   top: 0;
   left: 50%;
+
   -webkit-transform: translateX(-50%);
   -moz-transform: translateX(-50%);
   -ms-transform: translateX(-50%);
   -o-transform: translateX(-50%);
   transform: translateX(-50%);
-  border-radius: 31px;
-  background-color: #000;
+  border:none;
+
+  border-radius: 10px;
+  background-color: #d6d6d6;
   pointer-events: none;
   
   -webkit-transition: all 0.4s;
@@ -287,9 +118,7 @@ textarea.input100 {
   transition: all 0.4s;
 }
 
-.contact100-form-btn:hover:before {
-  background-color: #000;
+.btn:hover:before {
+  background-color: #d6d6d6;
   width: calc(100% + 20px);
 }
-
-

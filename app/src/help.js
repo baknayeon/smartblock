@@ -124,7 +124,7 @@ function smartApp(){
 			var iconUrl = document.getElementById("iconUrl").value
 
 			if(author)
-				definition +=  'author: "'+ author +'",'+"\n"
+				definition +=  'author: "'+ author +'"'+"\n"
 			if(namespace)
 				definition += 'namespace: "'+ namespace +'",'+"\n"
 			if(description)
@@ -133,9 +133,9 @@ function smartApp(){
 				definition +='iconUrl: \"'+iconUrl+'",'+"\n"
 				+'iconX2Url: \"'+iconUrl+'"'+"\n"+')';
 			else
-				definition +='iconUrl: \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlqp6tX_F2iTdI8cOTCroeBQEfEnXphwWN3KnyOfDt1I8rr9-APiuotKc\",'+"\n"
-				+'iconX2Url: \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlqp6tX_F2iTdI8cOTCroeBQEfEnXphwWN3KnyOfDt1I8rr9-APiuotKc\"'+"\n"+')';
-
+				//definition +='iconUrl: \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlqp6tX_F2iTdI8cOTCroeBQEfEnXphwWN3KnyOfDt1I8rr9-APiuotKc\",'+"\n"
+				//+'iconX2Url: \"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlqp6tX_F2iTdI8cOTCroeBQEfEnXphwWN3KnyOfDt1I8rr9-APiuotKc\"'+"\n"
+			definition +=')';
 			//prferences
 			var prferences = generating_pref(ecaList)
 
@@ -719,8 +719,8 @@ function change_button_color(x){
 
 	if( x.style.background == 'rgb(255, 255, 255)' || x.style.background == '' ){
 		selected_dev.set(x.id, x.id)
-		x.style.background = 'rgb(227, 233, 242)';
-	}else if(x.style.background == 'rgb(227, 233, 242)'){
+		x.style.background = 'rgb(205, 239, 244)';
+	}else if(x.style.background == 'rgb(205, 239, 244)'){
 		selected_dev.delete(x.id)
 		x.style.background = 'rgb(255, 255, 255)';
 	}
@@ -729,5 +729,5 @@ function change_button_color(x){
 
 var openWin;
 function app_info(x){
-	openWin = window.open("./app_info.html", 'myWindow', 'scrollbars=no,toolbar=no,resizable=no,width=500px,height=600px,left=400,top=100');
+	openWin = window.open("./app_info.html", 'myWindow', 'scrollbars=no,toolbar=no,resizable=no,width=400px,height=400px,left=400,top=100');
 }

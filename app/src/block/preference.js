@@ -12,29 +12,20 @@ function pre_block(devname, colour){
 			var input_c_list = ecaList_g[i].input_c_make;
 			
 			if(text_name === input_e.name){
-				if(value_name)
-					input += "\n\t\t\t"+input_e.input+", "+value_name;
-				else
-					input += "\n\t\t\t"+input_e.input;
+				input = hi(input, input_e.input, value_name)
 				break
 			}
 
 			for(a in input_a_list){
 				if(text_name === input_a_list[a].name){
-					if(value_name)
-						input += "\n\t\t\t"+input_a_list[a].input+", "+value_name;
-					else
-						input += "\n\t\t\t"+input_a_list[a].input;
+					input = hi(input, input_a_list[a].input, value_name)
 				}
 
 			 }
 
 			for(c in input_c_list){
 				if(text_name === input_c_list[c].name){
-					if(value_name)
-						input += "\n\t\t\t"+input_c_list[c].input+", "+value_name;
-					else
-						input += "\n\t\t\t"+input_c_list[c].input;
+					input = hi(input, input_c_list[c].input, value_name)
 				}
 
 			 }
@@ -57,6 +48,14 @@ function pre_block(devname, colour){
 	 this.setHelpUrl("");
 	  }
 	};
+}
+function hi(string_input, input, value_name){
+	if(string_input.indexOf(input) == -1)
+		if(value_name)
+			string_input += "\n\t\t\t"+input+", "+value_name;
+		else
+			string_input += "\n\t\t\t"+input;
+	return string_input
 }
 
 Blockly.Blocks['page'] = {
