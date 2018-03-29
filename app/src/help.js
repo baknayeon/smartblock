@@ -589,8 +589,7 @@ function add_logic_xml(xmlList){
 function device_table(){
 
 	var alphabet = ["Things", "A","B","C","D", "E","FG","H","IJ","KL","M","NO","P","QR","S", "T", "UV","WXYZ"]
-	var comman_uesed = ["alarm", "button", "light", "lock", "motion", "outlet", "presenceSensor",
-	"smokeDetector",  "switch"]
+	var comman_uesed = ["alarm", "button", "light", "lock", "motion", "outlet", "presenceSensor", "switch"]
 	
 	var index = 0;
 	if (!deviceMap.keys) {
@@ -729,5 +728,5 @@ function change_button_color(x){
 
 var openWin;
 function app_info(x){
-	openWin = window.open("./app_info.html", 'myWindow', 'scrollbars=no,toolbar=no,resizable=no,width=400px,height=400px,left=400,top=100');
+	openWin = window.open("./app_info.html", 'myWindow', 'scrollbars=no,toolbar=no,resizable=no,width=430px,height=450px,left=400,top=100');
 }

@@ -1,5 +1,5 @@
 body {
-	width: 1410px;
+	width: 1420px;
 	font-family: NotoSansCJKkr-Thin;
 	margin: 0 auto ;
 }
@@ -14,7 +14,7 @@ body {
 		margin-bottom: 20px;
 	}
 	#app{
-		margin: 0px 0px 0px 33%;
+		margin: 0px 0px 0px 34%;
 		display:flex; 
 	    width:535px;
 	}
@@ -68,17 +68,17 @@ body {
   float:left; 
   width: 335px;
   height:700px;
-  margin-right: 2px;
+  margin-right: 5px;
 }
 .share-btn {
-    font-family: NotoSansCJKkr-Thin;
+  font-family: NotoSansCJKkr-Thin;
   float:left; 
   width: 105px;
   height: 104px;
   margin: 2px 3px 12px 3px; 
   text-align: center;
   cursor: pointer;
-  box-shadow: 0 5px 10px #eee;
+  box-shadow: 0 5px 10px #ddd;
   overflow: hidden;
 }
 .share-btn:hover{
@@ -125,7 +125,7 @@ body {
 	margin: 0px 5px 5px 5px; 
 	text-align: center;
 	cursor: pointer;
-	box-shadow: 0 5px 10px rgb(0, 0, 40, 0.03);
+	box-shadow: 0 5px 10px #eee;
 	overflow: hidden;
 	font-size: 80%;
 	transform: scale(0.7) translateX(10px) translateY(-10px);
@@ -148,8 +148,9 @@ body {
 .share-btn.clicked{
 	position: fixed;
 	left: 0x;
-	top: 145px;
+	top: 140px;
 	background: #fff;
+	box-shadow: 0 5px 10px #cccccc;
 }
 .share-btn.clicked .cta {
   left: 40px;
@@ -204,7 +205,7 @@ body {
  }
  
 /*right bar */
-.tab {
+#tab {
 	position: relative; 
 	float: left;
 	margin-left: -1px;
@@ -212,22 +213,25 @@ body {
 	border-top: 1px solid #eee;
 	border-right: 1px solid #eee;
 	border-bottom: 1px solid #eee;
+	height: 699px;
+	width: 80px;
 }
-
-.tab button {
+#tab button {
 	color: #7a7a7a;
     background-color: #f2fbfc;
     font-family: NotoSansCJKkr-Thin;
-	padding: 22px 16px;
-	width: 100%;
+	cursor: pointer;
+	font-size: 17px;
 	height: 233px;
-	display: block;
+	width: 80px;
 	border: none;
 	outline: none;
-	text-align: left;
-	cursor: pointer;
 	transition: 0.3s;
-	font-size: 17px;
+
+}
+.tab_but{
+	transform: rotate(90deg); 
+
 }
 
 /*mark in bottom */

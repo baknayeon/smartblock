@@ -5,19 +5,19 @@ h1{
 	margin:30px 0 15px 0;
 }
 #main{
-	margin:10px 0px 0px 50px;
+	margin:30px 0px 20px 90px;
 	font-size:16px;
 }
 .set { 
   position:relative; 
-  margin: 30px 0px 10px 0px;
+  margin: 35px 0px 10px 0px;
 }
 textarea {
   font-family: NotoSansCJKkr-Thin;
   color: #aaaaaa;
   padding:5px 5px 3px 5px;
   display:block;
-  width:300px;
+  width:230px;
   border:none;
   border-bottom: 2px solid #d6d6d6;
 }
@@ -35,7 +35,7 @@ input {
   color: #aaaaaa;
   padding:5px 5px 3px 5px;
   display:block;
-  width:300px;
+  width:230px;
   border:none;
   border-bottom: 2px solid #d6d6d6;
 }
