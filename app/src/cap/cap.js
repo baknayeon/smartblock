@@ -10,9 +10,10 @@ function mapInit(){
         attrMap.putENUM("light", new Attribute("switch", ["off", "on"])); 
         attrMap.putENUM("lock", new Attribute("lock", ["locked", "unknown", "unlocked", "unlocked with timeout"])); 
         attrMap.putENUM("motion", new Attribute("motion", ["active", "inactive"])); 
+
         attrMap.putENUM("outlet", new Attribute("switch", ["off", "on"])); 
         attrMap.putENUM("ovenMode", new Attribute("ovenMode", ["heating", "grill", "warming", "defrosting"])); 
-        attrMap.putENUM("presenceSensor", new Attribute("presenceSensor", ["present", "not present"]));
+        attrMap.putENUM("presenceSensor", new Attribute("presence", ["present", "not present"]));
         attrMap.putENUM("smokeDetector", new Attribute("smoke",  ["clear", "detected", "tested"])); 
 		attrMap.putNUMBER("switchLevel", new Attribute("level"), null);
         attrMap.putENUM("switch", new Attribute("switch",["off", "on"])); 
@@ -32,7 +33,9 @@ function mapInit(){
         commMap.put("alarm", ["both", "off", "siren", "strobe"], null); ;  
         commMap.put("doorControl", ["close"], null); 
         commMap.put("light", ["off", "on"], null);  
-        commMap.put("lock", ["lock", "unlock"], null);  
+        commMap.put("lock", ["lock", "unlock"], null);   
+		commMap.put("musicPlayer", ["mute", "nextTrack", "pause", "play", "stop", "unmute"], null);  
+
         commMap.put("outlet", ["off", "on"], null);  
         commMap.put("switch", ["off", "on"], null);  
         commMap.put("thermostat", ["auto", "cool", "emergencyHeat", "fanAuto", "fanOn", "heat", "off"], null);   

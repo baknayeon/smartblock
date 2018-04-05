@@ -5,11 +5,19 @@ function action_block(devname){
 		var actionList = Blockly.SmartThings.valueToCode(block, devname, Blockly.SmartThings.ORDER_ATOMIC);
 		// TODO: Assemble SmartThings into code variable.
 		
+			
+			var smartAction = new Action();
+		if(commMap.isSingleCommad(devname)){
+			smartAction.devname = variable_name;
+			smartAction.command= smartAction.devname+'.'+dropdown_commands+'()';
+			smartAction.device = devname;	
+		}else if(commMap.isSingleMethod(devname)){
+			var command = commMap.getMethod(devname)
 
-		var smartAction = new Action();
-		smartAction.devname = variable_name;
-		smartAction.command= smartAction.devname+'.'+dropdown_commands+'()';
-		smartAction.device = devname;
+			smartAction.devname = variable_name;
+			smartAction.command= smartAction.devname+'.'+command.id+'('+dropdown_commands+')';
+			smartAction.device = devname;	
+		}
 
 		if(goog.isArray(actionList)){
 			var result = actionList.concat(smartAction);
@@ -188,7 +196,7 @@ Blockly.Blocks['sendnotification'] = {
 Blockly.SmartThings['sendpush'] = function(block) {
 	var text_text = block.getFieldValue('text');
 	var value_message = Blockly.SmartThings.valueToCode(block, 'message', Blockly.SmartThings.ORDER_ATOMIC);
-	var nextAction = Blockly.SmartThings.valueToCode(block, 'action', Blockly.SmartThings.ORDER_ATOMIC);
+	var actionList = Blockly.SmartThings.valueToCode(block, 'action', Blockly.SmartThings.ORDER_ATOMIC);
   // TODO: Assemble SmartThings into code variable.
   console.log("sendPush");
 
@@ -200,7 +208,14 @@ Blockly.SmartThings['sendpush'] = function(block) {
 	  smartAction.method = 'sendPush('+value_message.capname+')';
 	  smartAction.args.push(value_message)
   }
-  return smartAction;
+  
+	if(goog.isArray(actionList)){
+		var result = actionList.concat(smartAction);
+	}else{
+		var result = [smartAction];
+
+	}
+  return result;
 };
 
 Blockly.SmartThings['sendsms'] = function(block) {
@@ -221,11 +236,17 @@ Blockly.SmartThings['sendsms'] = function(block) {
 Blockly.SmartThings['sendnotification'] = function(block) {
 	var text_text = block.getFieldValue('text');
 	var value_message = Blockly.SmartThings.valueToCode(block, 'message', Blockly.SmartThings.ORDER_ATOMIC);
-	var nextAction = Blockly.SmartThings.valueToCode(block, 'action', Blockly.SmartThings.ORDER_ATOMIC);
+	var actionList = Blockly.SmartThings.valueToCode(block, 'action', Blockly.SmartThings.ORDER_ATOMIC);
   // TODO: Assemble SmartThings into code variable.
    var smartAction = new Action();
   smartAction.method = 'sendNotification(\"'+text_text+'\")';
 
+	if(goog.isArray(actionList)){
+		var result = actionList.concat(smartAction);
+	}else{
+		var result = [smartAction];
+
+	}
   return smartAction;
 };
 

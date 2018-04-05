@@ -109,10 +109,7 @@ Blockly.Blocks['dynamicpage'] = {
     this.setColour(Block_colour_page);
  this.setTooltip("");
  this.setHelpUrl("");
-  },
-	onchange: function(event) {
-		event
-	}
+  }
 };
 
 

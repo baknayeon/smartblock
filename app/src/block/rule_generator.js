@@ -52,7 +52,7 @@ function Device_attr(){
 function ECA(statements_event, value_condition, statements_action) {
 	this.event = statements_event;
     this.condition = value_condition;
-    this.actionList = statements_action;
+    this.actionList = statements_action.reverse();
 
 	eca_num++;
 

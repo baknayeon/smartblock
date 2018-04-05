@@ -3,6 +3,10 @@ body {
 	font-family: NotoSansCJKkr-Thin;
 	margin: 0 auto ;
 }
+button{
+	outline: none;
+	border: none;
+}
 
 #logo{
 	width:300px;
@@ -88,7 +92,6 @@ body {
 .share-btn:hover p{
   color: #83d8e5;
 }
-
 .share-btn .cta {
   color: #bababa;
   margin: 30px 0 0 0;
@@ -121,7 +124,6 @@ body {
 	width: 140px;
 	height: 50px;
 	background-color: #fff;
-	border: 1px solid #fff;
 	margin: 0px 5px 5px 5px; 
 	text-align: center;
 	cursor: pointer;
@@ -131,13 +133,14 @@ body {
 	transform: scale(0.7) translateX(10px) translateY(-10px);
 	transition: all 0.25s ease-in-out;
 	opacity: 0; 
+	outline: none;
+	border: none;
 }
 .share-btn .social button:hover {
-	background: #c1ebf2;
-	border: solid 1px #fff;
+	background: #B0E6EE;
 }
 .share-btn .social button:active {
-	background: #a8e3ec;
+	background: #9CE0EA;
 }
 .clicked {
   width: 330px;
@@ -147,7 +150,6 @@ body {
 }
 .share-btn.clicked{
 	position: fixed;
-	left: 0x;
 	top: 140px;
 	background: #fff;
 	box-shadow: 0 5px 10px #cccccc;
@@ -156,7 +158,7 @@ body {
   left: 40px;
   top: 30px;
   transform: translateX(0) translateY(0);
-  color: #83d8e5;
+  color: #9CE0EA;
 }
 .share-btn.clicked .close {
   opacity: 1;
@@ -165,10 +167,93 @@ body {
 .share-btn.clicked .social button {
   transform: scale(1) translateX(0) translateY(0);
   opacity: 1;
+	outline: none;
 }
+
+#setting_things_open{
+   width: 24px;
+   height:24px;  
+	position: absolute; 
+	bottom: 0; 
+	right:0;  
+	background: url(setting.png) no-repeat;
+	box-shadow:none;
+}
+#device_setting{
+	position: fixed;
+	top: 140px;
+	width: 330px;
+	height:700px;  
+	background: #fff;
+	overflow: auto;
+}
+
+#device_setting p{
+  color: #bababa;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 22px;
+  letter-spacing: 1px;
+  
+}
+#setting_close{
+	width:24px;
+	height:24px;  
+	position: absolute; 
+	margin: 0px 8px 0;
+	right:0;  
+	background: url(close.png) no-repeat;
+	cursor: pointer;	
+}
+.setting_list{
+    margin: 30px 10px 5px 10px; 
+	position: absolute; 
+	overflow-y:auto;
+
+}
+.setting_list button {
+   float:left; 
+	margin: 5px 3px 5px 3px; 
+	width: 140px;
+	height: 50px;
+	background-color: #fff;
+	text-align: center;
+	cursor: pointer;
+	box-shadow: 0 5px 10px #eee;
+	overflow: hidden;
+	font-size: 80%;
+ }
+.setting_list button:hover {
+	background: #eee;
+}
+.setting_list button:active {
+	background: #ddd;
+}
+
+.setting_list::-webkit-scrollbar {
+	background-color: #f4f4f4;
+}
+.setting_list::-webkit-scrollbar-track {
+      background-color: #f4f4f4;
+} /* the new scrollbar will have a flat appearance with the set background color */
+ 
+.setting_list::-webkit-scrollbar-thumb {
+      background-color: rgba(192,192,192,0.3); 
+	border-radius: 10px;
+} /* this will style the thumb, ignoring the track */
+
+.setting_list::-webkit-scrollbar-button {
+      background-color: #f4f4f4;
+} /* optionally, you can style the top and the bottom buttons (left and right for horizontal bars) */
+
+.setting_list::-webkit-scrollbar-corner {
+      background-color: #f4f4f4;
+} /*
+
 
 /*main */
 #box{
+	position:relative;
 	float:left;
 }
 .blocklyMainBackground { 
@@ -195,15 +280,69 @@ body {
    background-color: #f2fbfc;
 }
 .blocklyScrollbarHandle {
-    fill: #e6f7f9;
+    fill: #DFF5F9;
     fill-opacity: .8;
 }
 .blocklyScrollbarBackground:hover+.blocklyScrollbarHandle,
   .blocklyScrollbarHandle:hover {
-    fill: #d9f3f7;
+    fill: #D7F2F7;
     fill-opacity: .8;
  }
+
+#save_but{
+	visibility: hidden;
+	position:absolute;
+	top:10px;
+	left:900px;
+	font-family: NotoSansCJKkr-Thin;
+	width: 80px;
+	height: 30px;
+	text-align: center;
+	cursor: pointer;
+    color: #999;
+    background-color: #fff;
+	border:none;
+    box-shadow: 0 3px 5px #ddd;
+	outline: none;
+	transition: all 0.25s ease-in-out;
+}
+#save_but:hover{
+    background-color: #eee;
+
+}
+#smartApp_code{
+	position:absolute;
+
+}
+
+.groovy{
+	overflow: auto;
+	height: 678px;
+	width: 979px;
+}
+.groovy::-webkit-scrollbar {
+	width: 10px;
+	background-color: #f4f4f4;
+}
+.groovy::-webkit-scrollbar-track {
+      background-color: #f4f4f4;
+} /* the new scrollbar will have a flat appearance with the set background color */
  
+.groovy::-webkit-scrollbar-thumb {
+      background-color: rgba(192,192,192,0.3); 
+	border-radius: 10px;
+} /* this will style the thumb, ignoring the track */
+
+.groovy::-webkit-scrollbar-button {
+      background-color: #f4f4f4;
+} /* optionally, you can style the top and the bottom buttons (left and right for horizontal bars) */
+
+.groovy::-webkit-scrollbar-corner {
+      background-color: #f4f4f4;
+} /*
+
+
+
 /*right bar */
 #tab {
 	position: relative; 
@@ -233,7 +372,6 @@ body {
 	transform: rotate(90deg); 
 
 }
-
 /*mark in bottom */
 #bottom{
 	float:right;

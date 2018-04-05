@@ -1096,7 +1096,7 @@ Blockly.Connection.prototype.connect_=function(a){
 	d.setParent(c);
 	n&&(n.recordNew(),Blockly.Events.fire(n))
 	
-	change_block_color(d)//ny connection
+	change_connted_color(d)//ny connection
 };
 Blockly.Connection.prototype.dispose=function(){if(this.isConnected())throw"Disconnect connection before disposing of it.";this.inDB_&&this.db_.removeConnection_(this);this.dbOpposite_=this.db_=null};
 Blockly.Connection.prototype.getSourceBlock=function(){return this.sourceBlock_};Blockly.Connection.prototype.isSuperior=function(){return this.type==Blockly.INPUT_VALUE||this.type==Blockly.NEXT_STATEMENT};Blockly.Connection.prototype.isConnected=function(){return!!this.targetConnection};
@@ -1121,7 +1121,7 @@ Blockly.Connection.prototype.disconnect=function(){
 	this.disconnectInternal_(b,c);
 	a.respawnShadow_()
 		
-	change_block_color(c)//ny connection
+	change_disconnted_color(c)//ny connection
 };
 
 Blockly.Connection.prototype.disconnectInternal_=function(a,b){
@@ -2422,7 +2422,9 @@ Blockly.Generator.prototype.blockToCode=function(a){
 
 function isit(b){
 	// ny
-	if(b.constructor == Condition || b.constructor == inputc ||b.constructor == Device_attr ||b.constructor == Args ||b.constructor == Event)
+	if(b.constructor == Condition || b.constructor == inputc ||b.constructor == Device_attr ||b.constructor == Args)
+		return true
+	else if (b.constructor == Event)
 		return true
 	else if(goog.isArray(b)){
 		var action = b[0]
@@ -2600,7 +2602,7 @@ Blockly.Flyout.prototype.placeNewBlock_=function(a){
 	a=goog.math.Coordinate.sum(e,a);
 	b=goog.math.Coordinate.difference(a,d).scale(1/b.scale);c.moveBy(b.x,b.y);
 	
-	change_block_color(c)//ny connection
+	change_disconnted_color(c)//ny connection
 	return c
 };
 

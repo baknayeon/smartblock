@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Snow Block for SmartThings</title>
+  <title>Samrt Block for SmartThings</title>
   
   <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
   <script src="../blockly_compressed.js"></script>
@@ -14,6 +14,8 @@
   <script src="cap/cap.js"></script>
   <script src="cap/cap_help.js"></script>
   <script src="help.js"></script>
+  <script src="generate.js"></script>
+  <script src="xml.js"></script>
 
   <script src="block/rule_definer.js"></script>
   <script src="block/rule_generator.js"></script>
@@ -33,6 +35,7 @@
 	var selected_dev = new Map();
 	var attrMap = new AttributeMap(); 	
 	var commMap = new CommandMap();
+	var comman_uesed = new Array;
 
 	mapInit(); 	
 	
@@ -109,8 +112,10 @@
 
 			<div id="in_box3" style="height: 701px; width: 1000px; background: #f4f4f4;">
 				<pre style="margin:0px;">
-					<code style="padding: 0px 8px 8px 8px;" class="groovy" id="smartApp_code"></code>
+					<code style="padding: 0px 8px 8px 8px;" class="groovy" id="smartApp_code">
+					</code>
 				</pre>
+				<button id="save_but" onClick="saveCode()">SaveCode</button>
 			</div>
 		</div>
 		<div id="tab">
@@ -160,12 +165,13 @@
 		_("in_box1").style.display = "none"
 		_("in_box2").style.display = "none"
 		_("in_box3").style.display = "block"
+		_("save_but").style.visibility  = "visible"
 	
 		_("click1").style.background = "#fff"
 		_("click2").style.background = "#fff"
 		_("click3").style.background = "#f4f4f4"
 
-		var code = smartApp('SamrtApp');
+		var code = smartApp();
 		_("smartApp_code").textContent = code;
 		hljs.highlightBlock(_("smartApp_code"));
 	}
@@ -174,7 +180,7 @@
 		try{
 			var fileName = document.getElementById("name").value;
 			if(fileName){
-				var code = smartApp();
+				var code = _("smartApp_code").textContent;
 				var blob = new Blob([code], {type: "text/plain;charset=utf-8"});
 				saveAs(blob, fileName+".groovy");
 			}else{
@@ -190,6 +196,7 @@
 		_("in_box1").style.display = "none"
 		_("in_box2").style.display = "block"
 		_("in_box3").style.display = "none"
+		_("save_but").style.visibility  = "hidden"
 		
 		_("click1").style.background = "#fff"
 		_("click2").style.background = "#f2fbfc"
@@ -209,6 +216,7 @@
 		_("in_box1").style.display = "block"
 		_("in_box2").style.display = "none"
 		_("in_box3").style.display = "none"
+		_("save_but").style.visibility  = "hidden"
 		
 		_("click1").style.background = "#f2fbfc"
 		_("click2").style.background = "#fff"
@@ -257,7 +265,7 @@
 		+'              <block type="section">'
 		+'                <value name="option">'
 		+'                  <block type="option_title">'
-		+'                    <field name="title">Codtion</field>'
+		+'                    <field name="title">Action</field>'
 		+'                  </block>'
 		+'                </value>'
 		+'              </block>'
@@ -266,7 +274,7 @@
 		+'              <block type="section">'
 		+'                <value name="option">'
 		+'                  <block type="option_title">'
-		+'                    <field name="title">Action</field>'
+		+'                    <field name="title">Codtion</field>'
 		+'                  </block>'
 		+'                </value>'
 		+'              </block>'

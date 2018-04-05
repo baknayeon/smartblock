@@ -1096,7 +1096,7 @@ Blockly.Connection.prototype.connect_=function(a){
 	d.setParent(c);
 	n&&(n.recordNew(),Blockly.Events.fire(n))
 	
-	change_block_color(d)//ny connection
+	change_connted_color(d)//ny connection
 };
 Blockly.Connection.prototype.dispose=function(){if(this.isConnected())throw"Disconnect connection before disposing of it.";this.inDB_&&this.db_.removeConnection_(this);this.dbOpposite_=this.db_=null};
 Blockly.Connection.prototype.getSourceBlock=function(){return this.sourceBlock_};Blockly.Connection.prototype.isSuperior=function(){return this.type==Blockly.INPUT_VALUE||this.type==Blockly.NEXT_STATEMENT};Blockly.Connection.prototype.isConnected=function(){return!!this.targetConnection};
@@ -1121,7 +1121,7 @@ Blockly.Connection.prototype.disconnect=function(){
 	this.disconnectInternal_(b,c);
 	a.respawnShadow_()
 		
-	change_block_color(c)//ny connection
+	change_disconnted_color(c)//ny connection
 };
 
 Blockly.Connection.prototype.disconnectInternal_=function(a,b){
@@ -1437,7 +1437,10 @@ a.absoluteTop-(this.BODY_HEIGHT_+this.LID_HEIGHT_)-this.bottom_,a.toolboxPositio
 Blockly.Trashcan.prototype.getClientRect=function(){if(!this.svgGroup_)return null;var a=this.svgGroup_.getBoundingClientRect();return new goog.math.Rect(a.left+this.SPRITE_LEFT_-this.MARGIN_HOTSPOT_,a.top+this.SPRITE_TOP_-this.MARGIN_HOTSPOT_,this.WIDTH_+2*this.MARGIN_HOTSPOT_,this.LID_HEIGHT_+this.BODY_HEIGHT_+2*this.MARGIN_HOTSPOT_)};Blockly.Trashcan.prototype.setOpen_=function(a){this.isOpen!=a&&(goog.Timer.clear(this.lidTask_),this.isOpen=a,this.animateLid_())};
 Blockly.Trashcan.prototype.animateLid_=function(){this.lidOpen_+=this.isOpen?.2:-.2;this.lidOpen_=goog.math.clamp(this.lidOpen_,0,1);var a=45*this.lidOpen_;this.svgLid_.setAttribute("transform","rotate("+(this.workspace_.RTL?-a:a)+","+(this.workspace_.RTL?4:this.WIDTH_-4)+","+(this.LID_HEIGHT_-2)+")");a=goog.math.lerp(.4,.8,this.lidOpen_);this.svgGroup_.style.opacity=a;0<this.lidOpen_&&1>this.lidOpen_&&(this.lidTask_=goog.Timer.callOnce(this.animateLid_,20,this))};
 Blockly.Trashcan.prototype.close=function(){this.setOpen_(!1)};
-Blockly.Trashcan.prototype.click=function(){var a=this.workspace_.startScrollX-this.workspace_.scrollX,b=this.workspace_.startScrollY-this.workspace_.scrollY;Math.sqrt(a*a+b*b)>Blockly.DRAG_RADIUS||console.log("TODO: Inspect trash.")};
+Blockly.Trashcan.prototype.click=function(){
+	var a=this.workspace_.startScrollX-this.workspace_.scrollX,b=this.workspace_.startScrollY-this.workspace_.scrollY;
+	Math.sqrt(a*a+b*b)>Blockly.DRAG_RADIUS||console.log("TODO: Inspect trash.")
+};
 
 
 Blockly.WorkspaceAudio=function(a){this.parentWorkspace_=a;this.SOUNDS_=Object.create(null)};
@@ -2597,7 +2600,7 @@ Blockly.Flyout.prototype.placeNewBlock_=function(a){
 	a=goog.math.Coordinate.sum(e,a);
 	b=goog.math.Coordinate.difference(a,d).scale(1/b.scale);c.moveBy(b.x,b.y);
 	
-	change_block_color(c)//ny connection
+	change_disconnted_color(c)//ny connection
 	return c
 };
 
