@@ -5,28 +5,29 @@ function action_block(devname){
 		var actionList = Blockly.SmartThings.valueToCode(block, devname, Blockly.SmartThings.ORDER_ATOMIC);
 		// TODO: Assemble SmartThings into code variable.
 		
-			
-			var smartAction = new Action();
-		if(commMap.isSingleCommad(devname)){
+		var smartAction = new Action();
+		if(dropdown_commands){
+			if(commMap.isSingleCommad(devname)){
+				smartAction.devname = variable_name;
+				smartAction.command= smartAction.devname+'.'+dropdown_commands+'()';
+				smartAction.device = devname;	
+			}else if(commMap.isSingleMethod(devname)){
+				var command = commMap.getMethod(devname)
+				smartAction.devname = variable_name;
+				smartAction.command= smartAction.devname+'.'+command.id+'('+dropdown_commands+')';
+				smartAction.device = devname;	
+			}
+		}else{
 			smartAction.devname = variable_name;
-			smartAction.command= smartAction.devname+'.'+dropdown_commands+'()';
 			smartAction.device = devname;	
-		}else if(commMap.isSingleMethod(devname)){
-			var command = commMap.getMethod(devname)
 
-			smartAction.devname = variable_name;
-			smartAction.command= smartAction.devname+'.'+command.id+'('+dropdown_commands+')';
-			smartAction.device = devname;	
 		}
 
-		if(goog.isArray(actionList)){
+		if(goog.isArray(actionList))
 			var result = actionList.concat(smartAction);
-		}else{
+		else
 			var result = [smartAction];
 	
-		}
-		
-		
 		return result;
 	};
 	
@@ -53,24 +54,85 @@ function action_block(devname){
 			this.setHelpUrl("");
 		},
 		onchange: function(event) {
-
+			var device = this.getField("device").text_;
+			var block = this.getInput(device);
+			
 			if(event.element == "field" && event.name ==="Command_id"){
-				var device = this.getField("device").text_;
 				var id = this.getField("Command_id").text_;
-				var block = this.getInput(device);
-				block.removeField("Command");
 				var list = commMap.getMethod_vaulesById(device, id);
+
+				block.removeField("Command");
+
 				if(list.length != 0)
 					block.appendField(new Blockly.FieldDropdown(list), "Command");
 				else
 					block.appendField(new Blockly.FieldTextInput(""), "Command");
-									
+
+			}
+			if(event.type == Blockly.Events.BLOCK_MOVE){
+
+				if(this.parentBlock_ && event.newParentId == this.parentBlock_.id){
+					//map - action
+					block.removeField("Command");
+				}
+				else if(event.oldParentId){
+					if(this.id == event.blockId){
+						//map - action
+						//disconneted
+						appendComm(device, block);
+					}
+				}
+				if(this.parentBlock_ && this.parentBlock_.type.includes("map")){
+					//init action with map
+					var parentBlock = this.parentBlock_
+					var length = parentBlock.inputList.length-1
+					var deviceList = new Set()
+					
+					for(var i = 0; i< length; i++){
+						var block = parentBlock.getInputTargetBlock("ADD"+i)
+						if(block){
+							var device = block.getField("device").text_
+							deviceList.add(device)
+						}
+					}
+
+					var action = parentBlock.getInputTargetBlock("p")
+					if(action){
+						var newComm = new Set()
+
+						for(let device of deviceList){
+							if(commMap.isSingleCommad(device)){
+								for(let comm of commMap.getCommad(device))
+								{
+									newComm.add(comm)
+								}
+							}
+						}
+
+						var command = []
+						for(let c of newComm){
+							command.push([c, c])
+						}
+						action.getInput("type").removeField("type")
+						action.getInput("type").appendField(new Blockly.FieldDropdown(command), "type");
+					}
+				}
 			}
 
 		}
 	};
 }
 
+function appendComm(device, block){
+	if(commMap.isSingleCommad(device)){
+		block.appendField(new Blockly.FieldDropdown(commMap.getCommad_vaules(device)), "Command");
+	}else if(commMap.isSingleMethod(device)){
+
+	}else if(commMap.isMultiMethod(device)){
+		
+	}
+
+}
 function setMethodField(block, device){
 		
 	var method = commMap.getMethod(device);
@@ -97,28 +159,59 @@ function setMethodField(block, device){
 
 }
 
-Blockly.Blocks['variable'] = {
+Blockly.SmartThings['map'] = function(block) {
+    var length = block.inputList.length-1
+	var i = 0;
+	var groupingDevice = new Grouping();
+	
+	groupingDevice.type = "map"
+
+	groupingDevice.p = Blockly.SmartThings.valueToCode(block, 'p', Blockly.SmartThings.ORDER_ATOMIC);
+
+	while(i < length){
+	 	var device = Blockly.SmartThings.valueToCode(block, 'ADD'+i, Blockly.SmartThings.ORDER_ATOMIC);
+	 	groupingDevice.list = groupingDevice.list.concat(device)
+		i++;
+	}
+
+  return groupingDevice;
+};
+
+Blockly.Blocks['option'] = {
   init: function() {
     this.appendDummyInput("type")
-        .appendField(new Blockly.FieldDropdown([["number","number"], ["phone","phone"], ["password","password"], ["time","time"], ["text","text"]]), "type");
+        .appendField(new Blockly.FieldLabel(""), "type");
 	this.setInputsInline(true);
-	this.setOutput(true, "number");
+	this.setOutput(true, "option");
     this.setColour(Block_colour_action);
 	this.setTooltip("");
 	this.setHelpUrl("");
   }, onchange: function(event) {
-  	if(event.element == "field" && event.blockId == this.id){
-  		this.setOutput(true, event.newValue);
+  	if(event.type == Blockly.Events.BLOCK_MOVE){
+  		//this.setOutput(true, event.newValue);
+  		if(!this.parentBlock_ && event.oldParentId){
+			this.getInput("type").removeField("type")
+			this.getInput("type").appendField(new Blockly.FieldLabel(""), "type");
+  		}else if(this.parentBlock_ && event.newParentId && event.blockId == this.id){
+  			if(event.newInputName == 'p'){
+					this.getInput("type").removeField("type")
+  			}else {
+				this.getInput("type").removeField("type")
+				this.getInput("type").appendField(new Blockly.FieldLabel(event.newInputName), "type");
+  			}
+  		}
+
   	}
   }
 };
+
 Blockly.Blocks['sendpush'] = {
   init: function() {
     this.appendValueInput("action")
         .setCheck("Action")
         .appendField("sendPush");
     this.appendValueInput("message")
-        .setCheck("text")
+        .setCheck("option")
         .appendField("message")
         .appendField(new Blockly.FieldTextInput(""), "text");
     this.setOutput(true, "Action");
@@ -142,11 +235,11 @@ Blockly.Blocks['sendsms'] = {
 		.setCheck("Action")
         .appendField("sendSms");
     this.appendValueInput("message")
-		.setCheck("text")
+		.setCheck("option")
         .appendField("message")
         .appendField(new Blockly.FieldTextInput(""), "text");
     this.appendValueInput("phone")
-		.setCheck("phone")
+		.setCheck("option")
         .appendField("phone")
         .appendField(new Blockly.FieldTextInput("+82010"), "phone");
     this.setOutput(true,  "Action");
@@ -175,7 +268,7 @@ Blockly.Blocks['sendnotification'] = {
         .setAlign(Blockly.ALIGN_CENTRE)
         .appendField("sendNotification");
     this.appendValueInput("message")
-        .setCheck("text")
+        .setCheck("option")
         .appendField("message")
         .appendField(new Blockly.FieldTextInput(""), "text");
     this.setOutput(true, "Action");
@@ -250,13 +343,13 @@ Blockly.SmartThings['sendnotification'] = function(block) {
   return smartAction;
 };
 
-Blockly.SmartThings['variable'] = function(block) {
+Blockly.SmartThings['option'] = function(block) {
   var dropdown_type = block.getFieldValue('type');
   // TODO: Assemble SmartThings into code variable.
 
   var args = new Args();
-  args.capbility = dropdown_type;
-  args.capname = dropdown_type+variable_num++;
+  args.function = dropdown_type;
+  args.name = dropdown_type+variable_num++;
 
   // TODO: Change ORDER_NONE to the correct strength.
   return args;

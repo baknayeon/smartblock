@@ -145,7 +145,7 @@ function toolbox_pre(){
 	var action_block ="";
 	var condition_block ="";
 	
-	toolbox_pre += '  <category name="input">\n';
+	toolbox_pre += '  <category name="input" >\n';
 	if(ecaList){
 		for(i in ecaList){
 			var event = ecaList[i].event;

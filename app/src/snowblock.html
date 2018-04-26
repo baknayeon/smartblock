@@ -73,13 +73,13 @@
 </head>
   
 <xml id="toolbox" style="display: none" >
-	<category name="Rule">
+	<category name="Rule" colour ="#304777">
 		<block type="eca"></block>
 		<block type="ea"></block>
 	</category>
-	<category name="Event" custom="SAMRT_DEVICE_E" ></category>
-	<category name="Codition" custom="SAMRT_DEVICE_C" ></category>
-	<category name="Action" custom="SAMRT_DEVICE_A" ></category>
+	<category name="Event" custom="SAMRT_DEVICE_E" colour ="#5eb7b5"></category>
+	<category name="Codition" custom="SAMRT_DEVICE_C" colour ="#A2CC0D"></category>
+	<category name="Action" custom="SAMRT_DEVICE_A" colour ="#efcd3f"></category>
 </xml>
 
 <body onload="all()">
@@ -103,14 +103,14 @@
 		</div>
 		<div id="box" >
 			<div id="in_box1">
-			  <div id="blocklyDiv" style="height: 701px; width: 1000px;"></div>
+			  <div id="blocklyDiv" style="height: 701px; width: 1200px;"></div>
 			</div>
 
 			<div id="in_box2">
-				<div id="blocklyDiv2" style="height: 701px; width: 1000px;"></div>
+				<div id="blocklyDiv2" style="height: 701px; width: 1200px;"></div>
 			</div>
 
-			<div id="in_box3" style="height: 701px; width: 1000px; background: #f4f4f4;">
+			<div id="in_box3" style="height: 701px; width: 1200px; background: #f4f4f4;">
 				<pre style="margin:0px;">
 					<code style="padding: 0px 8px 8px 8px;" class="groovy" id="smartApp_code">
 					</code>
@@ -198,9 +198,9 @@
 		_("in_box3").style.display = "none"
 		_("save_but").style.visibility  = "hidden"
 		
-		_("click1").style.background = "#fff"
+		_("click1").style.background = "#f8f8f8"
 		_("click2").style.background = "#f2fbfc"
-		_("click3").style.background = "#fff"
+		_("click3").style.background = "#f8f8f8"
 		
 		var toolbox = toolbox_pre();
 
@@ -219,8 +219,8 @@
 		_("save_but").style.visibility  = "hidden"
 		
 		_("click1").style.background = "#f2fbfc"
-		_("click2").style.background = "#fff"
-		_("click3").style.background = "#fff"
+		_("click2").style.background = "#f8f8f8"
+		_("click3").style.background = "#f8f8f8"
 	}
 
 	function all(){
@@ -229,8 +229,8 @@
 		_("in_box3").style.display = "none"
 
 		_("click1").style.background = "#f2fbfc"
-		_("click2").style.background = "#fff"
-		_("click3").style.background = "#fff"
+		_("click2").style.background = "#f8f8f8"
+		_("click3").style.background = "#f8f8f8"
 	}
 
 

@@ -17,17 +17,17 @@ function smartApp(){
 			if(author)
 				definition +=  'author: "'+ author +'"'+"\n"
 			else
-				definition += 'author: "snowBlock",'+"\n"
+				definition += 'author: "SmartBlock",'+"\n"
 
 			if(namespace)
 				definition += 'namespace: "'+ namespace +'",'+"\n"
 			else
-				definition += 'namespace: "snowBlock",'+"\n"
+				definition += 'namespace: "SmartBlock",'+"\n"
 
 			if(description)
 				definition += 'description: "'+ description +'",'+"\n"
 			else 
-				definition += 'description: "this app is made by SnowBlock",\n'
+				definition += 'description: "this app is made by SmartBlock",\n'
 
 			if(iconUrl)
 				definition +='iconUrl: \"'+iconUrl+'",'+"\n"
@@ -124,15 +124,17 @@ function generating_pref(ecaList){
 		for(i in ecaList){
 			var input_e = ecaList[i].input_e_make;
 			var input_a = ecaList[i].input_a_make;
-			var input_c = generat_codition_input(ecaList[i].condition)
+			var input_c 
 
 			//eliminate dutulicate
-			var cSt_e = codition_input.indexOf(input_e.input);
-			var eSt_e = event_input.indexOf(input_e.input);
-			var aSt_e = action_input.indexOf(input_e.input);
+			for(e in input_e){
+				var cSt_e = codition_input.indexOf(input_e[e].input);
+				var eSt_e = event_input.indexOf(input_e[e].input);
+				var aSt_e = action_input.indexOf(input_e[e].input);
+				if(cSt_e == -1 && eSt_e == -1 && aSt_e == -1)
+					event_input += "\n\t\t\t"+input_e[e].input;
 
-			if(cSt_e == -1 && eSt_e == -1 && aSt_e == -1)
-				event_input += "\n\t\t\t"+input_e.input;
+			}
 
 			for(j in input_a){
 				var cSt_a = codition_input.indexOf(input_a[j].input);
@@ -143,13 +145,26 @@ function generating_pref(ecaList){
 
 			}
 
-			for(c in input_c){
-				var cSt_a = codition_input.indexOf(input_c[c]);
-				var eSt_a = event_input.indexOf(input_c[c]);
-				var aSt_a = action_input.indexOf(input_c[c]);
-				if(cSt_a == -1 && eSt_a == -1 && aSt_a == -1)
-					codition_input += "\n\t\t\t"+input_c[c];
+			if(ecaList[i].condition.constructor == Grouping){
+				input_c = ecaList[i].condition.list
+				for(c in input_c){
+					var cSt_c = codition_input.indexOf(input_c[c].input);
+					var eSt_c = event_input.indexOf(input_c[c].input);
+					var aSt_c = action_input.indexOf(input_c[c].input);
+					if(cSt_c == -1 && eSt_c == -1 && aSt_c == -1)
+						codition_input += "\n\t\t\t"+input_c[c].input;
 
+				}
+			}else{
+				input_c = generat_codition_input(ecaList[i].condition)
+				for(c in input_c){
+					var cSt_c = codition_input.indexOf(input_c[c]);
+					var eSt_c = event_input.indexOf(input_c[c]);
+					var aSt_c = action_input.indexOf(input_c[c]);
+					if(cSt_c == -1 && eSt_c == -1 && aSt_c == -1)
+						codition_input += "\n\t\t\t"+input_c[c];
+
+				}
 			}
 		}
 
@@ -220,7 +235,7 @@ function generating_eventHandler(ecaList){
 
 function generating_event_condition(event){
 	var attr = attrMap.getNUMBER(event.device)
-	if(attr){
+	if(attr && event.attr){
 		var if_condition = event.devname+'.currentValue("'+attr.id+'") == '+event.attr;
 		return if_condition;
 	}
@@ -265,7 +280,7 @@ function generating_condition(condition, devList){
 				}else if(attrMap.isOnlyNUMBER(field_right.device)){
 					var right_attr = attrMap.getNUMBER(field_right.device)
 					var left_attr = attrMap.getNUMBER(field_left.device)
-					if_condition = right.devname+'.currentValue("'+left_attr.id+'").value' + operator +field_left.devname+'.currentValue("'+right_attr.id+'").value'
+					if_condition = right.devname+'.currentValue("'+left_attr.id+'")' + operator +field_left.devname+'.currentValue("'+right_attr.id+'")'
 				}
 
 			}else if (right.constructor == inputc && left.constructor == Device_attr){// field =< n(attr)
@@ -279,13 +294,13 @@ function generating_condition(condition, devList){
 				
 				}else if(attrMap.isOnlyNUMBER(field.device)){
 					var field_attr = attrMap.getNUMBER(field.device)
-					if_condition = field.devname+'.currentValue("'+field_attr.id+'").value'+ operator+'"'+dev_attr.attr+'"';
+					if_condition = field.devname+'.currentValue("'+field_attr.id+'")'+ operator+'"'+dev_attr.attr+'"';
 				}
 
 
 			}else if (right.constructor == inputc && !isNaN(left)){// field =< n(num)
 				var field_attr = attrMap.getNUMBER(right.device)
-				if_condition = right.devname+'.currentValue("'+field_attr.id+'").value'+ operator+left;
+				if_condition = right.devname+'.currentValue("'+field_attr.id+'")'+ operator+left;
 			}
 			// currentState와 currentValue 구분 필요
 
@@ -315,8 +330,14 @@ function generating_subscribe(ecaList){
 	var subscribe = "";
 
 	for(i in ecaList){
-		var input_e = ecaList[i].input_e_make;
-		subscribe += "\t"+input_e.subscribe+"\n";
+		var input_list = ecaList[i].input_e_make;
+		for(e in input_list){
+			var input_e = input_list[e]
+			var subSt_e = subscribe.indexOf(input_e.subscribe);
+			if(subSt_e == -1)
+				subscribe += "\t"+input_e.subscribe+"\n";
+		}
+
 	}
 	return subscribe;
 }

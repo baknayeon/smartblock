@@ -33,6 +33,7 @@ goog.require('Blockly.Blocks');
  * Common HSV hue for all blocks in this category.
  */
 
+
 Blockly.Blocks['operation'] = {
   /**
    * Block for logical operations: 'and', 'or'.
@@ -62,6 +63,9 @@ Blockly.Blocks['operation'] = {
     });
     this.setColour(Block_colour_condition);
     this.setOutput(true, "Condition");
+  },
+  onchange: function(event) {
+  	
   }
 };
 
@@ -75,12 +79,12 @@ Blockly.Blocks['compare'] = {
     var OPERATORS = this.RTL ? [
           ['=', 'EQ'],
           ['>', 'LT'],
-          //['<', 'GT'],
+          ['<', 'GT'],
           ['ϵ', 'EO'],
         ] : [
           ['=', 'EQ'],
           ['<', 'LT'],
-          //['>', 'GT'],
+          ['>', 'GT'],
           ['ϵ', 'EO'],
         ];
     this.appendValueInput('A')
@@ -107,12 +111,6 @@ Blockly.Blocks['compare'] = {
       return TOOLTIPS[op];
     });
   },
-
-  /**
-   * Called whenever anything on the workspace changes.
-   * Prevent mismatched types from being compared.
-   * @this Blockly.Block
-   */
  onchange: function(event) {
 	var dropdown = this.getFieldValue('OP');
 
@@ -122,7 +120,7 @@ Blockly.Blocks['compare'] = {
 	if(dropdown.value_ =='EO'){
 		blockB.setCheck(["Device"]);
 	}else if(dropdown =='EQ'|| dropdown =='LT' || dropdown =='GT'){
-		this.getInput('B').setCheck(["c_dev","attribute"]);
+		this.getInput('B').setCheck(["c_dev","attribute", "number"]);
 		if(typeof event.element == "string"){
 		}else{
 			if(blockA && blockB){
@@ -141,24 +139,24 @@ Blockly.Blocks['compare'] = {
 							var newAttr = attrMap.getENUM_vaules(device);
 
 							blockB.appendDummyInput('dev_attr')
-								  .appendField(new Blockly.FieldLabel(device_type.toLowerCase()+".", "device"), "device")
+								  .appendField(new Blockly.FieldLabel(device_type+".", "device"), "device")
 								  .appendField(new Blockly.FieldDropdown(newAttr), 'attribute');
 						}else if(attrMap.isOnlyNUMBER(device)){
 							
 							blockB.appendDummyInput('dev_attr')
-								  .appendField(new Blockly.FieldLabel(device_type.toLowerCase()+".", "device"), "device")
+								  .appendField(new Blockly.FieldLabel(device_type+".", "device"), "device")
 								  .appendField(new Blockly.FieldTextInput("0"), "attribute");
 						}else if(attrMap.hasMultiTypeENUM(device)){
 						
 							blockB.appendDummyInput('dev_attr')
-								  .appendField(new Blockly.FieldLabel(device_type.toLowerCase()+".", "device"), "device")
+								  .appendField(new Blockly.FieldLabel(device_type+".", "device"), "device")
 								  .appendField(new Blockly.FieldDropdown(attrMap.getMultiType(device)), "attribute_id")
 								  .appendField(new Blockly.FieldDropdown(attrMap.getENUM_vaules(device)), "attribute");
 						
 						}else if(attrMap.hasMultiTypeNUMBER(device)){
 						
 							blockB.appendDummyInput('dev_attr')
-								  .appendField(new Blockly.FieldLabel(device_type.toLowerCase()+".", "device"), "device")
+								  .appendField(new Blockly.FieldLabel(device_type+".", "device"), "device")
 								  .appendField(new Blockly.FieldDropdown(attrMap.getMultiType(device)), "attribute_id")
 								  .appendField(new Blockly.FieldTextInput("0"), "attribute");
 						
@@ -166,6 +164,63 @@ Blockly.Blocks['compare'] = {
 					}
 				}
 			}
+		}
+	}
+	if(event.type == Blockly.Events.BLOCK_MOVE && this.parentBlock_){ // operator with all and exists
+		var parentBlock = this.parentBlock_
+		if(parentBlock.type =="all" || parentBlock.type=="exists" ){
+			if(event.newInputName == "p" || event.newInputName == "A" || event.newInputName == "B"){
+				eliminate_A(this)
+			}
+			else if(event.oldInputName == "p" || event.oldInputName == "A" || event.oldInputName == "B"){
+				if(event.oldParentId == this.id){
+					var pblock =  demoWorkspace.getBlockById(event.blockId)
+					//append_A(pblock)
+				}
+			}
+
+			if("ADD".indexOf(event.newInputName) || "ADD".indexOf(event.oldInputName)){		
+					var length = parentBlock.inputList.length-1
+					var attrs = new Set()
+					
+					for(var i = 0; i< length; i++){
+						var block = parentBlock.getInputTargetBlock("ADD"+i)
+						if(block){
+							var device = block.getField("type").text_
+							if(attrMap.isOnlyENUM(device)){
+								var newAttr = attrMap.getENUM(device);
+								for(let new_a of newAttr.value){
+									attrs.add(new_a)
+
+								}
+							}else if(attrMap.hasMultiTypeENUM(device)){
+								var attribute_id = parentBlock.getField("attribute_id").text_;
+								var newAttr = attrMap.getENUMById(device, attribute_id);
+								for(let new_a of newAttr.value){
+									attrs.add(new_a)
+
+								}
+
+							}
+						}
+						
+					}
+					var newAttr = []
+					for(let attr of attrs){
+						newAttr.push([attr, attr])
+					}
+
+					var p = parentBlock.getInputTargetBlock("p")
+					if(p){
+						var blockB = p.getInputTargetBlock("B")
+						if(blockB.type == 'dev_attr'){
+							blockB.getInput("dev_attr").removeField('attribute');
+							blockB.getInput("dev_attr").appendField(new Blockly.FieldDropdown(newAttr), "attribute");
+							
+						}
+					}
+			}
+
 		}
 	}
 
@@ -188,6 +243,22 @@ Blockly.Blocks['compare'] = {
  }
 };
 
+function shortName(device){
+	var new_devName = ""
+	if(device == "carbonDioxideMeasurement") new_devName = "carbonDioxideMeas"
+	else if(device == "carbonMonoxideDetector")  new_devName = "carbonMonoxideDet"
+	else if(device == "dishwasherOperatingState") new_devName = "dishwasherOper"
+	else if(device == "illuminanceMeasurement") new_devName = "illuminanceMeas"
+	else if(device == "relativeHumidityMeasurement") new_devName = "relativeHumidityMeas"
+	else if(device == "robotCleanerTurboMode") new_devName = "robotCleanerTurboMode"
+	else if(device == "temperatureMeasurement") new_devName = "temperature"
+	else if(device == "thermostatCoolingSetpoint") new_devName = "thermostatCoolSet"
+	else if(device == "thermostatHeatingSetpoint") new_devName = "thermostatHeatSet"
+	else if(device == "thermostatOperatingState") new_devName = "thermostatOper"
+	else new_devName = device
+
+	return new_devName
+}
 
 function condition_block(device){
 	Blockly.SmartThings['c_'+device] = function(block) {
@@ -206,10 +277,12 @@ function condition_block(device){
 	};
 
 	Blockly.Blocks['c_'+device] = {
-	    init: function() {    
+	    init: function() {
+			var new_devName = shortName(device)
+
 			this.appendDummyInput("device")
-				.appendField(new Blockly.FieldLabel(device), "type")
-				.appendField(new Blockly.FieldVariable(device+event_num, true, device), "name");
+				.appendField(new Blockly.FieldLabel(new_devName), "type")
+				.appendField(new Blockly.FieldVariable(new_devName+event_num, true, device), "name");
 
 			var block = this.getInput("device");
 			if(attrMap.hasMultiTypeENUM(device)){
@@ -430,7 +503,7 @@ Blockly.SmartThings['dev_attr'] = function(block) {
   return dev_attr
 
 };
-/*
+
 Blockly.Blocks['number'] = {
   init: function() {
     this.appendDummyInput()
@@ -449,4 +522,42 @@ Blockly.SmartThings['number'] = function(block) {
   var code = text_number;
   // TODO: Change ORDER_NONE to the correct strength.
   return [code, Blockly.SmartThings.ORDER_NONE];
-};*/
+};
+
+
+Blockly.SmartThings['all'] = function(block) {
+    var length = block.inputList.length-1
+	var i = 0;
+	var groupingDevice = new Grouping();
+	
+	groupingDevice.type = "all"
+
+	groupingDevice.p = Blockly.SmartThings.valueToCode(block, 'p', Blockly.SmartThings.ORDER_ATOMIC);
+
+	while(i < length){
+	 	var device = Blockly.SmartThings.valueToCode(block, 'ADD'+i, Blockly.SmartThings.ORDER_ATOMIC);
+	 	groupingDevice.list = groupingDevice.list.concat(device)
+		i++;
+	}
+
+  return groupingDevice;
+};
+
+
+Blockly.SmartThings['exists'] = function(block) {
+  var length = block.inputList.length-1
+	var i = 0;
+	var groupingDevice = new Grouping();
+	
+	groupingDevice.type = "exists"
+
+	groupingDevice.p = Blockly.SmartThings.valueToCode(block, 'p', Blockly.SmartThings.ORDER_ATOMIC);
+
+	while(i < length){
+	 	var device = Blockly.SmartThings.valueToCode(block, 'ADD'+i, Blockly.SmartThings.ORDER_ATOMIC);
+	 	groupingDevice.list = groupingDevice.list.concat(device)
+		i++;
+	}
+
+  return groupingDevice;
+};

@@ -2364,11 +2364,11 @@ Blockly.Block.prototype.appendInput_ = function(type, name, num) {
   }
   var input = new Blockly.Input(type, name, this, connection);
   // Append input to list.
-  
-  if(num === null )
+
+  if(num !=== null )
 	  this.inputList.push(input);
   else
-	  this.inputList.splice(num, 0, input)
+	  this.inputList.insert(num, input)
   return input;
 };
 

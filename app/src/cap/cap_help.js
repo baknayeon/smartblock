@@ -27,22 +27,25 @@ AttributeMap.prototype = {
 		}
     },  	
 	
-	putENUM : function(key, value){  
+	putENUM : function(key, attr){  
 		setDevice(key);
-		if(value.constructor == Attribute){
-			this.ENUM[key] = value; 
-		}else if(goog.isArray(value)){
-			this.ENUM[key] = value; 
+		if(attr.value != null){
+			if(attr.constructor == Attribute){
+				this.ENUM[key] = attr; 
+			}else if(goog.isArray(attr)){
+				this.ENUM[key] = attr; 
 
+			}
 		}
     },  	
-	putNUMBER : function(key, value){   
+	putNUMBER : function(key, attr){   
 		setDevice(key);
-		if(value.constructor == Attribute){
-			this.NUMBER[key] = value; 
-		}else if(goog.isArray(value)){
-			this.NUMBER[key] = value; 
-
+		if(attr.value == null){
+			if(attr.constructor == Attribute){
+				this.NUMBER[key] = attr; 
+			}else if(goog.isArray(attr)){
+				this.NUMBER[key] = attr; 
+			}
 		}
     }, 
     isOnlyENUM : function(key){   
@@ -85,6 +88,20 @@ AttributeMap.prototype = {
 	getNUMBER : function(key){   
         return this.NUMBER[key]; 
     },
+    getENUMById : function(key, id){
+		var newAttr = [];
+		if(this.set2[key]){
+			var attrlist = this.ENUM[key];
+			for(i in attrlist ){
+				if(attrlist[i].id == id){
+					var attr = attrlist[i];
+					for(a in attr.value)
+						newAttr.push(attr.value[a])
+				}
+			}
+		}
+    	 return new Attribute(id, newAttr)
+    },
     getENUM_vaulesById : function(key, id){
 		var newAttr = [];
 		if(this.set2[key]){
@@ -114,7 +131,10 @@ AttributeMap.prototype = {
 
 		}
 		return newAttr
-    }
+    },
+	makeBlock : function(key){   
+        return this.set1[key] || this.set1[key]; 
+    } 
 }; 
 
 CommandMap = function(){   

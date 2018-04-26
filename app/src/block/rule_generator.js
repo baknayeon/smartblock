@@ -52,24 +52,36 @@ function Device_attr(){
 function ECA(statements_event, value_condition, statements_action) {
 	this.event = statements_event;
     this.condition = value_condition;
-    this.actionList = statements_action.reverse();
+    this.actionList = statements_action;
 
 	eca_num++;
 
-    this.input_e_make = new inpute(this.event);
+    this.input_e_make = new Array(); // ;
     this.input_a_make = new Array();
     this.input_c_make = new Array();
 
-	var coditionList = new Array();
-	condition_input(value_condition, coditionList);
+	if(this.event.constructor != Grouping){
+		this.input_e_make.push(new inpute(this.event))
+	}else {
+		var device_list = this.event.list
+		for(i in device_list){
+			var event_dev = device_list[i]
+			this.input_e_make.push(new inpute(event_dev))
+		}
+	}
 
-	for(i in this.actionList){ // input for action generate
-		if(this.actionList[i].devname){
-			var a = new inputa(this.actionList[i]);
+	if(statements_action.constructor == Grouping){
+		statements_action = statements_action.list
+	}
+
+
+	for(i in statements_action){ // input for action generate
+		if(statements_action[i].devname){
+			var a = new inputa(statements_action[i]);
 			this.input_a_make.push(a);
 		}
-		else if(this.actionList[i].method){
-			var argument = this.actionList[i].args
+		else if(statements_action[i].method){
+			var argument = statements_action[i].args
 			if(argument){
 				for(index in argument){
 					var a = new inputa(argument[index]);
@@ -79,10 +91,19 @@ function ECA(statements_event, value_condition, statements_action) {
 		}
 	}
 
-	for(i in coditionList){ // input for action generate
-		if(coditionList[i].devname){
-			var c = new inputa(coditionList[i]);
-			this.input_c_make.push(c);
+	var coditionList = new Array();
+
+	
+	if(value_condition.constructor == Grouping){
+		this.input_c_make = value_condition.list
+	}else{
+		condition_input(value_condition, coditionList);
+
+		for(i in coditionList){ // input for action generate
+			if(coditionList[i].devname){
+				var c = new inputa(coditionList[i]);
+				this.input_c_make.push(c);
+			}
 		}
 	}
 }  
@@ -100,10 +121,14 @@ function inpute(e) {
 		this.attr = e.event_handler.to
 	}
 
-	if(this.device == "battery")
-		this.subscribe = "subscribe("+this.name+', \"'+ this.device+'\", '+ handler_name+")";
-	else
-		this.subscribe = "subscribe("+this.name+', \"'+ this.device +'.'+this.attr+'\", '+ handler_name+")";
+	if(attrMap.isOnlyENUM(this.device)){
+		var attr_obj = attrMap.getENUM(this.device)
+		this.subscribe = "subscribe("+this.name+', \"'+ attr_obj.id +'.'+this.attr+'\", '+ handler_name+")";
+
+	}else if(attrMap.isOnlyNUMBER(this.device)){
+		var attr_obj = attrMap.getNUMBER(this.device)
+		this.subscribe = "subscribe("+this.name+', \"'+ attr_obj.id+'\", '+ handler_name+")";
+	}
 }
 
 function inputa(a) {
@@ -117,6 +142,12 @@ function inputa(a) {
 		this.input = 'input \"'+this.name+'\", \"'+this.device +'\", title:\"'+this.name+'\"' ;
 	}
 
+}
+
+function Grouping() {
+	this.type;
+	this.p;
+	this.list = new Array();
 }
 
 function Event() {
@@ -147,6 +178,6 @@ function Condition(name, device) {
 
 
 function Args() {
-	this.capname;
-	this.capbility;
+	this.name;
+	this.function;
 }

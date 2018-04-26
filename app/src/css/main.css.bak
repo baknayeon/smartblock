@@ -1,5 +1,5 @@
 body {
-	width: 1420px;
+	width: 1440px;
 	font-family: NotoSansCJKkr-Thin;
 	margin: 0 auto ;
 }
@@ -182,7 +182,7 @@ button{
 #device_setting{
 	position: fixed;
 	top: 140px;
-	width: 330px;
+	width: 340px;
 	height:700px;  
 	background: #fff;
 	overflow: auto;
@@ -262,7 +262,7 @@ button{
   stroke-width: 2px;
 } 
 .blocklyToolboxDiv {
-    background-color: #fff;    
+    background-color: #F4F4F4;    
 	border-top: 1px solid #eee;
 	border-left: 1px solid #eee;
 	border-bottom: 1px solid #eee;
@@ -293,7 +293,7 @@ button{
 	visibility: hidden;
 	position:absolute;
 	top:10px;
-	left:700px;
+	left:900px;
 	font-family: NotoSansCJKkr-Thin;
 	width: 80px;
 	height: 30px;
@@ -302,7 +302,7 @@ button{
     color: #999;
     background-color: #fff;
 	border:none;
-  box-shadow: 0 3px 5px #ddd;
+    box-shadow: 0 3px 5px #ddd;
 	outline: none;
 	transition: all 0.25s ease-in-out;
 }
