@@ -166,7 +166,7 @@ Blockly.Blocks['compare'] = {
 			}
 		}
 	}
-	if(event.type == Blockly.Events.BLOCK_MOVE && this.parentBlock_){ // operator with all and exists
+	/*if(event.type == Blockly.Events.BLOCK_MOVE && this.parentBlock_){ // operator with all and exists
 		var parentBlock = this.parentBlock_
 		if(parentBlock.type =="all" || parentBlock.type=="exists" ){
 			if(event.newInputName == "p" || event.newInputName == "A" || event.newInputName == "B"){
@@ -222,7 +222,7 @@ Blockly.Blocks['compare'] = {
 			}
 
 		}
-	}
+	}*/
 
     // Disconnect blocks that existed prior to this change if they don't match.
     if (blockA && blockB &&
@@ -263,7 +263,7 @@ function shortName(device){
 function condition_block(device){
 	Blockly.SmartThings['c_'+device] = function(block) {
 	  var type = block.getFieldValue('type');
-	  var variable_name = Blockly.SmartThings.variableDB_.getName(block.getFieldValue('name'), Blockly.Variables.NAME_TYPE);
+	  var variable_name = Blockly.SmartThings.variableDB_.getName(block.getFieldText('name'), Blockly.Variables.NAME_TYPE);
 	  // TODO: Assemble SmartThings into code variable.
 	  
 	  var c = new inputc();
@@ -279,10 +279,14 @@ function condition_block(device){
 	Blockly.Blocks['c_'+device] = {
 	    init: function() {
 			var new_devName = shortName(device)
+			var count = deviceCount.get(device)
+			if(goog.isNumber(count)){
+				count = count.toString();
+			}
 
 			this.appendDummyInput("device")
 				.appendField(new Blockly.FieldLabel(new_devName), "type")
-				.appendField(new Blockly.FieldVariable(new_devName+event_num, true, device), "name");
+				.appendField(new Blockly.FieldVariable(count, null, null, device), "name"); // , null, null, device)
 
 			var block = this.getInput("device");
 			if(attrMap.hasMultiTypeENUM(device)){
@@ -349,7 +353,7 @@ Blockly.Blocks['negate'] = {
 Blockly.Blocks['device_list'] = {
     init : function() {
         this.appendDummyInput('device_list')
-		.appendField(new Blockly.FieldDropdown(Array.from(deviceMap)), 'device')
+		.appendField(new Blockly.FieldDropdown(Array.from(deviceSet.entries())), 'device')
         .appendField("Device");
 		this.setInputsInline(true);
 		this.setColour(Block_colour_condition);

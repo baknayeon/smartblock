@@ -1,5 +1,5 @@
 body {
-	width: 1440px;
+	width: 1640px;
 	font-family: NotoSansCJKkr-Thin;
 	margin: 0 auto ;
 }
@@ -293,7 +293,7 @@ button{
 	visibility: hidden;
 	position:absolute;
 	top:10px;
-	left:900px;
+	left:1180px;
 	font-family: NotoSansCJKkr-Thin;
 	width: 80px;
 	height: 30px;
@@ -312,7 +312,7 @@ button{
 }
 #smartApp_code{
 	position:absolute;
-
+width: 1180px;
 }
 
 .groovy{

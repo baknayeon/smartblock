@@ -1,25 +1,25 @@
-function action_block(devname){
-	Blockly.SmartThings['a_'+devname] = function(block) {
-		var variable_name = Blockly.SmartThings.variableDB_.getName(block.getFieldValue('name'), Blockly.Variables.NAME_TYPE);
+function action_block(device){
+	Blockly.SmartThings['a_'+device] = function(block) {
+		var variable_name = Blockly.SmartThings.variableDB_.getName(block.getFieldText('name'), Blockly.Variables.NAME_TYPE);
 		var dropdown_commands = block.getFieldValue('Command');
-		var actionList = Blockly.SmartThings.valueToCode(block, devname, Blockly.SmartThings.ORDER_ATOMIC);
+		var actionList = Blockly.SmartThings.valueToCode(block, device, Blockly.SmartThings.ORDER_ATOMIC);
 		// TODO: Assemble SmartThings into code variable.
 		
 		var smartAction = new Action();
 		if(dropdown_commands){
-			if(commMap.isSingleCommad(devname)){
+			if(commMap.isSingleCommad(device)){
 				smartAction.devname = variable_name;
 				smartAction.command= smartAction.devname+'.'+dropdown_commands+'()';
-				smartAction.device = devname;	
-			}else if(commMap.isSingleMethod(devname)){
-				var command = commMap.getMethod(devname)
+				smartAction.device = device;	
+			}else if(commMap.isSingleMethod(device)){
+				var command = commMap.getMethod(device)
 				smartAction.devname = variable_name;
 				smartAction.command= smartAction.devname+'.'+command.id+'('+dropdown_commands+')';
-				smartAction.device = devname;	
+				smartAction.device = device;	
 			}
 		}else{
 			smartAction.devname = variable_name;
-			smartAction.device = devname;	
+			smartAction.device = device;	
 
 		}
 
@@ -31,21 +31,26 @@ function action_block(devname){
 		return result;
 	};
 	
-	Blockly.Blocks['a_'+devname] = {
+	Blockly.Blocks['a_'+device] = {
 		init: function() {
-			this.appendValueInput(devname)
+			var count = deviceCount.get(device)
+			if(goog.isNumber(count)){
+				count = count.toString();
+			}
+
+			this.appendValueInput(device)
 				.setCheck("Action")
-				.appendField(devname, "device")
-				.appendField(new Blockly.FieldVariable(devname+action_num, true, devname), "name");
+				.appendField(device, "device")
+				.appendField(new Blockly.FieldVariable(count, null, null, device), "name");
 			 this.setInputsInline(false);
-			var block = this.getInput(devname);
-			if(commMap.isSingleCommad(devname)){
-				block.appendField(new Blockly.FieldDropdown(commMap.getCommad_vaules(devname)), "Command");
-			}else if(commMap.isSingleMethod(devname)){
-				setMethodField(block, devname);
-			}else if(commMap.isMultiMethod(devname)){
-				block.appendField(new Blockly.FieldDropdown(commMap.getMultiType(devname)), "Command_id");
-				setMethodField(block, devname);
+			var block = this.getInput(device);
+			if(commMap.isSingleCommad(device)){
+				block.appendField(new Blockly.FieldDropdown(commMap.getCommad_vaules(device)), "Command");
+			}else if(commMap.isSingleMethod(device)){
+				setMethodField(block, device);
+			}else if(commMap.isMultiMethod(device)){
+				block.appendField(new Blockly.FieldDropdown(commMap.getMultiType(device)), "Command_id");
+				setMethodField(block, device);
 			}
 
 			this.setOutput(true, "Action");
@@ -69,7 +74,7 @@ function action_block(devname){
 					block.appendField(new Blockly.FieldTextInput(""), "Command");
 
 			}
-			if(event.type == Blockly.Events.BLOCK_MOVE){
+			/*if(event.type == Blockly.Events.BLOCK_MOVE){
 
 				if(this.parentBlock_ && event.newParentId == this.parentBlock_.id){
 					//map - action
@@ -118,7 +123,7 @@ function action_block(devname){
 					}
 				}
 			}
-
+*/
 		}
 	};
 }

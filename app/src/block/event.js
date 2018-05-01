@@ -17,15 +17,15 @@ Blockly.Blocks['event_handler'] = {
 			if(this.parentBlock_){ //this.squareTopLeftCorner_ && 
 				var parentBlock = this.parentBlock_
 			
-				if(event.type == Blockly.Events.BLOCK_MOVE){
+				if(event.type == Blockly.Events.BLOCK_MOVE ){
 				
-					if(event.newParentId == parentBlock.id && parentBlock.type.includes("e_")){
+					if((event.newParentId == parentBlock.id && parentBlock.type.includes("e_") )){
 						//init event_handler with event
 						var fromBlock = this.getInput('from');
 						var toBlock = this.getInput('to');
 
-						var device = parentBlock.getField("device").text_
-						var parentBlock_attr = parentBlock.getField("attribute").text_;
+						var device = parentBlock.getFieldValue("device")
+						var parentBlock_attr = parentBlock.getFieldValue("attribute");
 						parentBlock.getInput(device).removeField("attribute");
 
 						if(attrMap.isOnlyENUM(device)){
@@ -166,7 +166,7 @@ Blockly.SmartThings['any'] = function(block) {
 
 function event_block(device){
 	Blockly.SmartThings['e_'+device] = function(block) {
-	  var variable_name = Blockly.SmartThings.variableDB_.getName(block.getFieldValue('name'), Blockly.Variables.NAME_TYPE);
+	   var variable_name = Blockly.SmartThings.variableDB_.getName(block.getFieldText('name'), Blockly.Variables.NAME_TYPE);
 	  var dropdown_attributes = block.getFieldValue('attribute');
 	  var value_switch = Blockly.SmartThings.valueToCode(block, device, Blockly.SmartThings.ORDER_ATOMIC);
 	  // TODO: Assemble SmartThings into code variable.
@@ -186,10 +186,14 @@ function event_block(device){
 		
 		init: function() {
 			var new_devName = shortName(device)
+			var count = deviceCount.get(device)
+			if(goog.isNumber(count)){
+				count = count.toString();
+			}
 			this.appendValueInput(device)
 					.setCheck("Event_Handler")
 					.appendField(new_devName, "device")
-					.appendField(new Blockly.FieldVariable(new_devName+event_num, true, device), "name");
+					.appendField(new Blockly.FieldVariable(count, null, null, device), "name");
 
 			var block = this.getInput(device);
 			if(attrMap.isOnlyENUM(device)){
@@ -226,7 +230,7 @@ function event_block(device){
 						block.appendField(new Blockly.FieldDropdown(attrMap.getENUM_vaulesById(device, attribute_id)),"attribute");
 					}
 				}
-				else if(this.parentBlock_ && event.newParentId == this.parentBlock_.id){
+				/*else if(this.parentBlock_ && event.newParentId == this.parentBlock_.id){
 					//any - event
 					block.removeField("attribute");
 				}
@@ -236,7 +240,7 @@ function event_block(device){
 						//disconneted
 						appendAttr(device, block);
 					}
-				}
+				}*/
 			}
 			
 		}

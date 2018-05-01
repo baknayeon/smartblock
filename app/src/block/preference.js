@@ -7,15 +7,17 @@ function pre_block(devname, colour){
 	  
 	  for(i in ecaList_g){
 	  	if(input ==""){
-	  		var input_e = ecaList_g[i].input_e_make;
+	  		var input_e_list = ecaList_g[i].input_e_make;
 			var input_a_list = ecaList_g[i].input_a_make;
 			var input_c_list = ecaList_g[i].input_c_make;
 			
-			if(text_name === input_e.name){
-				input = hi(input, input_e.input, value_name)
-				break
-			}
 
+			for(e in input_e_list){
+				if(text_name === input_e_list[e].name){
+					input = hi(input, input_e_list[e].input, value_name)
+				}
+
+			 }
 			for(a in input_a_list){
 				if(text_name === input_a_list[a].name){
 					input = hi(input, input_a_list[a].input, value_name)

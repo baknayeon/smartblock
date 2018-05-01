@@ -2,7 +2,7 @@ Blockly.devicesFlyoutCallback_event = function(workspace) {
 	var xmlList = [];
 
 	add_eventHander_xml(xmlList);
-	add_grouping("any", Block_colour_event, xmlList);
+	//add_grouping("any", Block_colour_event, xmlList);
 
 	selected_dev.forEach(function(itme){
 		var device = itme
@@ -25,8 +25,8 @@ Blockly.devicesFlyoutCallback_condition = function(workspace) {
 	});
 	
 
-	add_grouping("all", Block_colour_condition, xmlList);
-	add_grouping("exists", Block_colour_condition, xmlList);
+	//add_grouping("all", Block_colour_condition, xmlList);
+	//add_grouping("exists", Block_colour_condition, xmlList);
   add_logic_xml(xmlList)
 
   return xmlList;
@@ -42,7 +42,7 @@ Blockly.devicesFlyoutCallback_action = function(workspace) {
 			xmlList.push(addXml("a_"+device));
 		}
 	});
-	add_grouping("map", Block_colour_action, xmlList);
+	//add_grouping("map", Block_colour_action, xmlList);
 	
 
 	add_action_method_xml(xmlList);
@@ -267,6 +267,8 @@ function grouping(name, color){
 			this.setOutput(true, "Action");
 		}
 
+    this.setInputsInline(false);
+    this.setOutput(true, null);
 		this.setColour(color);
 		this.itemCount_ = 2;
 		this.updateShape_();
@@ -335,6 +337,7 @@ function grouping(name, color){
 	  compose: function(containerBlock) {
 		var itemBlock = containerBlock.getInputTargetBlock('STACK');
 		// Count number of inputs.
+		
 		var connections = [];
 		while (itemBlock) {
 		  connections.push(itemBlock.valueConnection_);

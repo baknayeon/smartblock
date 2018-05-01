@@ -34,7 +34,7 @@ function device_table(){
 	var alphabet = ["Things", "A","B","C","D", "E","FG","H","IJ","KL","M","NO","P","QR","S", "T", "UV","WXYZ"]
 	
 	var index = 0;
-	if (!deviceMap.keys) {
+	/*if (!deviceMap.keys) {
 	  deviceMap.keys = function(obj) {
 		var keys = [];
 
@@ -46,9 +46,9 @@ function device_table(){
 
 		return keys;
 	  };
-	}
+	}*/
 
-	var deviceList = Array.from(deviceMap.keys());
+	var deviceList = Array.from(deviceSet);
 
 	var table = ""
 
@@ -109,7 +109,7 @@ function setting_things(x){
 						'<strong><p>Setting</p></strong>'+
 						'<button id= "setting_close" onClick = "setting_close()"></button> '
 						
-		var deviceList = Array.from(deviceMap.keys());
+		var deviceList = Array.from(deviceSet);
 		var subdiv = document.createElement('div');
 		subdiv.setAttribute("class", "setting_list");
 		subdiv.innerHTML += '<div> ';

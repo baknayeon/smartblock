@@ -1,62 +1,65 @@
 function smartApp(){
-		var code
-		eca_num = 0;
-		var name = document.getElementById("name").value;
-		if(name){
+	var code;
+	var name = document.getElementById("name").value;
 
-			var ecaList = Blockly.SmartThings.workspaceToCode(demoWorkspace);//Blockly.SmartThings.workspaceToAST(demoWorkspace)
-			
-			//definition
-			var definition ='definition( '+'\n'+'name: \"'+name+'\",'+"\n"
-			
-			var author = document.getElementById("author").value;
-			var namespace = document.getElementById("namespace").value
-			var description = document.getElementById("description").value
-			var iconUrl = document.getElementById("iconUrl").value
+	if(name){
 
-			if(author)
-				definition +=  'author: "'+ author +'"'+"\n"
-			else
-				definition += 'author: "SmartBlock",'+"\n"
-
-			if(namespace)
-				definition += 'namespace: "'+ namespace +'",'+"\n"
-			else
-				definition += 'namespace: "SmartBlock",'+"\n"
-
-			if(description)
-				definition += 'description: "'+ description +'",'+"\n"
-			else 
-				definition += 'description: "this app is made by SmartBlock",\n'
-
-			if(iconUrl)
-				definition +='iconUrl: \"'+iconUrl+'",'+"\n"
-				+'iconX2Url: \"'+iconUrl+'"'+"\n"
-			else
-				definition +='iconUrl: "http://cs.sookmyung.ac.kr/~uslab/snowblock/logo2.png",'+"\n"
-				+'iconX2Url: "http://cs.sookmyung.ac.kr/~uslab/snowblock/logo1.png"'+"\n"
-			definition +=')';
-			
-			//prferences
-			var prferences = generating_pref(ecaList)
-
-			//predefined_callback
-			var subscribe = generating_subscribe(ecaList)
-			var installed = "def installed() {\n" + subscribe +"}";
-			var updated = "def updated() {\n\tunsubscribe()\n" +subscribe +"}";
-			var predefined_callback= installed+"\n"+updated;
-			
-			//eventHandler
-			var eventHandler = generating_eventHandler(ecaList)
+		var ecaList = Blockly.SmartThings.workspaceToCode(demoWorkspace);
+	
+		//definition
+		var definition = generating_definition()
 		
+		//prferences
+		var prferences = generating_pref(ecaList)
 
-			//4 section combaine
-			code = definition +"\n\n"+ prferences +"\n\n"+ predefined_callback +"\n\n"+ eventHandler;
-		}else{
-			alert("plz write the App name");
-		}
+		//predefined_callback
+		var subscribe = generating_subscribe(ecaList)
+		var installed = "def installed() {\n" + subscribe +"}";
+		var updated = "def updated() {\n\tunsubscribe()\n" +subscribe +"}";
+		var predefined_callback= installed+"\n"+updated;
+		
+		//eventHandler
+		var eventHandler = generating_eventHandler(ecaList)
+	
+		//4 section combaine
+		code = definition +"\n\n"+ prferences +"\n\n"+ predefined_callback +"\n\n"+ eventHandler;
+	}else{
+		alert("plz write the App name");
+	}
 
 	return code;
+}
+
+
+function generating_definition(){
+	var name = document.getElementById("name").value;
+	var author = document.getElementById("author").value;
+	var namespace = document.getElementById("namespace").value
+	var description = document.getElementById("description").value
+	var iconUrl = document.getElementById("iconUrl").value
+		
+	var definition ='definition( '+'\n'+'name: \"'+name+'\",'+"\n"
+	if(author)
+		definition +=  'author: "'+ author +'"'+"\n"
+	else
+		definition += 'author: "SmartBlock",'+"\n"
+	if(namespace)
+		definition += 'namespace: "'+ namespace +'",'+"\n"
+	else
+		definition += 'namespace: "SmartBlock",'+"\n"
+	if(description)
+		definition += 'description: "'+ description +'",'+"\n"
+	else 
+		definition += 'description: "this app is made by SmartBlock",\n'
+	if(iconUrl)
+		definition +='iconUrl: \"'+iconUrl+'",'+"\n"
+		+'iconX2Url: \"'+iconUrl+'"'+"\n"
+	else
+		definition +='iconUrl: "http://cs.sookmyung.ac.kr/~uslab/snowblock/logo2.png",'+"\n"
+		+'iconX2Url: "http://cs.sookmyung.ac.kr/~uslab/snowblock/logo1.png"'+"\n"
+	definition +=')';
+
+	return definition
 }
 
 function generat_codition_input(c){
@@ -205,7 +208,7 @@ function generating_eventHandler(ecaList){
 		var event_condition_battery= generating_event_condition(ecaList[i].event)
 
 		//handlerMethod
-		var handlerMethod = "def "+input_e.handler+"{\n"
+		var handlerMethod = "def "+input_e[0].handler+"{\n"
 
 		if(event_condition_battery)
 			handlerMethod +="\tif("+event_condition_battery+")\n"

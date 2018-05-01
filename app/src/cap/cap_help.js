@@ -6,9 +6,8 @@ AttributeMap = function(){
 };   
 AttributeMap.prototype = {  
 	generateGroup : function(){ 
-		var list = Array.from(deviceMap)
-		for( i in list){
-			var key = list[i][0];
+
+		for (let key of deviceSet.values()) {
 			var e = this.ENUM[key];
 			var n = this.NUMBER[key];
 			if(e && n){
@@ -225,5 +224,28 @@ function Command_method(i, t, v){
 }
 
 function setDevice(device){
-		deviceMap.set(device, device)
+		deviceCount.set(device, parseInt("1"))
+		deviceSet.add(device)
+}
+
+		
+CountMap = function(){   
+    this.dev = new Array(); 
+};   
+CountMap.prototype = {  
+	get : function(key){   
+
+        var value = this.dev[key]; 
+		return value
+    },
+		
+	up : function(key){   
+
+        var value = this.dev[key]
+		this.dev[key] = ++value;
+
+    },
+	set : function(key, value){   
+		this.dev[key] = value
+    }
 }

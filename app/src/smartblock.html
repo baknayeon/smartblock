@@ -14,7 +14,7 @@
   <script src="cap/cap.js"></script>
   <script src="cap/cap_help.js"></script>
   <script src="help.js"></script>
-  <script src="generate.js"></script>
+  <script src="codegenerate.js"></script>
   <script src="xml.js"></script>
 
   <script src="block/rule_definer.js"></script>
@@ -31,7 +31,8 @@
   <script src="highlight/highlight.pack.js"></script>
 
 <script>
-	var deviceMap = new Map();
+	var	deviceCount = new CountMap();
+	var deviceSet = new Set();
 	var selected_dev = new Map();
 	var attrMap = new AttributeMap(); 	
 	var commMap = new CommandMap();
@@ -62,9 +63,8 @@
 	var Block_colour_option = "#"+"8cd4db"
 	var Block_colour_option_disconnted = "#"+"cceef2"
 
-	var event_num = 1;
-	var action_num = 1;
 	var variable_num = 1;
+
 	var ecaList_g;
 	var eca_num;
 
@@ -135,24 +135,24 @@
 
 	document.getElementById("click1").click();
 
-	var options = { 
-		toolbox : toolbox, 
-		collapse : false, 
-		comments : false, 
-		disable : false, 
-		maxBlocks : Infinity, 
-		trashcan : true, 
-		horizontalLayout : false, 
-		toolboxPosition : 'start', 
-		css : true, 
-		media : 'https://blockly-demo.appspot.com/static/media/', 
-		rtl : false, 
-		scrollbars : true, 
-		sounds : true, 
-		oneBasedIndex : true
-	};
+	
+	var demoWorkspace = Blockly.inject('blocklyDiv', { 
+														toolbox : toolbox, 
+														collapse : false, 
+														comments : false, 
+														disable : false, 
+														maxBlocks : Infinity, 
+														trashcan : true, 
+														horizontalLayout : false, 
+														toolboxPosition : 'start', 
+														css : true, 
+														media : 'https://blockly-demo.appspot.com/static/media/', 
+														rtl : false, 
+														scrollbars : true, 
+														sounds : true, 
+														oneBasedIndex : true
+													});
 
-	var demoWorkspace = Blockly.inject('blocklyDiv', options);
 
 	demoWorkspace.registerToolboxCategoryCallback('SAMRT_DEVICE_C', Blockly.devicesFlyoutCallback_condition);
 	demoWorkspace.registerToolboxCategoryCallback('SAMRT_DEVICE_E', Blockly.devicesFlyoutCallback_event);
