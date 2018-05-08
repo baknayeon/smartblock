@@ -268,8 +268,8 @@ function condition_block(device){
 	  
 	  var c = new inputc();
 	  c.device = type;
-	  c.devname =variable_name;
-	  c.input = 'input \"'+variable_name+'\", \"capability.'+type +'\", title:\"'+variable_name+'\"' ;
+	  c.devname =device+variable_name;
+	  c.input = 'input \"'+c.devname+'\", \"capability.'+type +'\", title:\"'+c.devname+'\"' ;
 	  return c;
 	  //var code = 
 	  // TODO: Change ORDER_NONE to the correct strength.

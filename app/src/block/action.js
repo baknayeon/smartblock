@@ -1,24 +1,24 @@
 function action_block(device){
 	Blockly.SmartThings['a_'+device] = function(block) {
 		var variable_name = Blockly.SmartThings.variableDB_.getName(block.getFieldText('name'), Blockly.Variables.NAME_TYPE);
-		var dropdown_commands = block.getFieldValue('Command');
+	    var dropdown_commands = block.getFieldValue('Command');
 		var actionList = Blockly.SmartThings.valueToCode(block, device, Blockly.SmartThings.ORDER_ATOMIC);
 		// TODO: Assemble SmartThings into code variable.
 		
 		var smartAction = new Action();
 		if(dropdown_commands){
 			if(commMap.isSingleCommad(device)){
-				smartAction.devname = variable_name;
+				smartAction.devname = device+variable_name;
 				smartAction.command= smartAction.devname+'.'+dropdown_commands+'()';
 				smartAction.device = device;	
 			}else if(commMap.isSingleMethod(device)){
 				var command = commMap.getMethod(device)
-				smartAction.devname = variable_name;
+				smartAction.devname = device+variable_name;
 				smartAction.command= smartAction.devname+'.'+command.id+'('+dropdown_commands+')';
 				smartAction.device = device;	
 			}
 		}else{
-			smartAction.devname = variable_name;
+			smartAction.devname = device+variable_name;
 			smartAction.device = device;	
 
 		}

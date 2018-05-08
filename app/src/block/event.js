@@ -166,14 +166,14 @@ Blockly.SmartThings['any'] = function(block) {
 
 function event_block(device){
 	Blockly.SmartThings['e_'+device] = function(block) {
-	   var variable_name = Blockly.SmartThings.variableDB_.getName(block.getFieldText('name'), Blockly.Variables.NAME_TYPE);
+	  var variable_name = Blockly.SmartThings.variableDB_.getName(block.getFieldText('name'), Blockly.Variables.NAME_TYPE);
 	  var dropdown_attributes = block.getFieldValue('attribute');
 	  var value_switch = Blockly.SmartThings.valueToCode(block, device, Blockly.SmartThings.ORDER_ATOMIC);
 	  // TODO: Assemble SmartThings into code variable.
 	  console.log("event_block"); 
 
 	  var smartevent = new Event();
-	  smartevent.devname = variable_name;
+	  smartevent.devname = device+variable_name;
 	  smartevent.device = device;
 	  smartevent.event_handler = value_switch;
 	  smartevent.attr = dropdown_attributes

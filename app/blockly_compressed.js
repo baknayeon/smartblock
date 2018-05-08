@@ -1440,7 +1440,19 @@ Blockly.Connection.prototype.checkConnection_=function(a){switch(this.canConnect
 Blockly.Connection.prototype.isConnectionAllowed=function(a){if(this.canConnectWithReason_(a)!=Blockly.Connection.CAN_CONNECT)return!1;if(a.type==Blockly.OUTPUT_VALUE||a.type==Blockly.PREVIOUS_STATEMENT)if(a.isConnected()||this.isConnected())return!1;return a.type==Blockly.INPUT_VALUE&&a.isConnected()&&!a.targetBlock().isMovable()&&!a.targetBlock().isShadow()||this.type==Blockly.PREVIOUS_STATEMENT&&a.isConnected()&&!this.sourceBlock_.nextConnection&&!a.targetBlock().isShadow()&&a.targetBlock().nextConnection||
 -1!=Blockly.draggingConnections_.indexOf(a)?!1:!0};Blockly.Connection.prototype.connect=function(a){this.targetConnection!=a&&(this.checkConnection_(a),this.isSuperior()?this.connect_(a):a.connect_(this))};Blockly.Connection.connectReciprocally_=function(a,b){goog.asserts.assert(a&&b,"Cannot connect null connections.");a.targetConnection=b;b.targetConnection=a};
 Blockly.Connection.singleConnection_=function(a,b){for(var c=!1,d=0;d<a.inputList.length;d++){var e=a.inputList[d].connection;if(e&&e.type==Blockly.INPUT_VALUE&&b.outputConnection.checkType_(e)){if(c)return null;c=e}}return c};Blockly.Connection.lastConnectionInRow_=function(a,b){for(var c=a,d;d=Blockly.Connection.singleConnection_(c,b);)if(c=d.targetBlock(),!c||c.isShadow())return d;return null};
-Blockly.Connection.prototype.disconnect=function(){var a=this.targetConnection;goog.asserts.assert(a,"Source connection not connected.");goog.asserts.assert(a.targetConnection==this,"Target connection not connected to source connection.");if(this.isSuperior()){var b=this.sourceBlock_;var c=a.getSourceBlock();a=this}else b=a.getSourceBlock(),c=this.sourceBlock_;this.disconnectInternal_(b,c);a.respawnShadow_()};
+
+Blockly.Connection.prototype.disconnect=function(){
+	var a=this.targetConnection;goog.asserts.assert(a,"Source connection not connected.");
+	goog.asserts.assert(a.targetConnection==this,"Target connection not connected to source connection.");
+	
+	if(this.isSuperior()){
+		var b=this.sourceBlock_;var c=a.getSourceBlock();a=this
+	}else b=a.getSourceBlock(),c=this.sourceBlock_;
+
+	this.disconnectInternal_(b,c);
+	a.respawnShadow_()
+	change_disconnted_color(c)//ny connection
+};
 Blockly.Connection.prototype.disconnectInternal_=function(a,b){var c;Blockly.Events.isEnabled()&&(c=new Blockly.Events.BlockMove(b));this.targetConnection=this.targetConnection.targetConnection=null;b.setParent(null);c&&(c.recordNew(),Blockly.Events.fire(c))};
 Blockly.Connection.prototype.respawnShadow_=function(){var a=this.getSourceBlock(),b=this.getShadowDom();if(a.workspace&&b&&Blockly.Events.recordUndo)if(a=Blockly.Xml.domToBlock(b,a.workspace),a.outputConnection)this.connect(a.outputConnection);else if(a.previousConnection)this.connect(a.previousConnection);else throw"Child block does not have output or previous statement.";};Blockly.Connection.prototype.targetBlock=function(){return this.isConnected()?this.targetConnection.getSourceBlock():null};
 Blockly.Connection.prototype.checkType_=function(a){if(!this.check_||!a.check_)return!0;for(var b=0;b<this.check_.length;b++)if(-1!=a.check_.indexOf(this.check_[b]))return!0;return!1};Blockly.Connection.prototype.onCheckChanged_=function(){this.isConnected()&&!this.checkType_(this.targetConnection)&&(this.isSuperior()?this.targetBlock():this.sourceBlock_).unplug()};
@@ -1605,7 +1617,9 @@ d+'">'+Blockly.Variables.generateVariableFieldXmlString(c)+'<value name="DELTA">
 Blockly.Variables.generateUniqueName=function(a){a=a.getAllVariables();var b="";if(a.length)for(var c=1,d=0,e="ijkmnopqrstuvwxyzabcdefgh".charAt(d);!b;){for(var f=!1,g=0;g<a.length;g++)if(a[g].name.toLowerCase()==e){f=!0;break}f?(d++,25==d&&(d=0,c++),e="ijkmnopqrstuvwxyzabcdefgh".charAt(d),1<c&&(e+=c)):b=e}else b="i";return b};
 Blockly.Variables.createVariableButtonHandler=function(a,b,c){var d=c||"",e=function(c){Blockly.Variables.promptName(Blockly.Msg.NEW_VARIABLE_TITLE,c,function(c){if(c){var f=Blockly.Variables.nameUsedWithAnyType_(c,a);if(f){var g=c.toLowerCase();if(f.type==d)var m=Blockly.Msg.VARIABLE_ALREADY_EXISTS.replace("%1",g);else m=Blockly.Msg.VARIABLE_ALREADY_EXISTS_FOR_ANOTHER_TYPE,m=m.replace("%1",g).replace("%2",f.type);Blockly.alert(m,function(){e(c)})}else a.createVariable(c,d),b&&b(c)}else b&&b(null)})};
 e("")};goog.exportSymbol("Blockly.Variables.createVariableButtonHandler",Blockly.Variables.createVariableButtonHandler);Blockly.Variables.createVariable=Blockly.Variables.createVariableButtonHandler;goog.exportSymbol("Blockly.Variables.createVariable",Blockly.Variables.createVariable);
-Blockly.Variables.renameVariable=function(a,b,c){var d=function(e){var f=Blockly.Msg.RENAME_VARIABLE_TITLE.replace("%1",b.name);Blockly.Variables.promptName(f,e,function(e){if(e){var f=Blockly.Variables.nameUsedWithOtherType_(e,b.type,a);f?(f=Blockly.Msg.VARIABLE_ALREADY_EXISTS_FOR_ANOTHER_TYPE.replace("%1",e.toLowerCase()).replace("%2",f.type),Blockly.alert(f,function(){d(e)})):(a.renameVariableById(b.getId(),e),c&&c(e))}else c&&c(null)})};d("")};
+Blockly.Variables.renameVariable=function(a,b,c){var d=function(e){
+	var f= "Rename all "+b.type+" named '"+b.name+"' to:"// Blockly.Msg.RENAME_VARIABLE_TITLE.replace("%1",b.name); ny
+	Blockly.Variables.promptName(f,e,function(e){if(e){var f=Blockly.Variables.nameUsedWithOtherType_(e,b.type,a);f?(f=Blockly.Msg.VARIABLE_ALREADY_EXISTS_FOR_ANOTHER_TYPE.replace("%1",e.toLowerCase()).replace("%2",f.type),Blockly.alert(f,function(){d(e)})):(a.renameVariableById(b.getId(),e),c&&c(e))}else c&&c(null)})};d("")};
 Blockly.Variables.promptName=function(a,b,c){Blockly.prompt(a,b,function(a){a&&(a=a.replace(/[\s\xa0]+/g," ").replace(/^ | $/g,""),a==Blockly.Msg.RENAME_VARIABLE||a==Blockly.Msg.NEW_VARIABLE)&&(a=null);c(a)})};
 
 Blockly.Variables.nameUsedWithOtherType_=function(a,b,c){
@@ -1630,31 +1644,784 @@ Blockly.WorkspaceDragSurfaceSvg.prototype.createDom=function(){this.SVG_||(this.
 Blockly.WorkspaceDragSurfaceSvg.prototype.translateSurface=function(a,b){var c=a.toFixed(0),d=b.toFixed(0);this.SVG_.style.display="block";Blockly.utils.setCssTransform(this.SVG_,"translate3d("+c+"px, "+d+"px, 0px)")};Blockly.WorkspaceDragSurfaceSvg.prototype.getSurfaceTranslation=function(){return Blockly.utils.getRelativeXY(this.SVG_)};
 Blockly.WorkspaceDragSurfaceSvg.prototype.clearAndHide=function(a){if(!a)throw"Couldn't clear and hide the drag surface: missing new surface.";var b=this.SVG_.childNodes[0],c=this.SVG_.childNodes[1];if(!(b&&c&&Blockly.utils.hasClass(b,"blocklyBlockCanvas")&&Blockly.utils.hasClass(c,"blocklyBubbleCanvas")))throw"Couldn't clear and hide the drag surface.  A node was missing.";null!=this.previousSibling_?Blockly.utils.insertAfter_(b,this.previousSibling_):a.insertBefore(b,a.firstChild);Blockly.utils.insertAfter_(c,
 b);this.SVG_.style.display="none";goog.asserts.assert(0==this.SVG_.childNodes.length,"Drag surface was not cleared.");Blockly.utils.setCssTransform(this.SVG_,"");this.previousSibling_=null};
-Blockly.WorkspaceDragSurfaceSvg.prototype.setContentsAndShow=function(a,b,c,d,e,f){goog.asserts.assert(0==this.SVG_.childNodes.length,"Already dragging a block.");this.previousSibling_=c;a.setAttribute("transform","translate(0, 0) scale("+f+")");b.setAttribute("transform","translate(0, 0) scale("+f+")");this.SVG_.setAttribute("width",d);this.SVG_.setAttribute("height",e);this.SVG_.appendChild(a);this.SVG_.appendChild(b);this.SVG_.style.display="block"};Blockly.Xml={};Blockly.Xml.workspaceToDom=function(a,b){var c=goog.dom.createDom("xml"),d=Blockly.Variables.allUsedVarModels(a);d.length&&c.appendChild(Blockly.Xml.variablesToDom(d));d=a.getTopBlocks(!0);for(var e=0,f;f=d[e];e++)c.appendChild(Blockly.Xml.blockToDomWithXY(f,b));return c};Blockly.Xml.variablesToDom=function(a){for(var b=goog.dom.createDom("variables"),c=0,d;d=a[c];c++){var e=goog.dom.createDom("variable",null,d.name);e.setAttribute("type",d.type);e.setAttribute("id",d.getId());b.appendChild(e)}return b};
-Blockly.Xml.blockToDomWithXY=function(a,b){var c;a.workspace.RTL&&(c=a.workspace.getWidth());var d=Blockly.Xml.blockToDom(a,b),e=a.getRelativeToSurfaceXY();d.setAttribute("x",Math.round(a.workspace.RTL?c-e.x:e.x));d.setAttribute("y",Math.round(e.y));return d};
-Blockly.Xml.fieldToDomVariable_=function(a){null==a.getValue()&&(a.initModel(),a.getValue());var b=a.getVariable();if(!b)throw Error("Tried to serialize a variable field with no variable.");var c=goog.dom.createDom("field",null,b.name);c.setAttribute("name",a.name);c.setAttribute("id",b.getId());c.setAttribute("variabletype",b.type);return c};
-Blockly.Xml.fieldToDom_=function(a){if(a.name&&a.EDITABLE){if(a instanceof Blockly.FieldVariable)return Blockly.Xml.fieldToDomVariable_(a);var b=goog.dom.createDom("field",null,a.getValue());b.setAttribute("name",a.name);return b}return null};Blockly.Xml.allFieldsToDom_=function(a,b){for(var c=0,d;d=a.inputList[c];c++)for(var e=0,f;f=d.fieldRow[e];e++)(f=Blockly.Xml.fieldToDom_(f))&&b.appendChild(f)};
-Blockly.Xml.blockToDom=function(a,b){var c=goog.dom.createDom(a.isShadow()?"shadow":"block");c.setAttribute("type",a.type);b||c.setAttribute("id",a.id);if(a.mutationToDom){var d=a.mutationToDom();d&&(d.hasChildNodes()||d.hasAttributes())&&c.appendChild(d)}Blockly.Xml.allFieldsToDom_(a,c);if(d=a.getCommentText()){d=goog.dom.createDom("comment",null,d);if("object"==typeof a.comment){d.setAttribute("pinned",a.comment.isVisible());var e=a.comment.getBubbleSize();d.setAttribute("h",e.height);d.setAttribute("w",
-e.width)}c.appendChild(d)}a.data&&(d=goog.dom.createDom("data",null,a.data),c.appendChild(d));e=0;for(var f;f=a.inputList[e];e++){var g,h=!0;if(f.type!=Blockly.DUMMY_INPUT){var k=f.connection.targetBlock();f.type==Blockly.INPUT_VALUE?g=goog.dom.createDom("value"):f.type==Blockly.NEXT_STATEMENT&&(g=goog.dom.createDom("statement"));d=f.connection.getShadowDom();!d||k&&k.isShadow()||g.appendChild(Blockly.Xml.cloneShadow_(d));k&&(g.appendChild(Blockly.Xml.blockToDom(k,b)),h=!1);g.setAttribute("name",
-f.name);h||c.appendChild(g)}}a.inputsInlineDefault!=a.inputsInline&&c.setAttribute("inline",a.inputsInline);a.isCollapsed()&&c.setAttribute("collapsed",!0);a.disabled&&c.setAttribute("disabled",!0);a.isDeletable()||a.isShadow()||c.setAttribute("deletable",!1);a.isMovable()||a.isShadow()||c.setAttribute("movable",!1);a.isEditable()||c.setAttribute("editable",!1);if(e=a.getNextBlock())g=goog.dom.createDom("next",null,Blockly.Xml.blockToDom(e,b)),c.appendChild(g);d=a.nextConnection&&a.nextConnection.getShadowDom();
-!d||e&&e.isShadow()||g.appendChild(Blockly.Xml.cloneShadow_(d));return c};Blockly.Xml.cloneShadow_=function(a){for(var b=a=a.cloneNode(!0),c;b;)if(b.firstChild)b=b.firstChild;else{for(;b&&!b.nextSibling;)c=b,b=b.parentNode,3==c.nodeType&&""==c.data.trim()&&b.firstChild!=c&&goog.dom.removeNode(c);b&&(c=b,b=b.nextSibling,3==c.nodeType&&""==c.data.trim()&&goog.dom.removeNode(c))}return a};Blockly.Xml.domToText=function(a){return(new XMLSerializer).serializeToString(a)};
-Blockly.Xml.domToPrettyText=function(a){a=Blockly.Xml.domToText(a).split("<");for(var b="",c=1;c<a.length;c++){var d=a[c];"/"==d[0]&&(b=b.substring(2));a[c]=b+"<"+d;"/"!=d[0]&&"/>"!=d.slice(-2)&&(b+="  ")}a=a.join("\n");a=a.replace(/(<(\w+)\b[^>]*>[^\n]*)\n *<\/\2>/g,"$1</$2>");return a.replace(/^\n/,"")};
-Blockly.Xml.textToDom=function(a){(a=(new DOMParser).parseFromString(a,"text/xml"))&&a.firstChild&&"xml"==a.firstChild.nodeName.toLowerCase()&&a.firstChild===a.lastChild||goog.asserts.fail("Blockly.Xml.textToDom did not obtain a valid XML tree.");return a.firstChild};
-Blockly.Xml.domToWorkspace=function(a,b){if(a instanceof Blockly.Workspace){var c=a;a=b;b=c;console.warn("Deprecated call to Blockly.Xml.domToWorkspace, swap the arguments.")}var d;b.RTL&&(d=b.getWidth());c=[];Blockly.Field.startCache();var e=a.childNodes.length,f=Blockly.Events.getGroup();f||Blockly.Events.setGroup(!0);b.setResizesEnabled&&b.setResizesEnabled(!1);var g=!0;try{for(var h=0;h<e;h++){var k=a.childNodes[h],m=k.nodeName.toLowerCase();if("block"==m||"shadow"==m&&!Blockly.Events.recordUndo){var p=
-Blockly.Xml.domToBlock(k,b);c.push(p.id);var l=k.hasAttribute("x")?parseInt(k.getAttribute("x"),10):10,n=k.hasAttribute("y")?parseInt(k.getAttribute("y"),10):10;isNaN(l)||isNaN(n)||p.moveBy(b.RTL?d-l:l,n);g=!1}else if("shadow"==m)goog.asserts.fail("Shadow block cannot be a top-level block."),g=!1;else if("variables"==m){if(g)Blockly.Xml.domToVariables(k,b);else throw Error("'variables' tag must exist once before block and shadow tag elements in the workspace XML, but it was found in another location.");
-g=!1}}}finally{f||Blockly.Events.setGroup(!1),Blockly.Field.stopCache()}b.setResizesEnabled&&b.setResizesEnabled(!0);return c};
-Blockly.Xml.appendDomToWorkspace=function(a,b){if(b.hasOwnProperty("scale")){var c=Blockly.BlockSvg.TAB_WIDTH;try{Blockly.BlockSvg.TAB_WIDTH=0;var d=b.getBlocksBoundingBox()}finally{Blockly.BlockSvg.TAB_WIDTH=c}}c=Blockly.Xml.domToWorkspace(a,b);if(d&&d.height){var e=d.y+d.height;var f=d.x;var g=Infinity,h=Infinity;for(d=0;d<c.length;d++){var k=b.getBlockById(c[d]).getRelativeToSurfaceXY();k.y<h&&(h=k.y);k.x<g&&(g=k.x)}e=e-h+Blockly.BlockSvg.SEP_SPACE_Y;f-=g;var m;b.RTL&&(m=b.getWidth());for(d=0;d<
-c.length;d++)b.getBlockById(c[d]).moveBy(b.RTL?m-f:f,e)}return c};
-Blockly.Xml.domToBlock=function(a,b){if(a instanceof Blockly.Workspace){var c=a;a=b;b=c;console.warn("Deprecated call to Blockly.Xml.domToBlock, swap the arguments.")}Blockly.Events.disable();c=b.getAllVariables();try{var d=Blockly.Xml.domToBlockHeadless_(a,b),e=d.getDescendants();if(b.rendered){d.setConnectionsHidden(!0);for(var f=e.length-1;0<=f;f--)e[f].initSvg();for(f=e.length-1;0<=f;f--)e[f].render(!1);setTimeout(function(){d.workspace&&d.setConnectionsHidden(!1)},1);d.updateDisabled();b.resizeContents()}else for(f=
-e.length-1;0<=f;f--)e[f].initModel()}finally{Blockly.Events.enable()}if(Blockly.Events.isEnabled()){e=Blockly.Variables.getAddedVariables(b,c);for(f=0;f<e.length;f++)Blockly.Events.fire(new Blockly.Events.VarCreate(e[f]));Blockly.Events.fire(new Blockly.Events.BlockCreate(d))}return d};
-Blockly.Xml.domToVariables=function(a,b){for(var c=0,d;d=a.children[c];c++){var e=d.getAttribute("type"),f=d.getAttribute("id");d=d.textContent;if(null==e)throw Error("Variable with id, "+f+" is without a type");b.createVariable(d,e,f)}};
-Blockly.Xml.domToBlockHeadless_=function(a,b){var c=null,d=a.getAttribute("type");goog.asserts.assert(d,"Block type unspecified: %s",a.outerHTML);var e=a.getAttribute("id");c=b.newBlock(d,e);var f=null;e=0;for(var g;g=a.childNodes[e];e++)if(3!=g.nodeType){for(var h=f=null,k=0,m;m=g.childNodes[k];k++)1==m.nodeType&&("block"==m.nodeName.toLowerCase()?f=m:"shadow"==m.nodeName.toLowerCase()&&(h=m));!f&&h&&(f=h);k=g.getAttribute("name");switch(g.nodeName.toLowerCase()){case "mutation":c.domToMutation&&
-(c.domToMutation(g),c.initSvg&&c.initSvg());break;case "comment":c.setCommentText(g.textContent);var p=g.getAttribute("pinned");p&&!c.isInFlyout&&setTimeout(function(){c.comment&&c.comment.setVisible&&c.comment.setVisible("true"==p)},1);f=parseInt(g.getAttribute("w"),10);g=parseInt(g.getAttribute("h"),10);!isNaN(f)&&!isNaN(g)&&c.comment&&c.comment.setVisible&&c.comment.setBubbleSize(f,g);break;case "data":c.data=g.textContent;break;case "title":case "field":Blockly.Xml.domToField_(c,k,g);break;case "value":case "statement":g=
-c.getInput(k);if(!g){console.warn("Ignoring non-existent input "+k+" in block "+d);break}h&&g.connection.setShadowDom(h);f&&(f=Blockly.Xml.domToBlockHeadless_(f,b),f.outputConnection?g.connection.connect(f.outputConnection):f.previousConnection?g.connection.connect(f.previousConnection):goog.asserts.fail("Child block does not have output or previous statement."));break;case "next":h&&c.nextConnection&&c.nextConnection.setShadowDom(h);f&&(goog.asserts.assert(c.nextConnection,"Next statement does not exist."),
-goog.asserts.assert(!c.nextConnection.isConnected(),"Next statement is already connected."),f=Blockly.Xml.domToBlockHeadless_(f,b),goog.asserts.assert(f.previousConnection,"Next block does not have previous statement."),c.nextConnection.connect(f.previousConnection));break;default:console.warn("Ignoring unknown tag: "+g.nodeName)}}(e=a.getAttribute("inline"))&&c.setInputsInline("true"==e);(e=a.getAttribute("disabled"))&&c.setDisabled("true"==e||"disabled"==e);(e=a.getAttribute("deletable"))&&c.setDeletable("true"==
-e);(e=a.getAttribute("movable"))&&c.setMovable("true"==e);(e=a.getAttribute("editable"))&&c.setEditable("true"==e);(e=a.getAttribute("collapsed"))&&c.setCollapsed("true"==e);if("shadow"==a.nodeName.toLowerCase()){d=c.getChildren();for(e=0;g=d[e];e++)goog.asserts.assert(g.isShadow(),"Shadow block not allowed non-shadow child.");goog.asserts.assert(0==c.getVarModels().length,"Shadow blocks cannot have variable references.");c.setShadow(!0)}return c};
-Blockly.Xml.domToFieldVariable_=function(a,b,c,d){var e=b.getAttribute("variabletype")||"";"''"==e&&(e="");a=Blockly.Variables.getOrCreateVariablePackage(a,b.id,c,e);if(null!=e&&e!==a.type)throw Error("Serialized variable type with id '"+a.getId()+"' had type "+a.type+", and does not match variable field that references it: "+Blockly.Xml.domToText(b)+".");d.setValue(a.getId())};
-Blockly.Xml.domToField_=function(a,b,c){var d=a.getField(b);d?(a=a.workspace,b=c.textContent,d instanceof Blockly.FieldVariable?Blockly.Xml.domToFieldVariable_(a,c,b,d):d.setValue(b)):console.warn("Ignoring non-existent field "+b+" in block "+a.type)};Blockly.Xml.deleteNext=function(a){for(var b=0,c;c=a.childNodes[b];b++)if("next"==c.nodeName.toLowerCase()){a.removeChild(c);break}};goog.global.Blockly||(goog.global.Blockly={});goog.global.Blockly.Xml||(goog.global.Blockly.Xml={});
+Blockly.WorkspaceDragSurfaceSvg.prototype.setContentsAndShow=function(a,b,c,d,e,f){goog.asserts.assert(0==this.SVG_.childNodes.length,"Already dragging a block.");this.previousSibling_=c;a.setAttribute("transform","translate(0, 0) scale("+f+")");b.setAttribute("transform","translate(0, 0) scale("+f+")");this.SVG_.setAttribute("width",d);this.SVG_.setAttribute("height",e);this.SVG_.appendChild(a);this.SVG_.appendChild(b);this.SVG_.style.display="block"};
+
+Blockly.Xml={};
+Blockly.Xml.workspaceToDom = function(workspace, opt_noId) {
+  var xml = goog.dom.createDom('xml');
+  var variables = Blockly.Variables.allUsedVarModels(workspace);
+  if (variables.length) {
+    xml.appendChild(Blockly.Xml.variablesToDom(variables));
+  }
+  var blocks = workspace.getTopBlocks(true);
+  for (var i = 0, block; block = blocks[i]; i++) {
+    xml.appendChild(Blockly.Xml.blockToDomWithXY(block, opt_noId));
+  }
+  return xml;
+};
+
+/**
+ * Encode a list of variables as XML.
+ * @param {!Array.<!Blockly.VariableModel>} variableList List of all variable
+ *     models.
+ * @return {!Element} List of XML elements.
+ */
+Blockly.Xml.variablesToDom = function(variableList) {
+  var variables = goog.dom.createDom('variables');
+  for (var i = 0, variable; variable = variableList[i]; i++) {
+    var element = goog.dom.createDom('variable', null, variable.name);
+    element.setAttribute('type', variable.type);
+    element.setAttribute('id', variable.getId());
+    variables.appendChild(element);
+  }
+  return variables;
+};
+
+/**
+ * Encode a block subtree as XML with XY coordinates.
+ * @param {!Blockly.Block} block The root block to encode.
+ * @param {boolean=} opt_noId True if the encoder should skip the block ID.
+ * @return {!Element} Tree of XML elements.
+ */
+Blockly.Xml.blockToDomWithXY = function(block, opt_noId) {
+  var width;  // Not used in LTR.
+  if (block.workspace.RTL) {
+    width = block.workspace.getWidth();
+  }
+  var element = Blockly.Xml.blockToDom(block, opt_noId);
+  var xy = block.getRelativeToSurfaceXY();
+  element.setAttribute('x',
+      Math.round(block.workspace.RTL ? width - xy.x : xy.x));
+  element.setAttribute('y', Math.round(xy.y));
+  return element;
+};
+
+/**
+ * Encode a variable field as XML.
+ * @param {!Blockly.FieldVariable} field The field to encode.
+ * @return {?Element} XML element, or null if the field did not need to be
+ *     serialized.
+ * @private
+ */
+Blockly.Xml.fieldToDomVariable_ = function(field) {
+  var id = field.getValue();
+  // The field had not been initialized fully before being serialized.
+  // This can happen if a block is created directly through a call to
+  // workspace.newBlock instead of from XML.
+  // The new block will be serialized for the first time when firing a block
+  // creation event.
+  if (id == null) {
+    field.initModel();
+    id = field.getValue();
+  }
+  // Get the variable directly from the field, instead of doing a lookup.  This
+  // will work even if the variable has already been deleted.  This can happen
+  // because the flyout defers deleting blocks until the next time the flyout is
+  // opened.
+  var variable = field.getVariable();
+
+  if (!variable) {
+    throw Error('Tried to serialize a variable field with no variable.');
+  }
+  var container = goog.dom.createDom('field', null, variable.name);
+  container.setAttribute('name', field.name);
+  container.setAttribute('id', variable.getId());
+  container.setAttribute('variabletype', variable.type);
+  return container;
+};
+
+/**
+ * Encode a field as XML.
+ * @param {!Blockly.Field} field The field to encode.
+ * @param {!Blockly.Workspace} workspace The workspace that the field is in.
+ * @return {?Element} XML element, or null if the field did not need to be
+ *     serialized.
+ * @private
+ */
+Blockly.Xml.fieldToDom_ = function(field) {
+  if (field.name && field.EDITABLE) {
+    if (field instanceof Blockly.FieldVariable) {
+      return Blockly.Xml.fieldToDomVariable_(field);
+    } else {
+      var container = goog.dom.createDom('field', null, field.getValue());
+      container.setAttribute('name', field.name);
+      return container;
+    }
+  }
+  return null;
+};
+
+/**
+ * Encode all of a block's fields as XML and attach them to the given tree of
+ * XML elements.
+ * @param {!Blockly.Block} block A block with fields to be encoded.
+ * @param {!Element} element The XML element to which the field DOM should be
+ *     attached.
+ * @private
+ */
+Blockly.Xml.allFieldsToDom_ = function(block, element) {
+  for (var i = 0, input; input = block.inputList[i]; i++) {
+    for (var j = 0, field; field = input.fieldRow[j]; j++) {
+      var fieldDom = Blockly.Xml.fieldToDom_(field);
+      if (fieldDom) {
+        element.appendChild(fieldDom);
+      }
+    }
+  }
+};
+
+/**
+ * Encode a block subtree as XML.
+ * @param {!Blockly.Block} block The root block to encode.
+ * @param {boolean=} opt_noId True if the encoder should skip the block ID.
+ * @return {!Element} Tree of XML elements.
+ */
+Blockly.Xml.blockToDom = function(block, opt_noId) {
+  var element = goog.dom.createDom(block.isShadow() ? 'shadow' : 'block');
+  element.setAttribute('type', block.type);
+  if (!opt_noId) {
+    element.setAttribute('id', block.id);
+  }
+  if (block.mutationToDom) {
+    // Custom data for an advanced block.
+    var mutation = block.mutationToDom();
+    if (mutation && (mutation.hasChildNodes() || mutation.hasAttributes())) {
+      element.appendChild(mutation);
+    }
+  }
+
+  Blockly.Xml.allFieldsToDom_(block, element);
+
+  var commentText = block.getCommentText();
+  if (commentText) {
+    var commentElement = goog.dom.createDom('comment', null, commentText);
+    if (typeof block.comment == 'object') {
+      commentElement.setAttribute('pinned', block.comment.isVisible());
+      var hw = block.comment.getBubbleSize();
+      commentElement.setAttribute('h', hw.height);
+      commentElement.setAttribute('w', hw.width);
+    }
+    element.appendChild(commentElement);
+  }
+
+  if (block.data) {
+    var dataElement = goog.dom.createDom('data', null, block.data);
+    element.appendChild(dataElement);
+  }
+
+  for (var i = 0, input; input = block.inputList[i]; i++) {
+    var container;
+    var empty = true;
+    if (input.type == Blockly.DUMMY_INPUT) {
+      continue;
+    } else {
+      var childBlock = input.connection.targetBlock();
+      if (input.type == Blockly.INPUT_VALUE) {
+        container = goog.dom.createDom('value');
+      } else if (input.type == Blockly.NEXT_STATEMENT) {
+        container = goog.dom.createDom('statement');
+      }
+      var shadow = input.connection.getShadowDom();
+      if (shadow && (!childBlock || !childBlock.isShadow())) {
+        container.appendChild(Blockly.Xml.cloneShadow_(shadow));
+      }
+      if (childBlock) {
+        container.appendChild(Blockly.Xml.blockToDom(childBlock, opt_noId));
+        empty = false;
+      }
+    }
+    container.setAttribute('name', input.name);
+    if (!empty) {
+      element.appendChild(container);
+    }
+  }
+  if (block.inputsInlineDefault != block.inputsInline) {
+    element.setAttribute('inline', block.inputsInline);
+  }
+  if (block.isCollapsed()) {
+    element.setAttribute('collapsed', true);
+  }
+  if (block.disabled) {
+    element.setAttribute('disabled', true);
+  }
+  if (!block.isDeletable() && !block.isShadow()) {
+    element.setAttribute('deletable', false);
+  }
+  if (!block.isMovable() && !block.isShadow()) {
+    element.setAttribute('movable', false);
+  }
+  if (!block.isEditable()) {
+    element.setAttribute('editable', false);
+  }
+
+  var nextBlock = block.getNextBlock();
+  if (nextBlock) {
+    var container = goog.dom.createDom('next', null,
+        Blockly.Xml.blockToDom(nextBlock, opt_noId));
+    element.appendChild(container);
+  }
+  var shadow = block.nextConnection && block.nextConnection.getShadowDom();
+  if (shadow && (!nextBlock || !nextBlock.isShadow())) {
+    container.appendChild(Blockly.Xml.cloneShadow_(shadow));
+  }
+
+  return element;
+};
+
+/**
+ * Deeply clone the shadow's DOM so that changes don't back-wash to the block.
+ * @param {!Element} shadow A tree of XML elements.
+ * @return {!Element} A tree of XML elements.
+ * @private
+ */
+Blockly.Xml.cloneShadow_ = function(shadow) {
+  shadow = shadow.cloneNode(true);
+  // Walk the tree looking for whitespace.  Don't prune whitespace in a tag.
+  var node = shadow;
+  var textNode;
+  while (node) {
+    if (node.firstChild) {
+      node = node.firstChild;
+    } else {
+      while (node && !node.nextSibling) {
+        textNode = node;
+        node = node.parentNode;
+        if (textNode.nodeType == 3 && textNode.data.trim() == '' &&
+            node.firstChild != textNode) {
+          // Prune whitespace after a tag.
+          goog.dom.removeNode(textNode);
+        }
+      }
+      if (node) {
+        textNode = node;
+        node = node.nextSibling;
+        if (textNode.nodeType == 3 && textNode.data.trim() == '') {
+          // Prune whitespace before a tag.
+          goog.dom.removeNode(textNode);
+        }
+      }
+    }
+  }
+  return shadow;
+};
+
+/**
+ * Converts a DOM structure into plain text.
+ * Currently the text format is fairly ugly: all one line with no whitespace.
+ * @param {!Element} dom A tree of XML elements.
+ * @return {string} Text representation.
+ */
+Blockly.Xml.domToText = function(dom) {
+  var oSerializer = new XMLSerializer();
+  return oSerializer.serializeToString(dom);
+};
+
+/**
+ * Converts a DOM structure into properly indented text.
+ * @param {!Element} dom A tree of XML elements.
+ * @return {string} Text representation.
+ */
+Blockly.Xml.domToPrettyText = function(dom) {
+  // This function is not guaranteed to be correct for all XML.
+  // But it handles the XML that Blockly generates.
+  var blob = Blockly.Xml.domToText(dom);
+  // Place every open and close tag on its own line.
+  var lines = blob.split('<');
+  // Indent every line.
+  var indent = '';
+  for (var i = 1; i < lines.length; i++) {
+    var line = lines[i];
+    if (line[0] == '/') {
+      indent = indent.substring(2);
+    }
+    lines[i] = indent + '<' + line;
+    if (line[0] != '/' && line.slice(-2) != '/>') {
+      indent += '  ';
+    }
+  }
+  // Pull simple tags back together.
+  // E.g. <foo></foo>
+  var text = lines.join('\n');
+  text = text.replace(/(<(\w+)\b[^>]*>[^\n]*)\n *<\/\2>/g, '$1</$2>');
+  // Trim leading blank line.
+  return text.replace(/^\n/, '');
+};
+
+/**
+ * Converts plain text into a DOM structure.
+ * Throws an error if XML doesn't parse.
+ * @param {string} text Text representation.
+ * @return {!Element} A tree of XML elements.
+ */
+Blockly.Xml.textToDom = function(text) {
+  var oParser = new DOMParser();
+  var dom = oParser.parseFromString(text, 'text/xml');
+  // The DOM should have one and only one top-level node, an XML tag.
+  if (!dom || !dom.firstChild ||
+      dom.firstChild.nodeName.toLowerCase() != 'xml' ||
+      dom.firstChild !== dom.lastChild) {
+    // Whatever we got back from the parser is not XML.
+    goog.asserts.fail('Blockly.Xml.textToDom did not obtain a valid XML tree.');
+  }
+  return dom.firstChild;
+};
+
+/**
+ * Decode an XML DOM and create blocks on the workspace.
+ * @param {!Element} xml XML DOM.
+ * @param {!Blockly.Workspace} workspace The workspace.
+ * @return {Array.<string>} An array containing new block IDs.
+ */
+Blockly.Xml.domToWorkspace = function(xml, workspace) {
+  if (xml instanceof Blockly.Workspace) {
+    var swap = xml;
+    xml = workspace;
+    workspace = swap;
+    console.warn('Deprecated call to Blockly.Xml.domToWorkspace, ' +
+                 'swap the arguments.');
+  }
+  var width;  // Not used in LTR.
+  if (workspace.RTL) {
+    width = workspace.getWidth();
+  }
+  var newBlockIds = [];  // A list of block IDs added by this call.
+  Blockly.Field.startCache();
+  // Safari 7.1.3 is known to provide node lists with extra references to
+  // children beyond the lists' length.  Trust the length, do not use the
+  // looping pattern of checking the index for an object.
+  var childCount = xml.childNodes.length;
+  var existingGroup = Blockly.Events.getGroup();
+  if (!existingGroup) {
+    Blockly.Events.setGroup(true);
+  }
+
+  // Disable workspace resizes as an optimization.
+  if (workspace.setResizesEnabled) {
+    workspace.setResizesEnabled(false);
+  }
+  var variablesFirst = true;
+  try {
+    for (var i = 0; i < childCount; i++) {
+      var xmlChild = xml.childNodes[i];
+      var name = xmlChild.nodeName.toLowerCase();
+      if (name == 'block' ||
+          (name == 'shadow' && !Blockly.Events.recordUndo)) {
+        // Allow top-level shadow blocks if recordUndo is disabled since
+        // that means an undo is in progress.  Such a block is expected
+        // to be moved to a nested destination in the next operation.
+        var block = Blockly.Xml.domToBlock(xmlChild, workspace);
+        newBlockIds.push(block.id);
+        var blockX = xmlChild.hasAttribute('x') ?
+            parseInt(xmlChild.getAttribute('x'), 10) : 10;
+        var blockY = xmlChild.hasAttribute('y') ?
+            parseInt(xmlChild.getAttribute('y'), 10) : 10;
+        if (!isNaN(blockX) && !isNaN(blockY)) {
+          block.moveBy(workspace.RTL ? width - blockX : blockX, blockY);
+        }
+        variablesFirst = false;
+      } else if (name == 'shadow') {
+        goog.asserts.fail('Shadow block cannot be a top-level block.');
+        variablesFirst = false;
+      } else if (name == 'variables') {
+        if (variablesFirst) {
+          Blockly.Xml.domToVariables(xmlChild, workspace);
+        } else {
+          throw Error('\'variables\' tag must exist once before block and ' +
+            'shadow tag elements in the workspace XML, but it was found in ' +
+            'another location.');
+        }
+        variablesFirst = false;
+      }
+    }
+  } finally {
+    if (!existingGroup) {
+      Blockly.Events.setGroup(false);
+    }
+    Blockly.Field.stopCache();
+  }
+  // Re-enable workspace resizing.
+  if (workspace.setResizesEnabled) {
+    workspace.setResizesEnabled(true);
+  }
+  return newBlockIds;
+};
+
+/**
+ * Decode an XML DOM and create blocks on the workspace. Position the new
+ * blocks immediately below prior blocks, aligned by their starting edge.
+ * @param {!Element} xml The XML DOM.
+ * @param {!Blockly.Workspace} workspace The workspace to add to.
+ * @return {Array.<string>} An array containing new block IDs.
+ */
+Blockly.Xml.appendDomToWorkspace = function(xml, workspace) {
+  var bbox;  // Bounding box of the current blocks.
+  // First check if we have a workspaceSvg, otherwise the blocks have no shape
+  // and the position does not matter.
+  if (workspace.hasOwnProperty('scale')) {
+    var savetab = Blockly.BlockSvg.TAB_WIDTH;
+    try {
+      Blockly.BlockSvg.TAB_WIDTH = 0;
+      bbox = workspace.getBlocksBoundingBox();
+    } finally {
+      Blockly.BlockSvg.TAB_WIDTH = savetab;
+    }
+  }
+  // Load the new blocks into the workspace and get the IDs of the new blocks.
+  var newBlockIds = Blockly.Xml.domToWorkspace(xml,workspace);
+  if (bbox && bbox.height) {  // check if any previous block
+    var offsetY = 0;  // offset to add to y of the new block
+    var offsetX = 0;
+    var farY = bbox.y + bbox.height;  // bottom position
+    var topX = bbox.x;  // x of bounding box
+    // Check position of the new blocks.
+    var newX = Infinity;  // x of top corner
+    var newY = Infinity;  // y of top corner
+    for (var i = 0; i < newBlockIds.length; i++) {
+      var blockXY = workspace.getBlockById(newBlockIds[i]).getRelativeToSurfaceXY();
+      if (blockXY.y < newY) {
+        newY = blockXY.y;
+      }
+      if (blockXY.x  < newX) {  // if we align also on x
+        newX = blockXY.x;
+      }
+    }
+    offsetY = farY - newY + Blockly.BlockSvg.SEP_SPACE_Y;
+    offsetX = topX - newX;
+    // move the new blocks to append them at the bottom
+    var width;  // Not used in LTR.
+    if (workspace.RTL) {
+      width = workspace.getWidth();
+    }
+    for (var i = 0; i < newBlockIds.length; i++) {
+      var block = workspace.getBlockById(newBlockIds[i]);
+      block.moveBy(workspace.RTL ? width - offsetX : offsetX, offsetY);
+    }
+  }
+  return newBlockIds;
+};
+
+/**
+ * Decode an XML block tag and create a block (and possibly sub blocks) on the
+ * workspace.
+ * @param {!Element} xmlBlock XML block element.
+ * @param {!Blockly.Workspace} workspace The workspace.
+ * @return {!Blockly.Block} The root block created.
+ */
+Blockly.Xml.domToBlock = function(xmlBlock, workspace) {
+  if (xmlBlock instanceof Blockly.Workspace) {
+    var swap = xmlBlock;
+    xmlBlock = workspace;
+    workspace = swap;
+    console.warn('Deprecated call to Blockly.Xml.domToBlock, ' +
+                 'swap the arguments.');
+  }
+  // Create top-level block.
+  Blockly.Events.disable();
+  var variablesBeforeCreation = workspace.getAllVariables();
+  try {
+    var topBlock = Blockly.Xml.domToBlockHeadless_(xmlBlock, workspace);
+    // Generate list of all blocks.
+    var blocks = topBlock.getDescendants();
+    if (workspace.rendered) {
+      // Hide connections to speed up assembly.
+      topBlock.setConnectionsHidden(true);
+      // Render each block.
+      for (var i = blocks.length - 1; i >= 0; i--) {
+        blocks[i].initSvg();
+      }
+      for (var i = blocks.length - 1; i >= 0; i--) {
+        blocks[i].render(false);
+      }
+      // Populating the connection database may be deferred until after the
+      // blocks have rendered.
+      setTimeout(function() {
+        if (topBlock.workspace) {  // Check that the block hasn't been deleted.
+          topBlock.setConnectionsHidden(false);
+        }
+      }, 1);
+      topBlock.updateDisabled();
+      // Allow the scrollbars to resize and move based on the new contents.
+      // TODO(@picklesrus): #387. Remove when domToBlock avoids resizing.
+      workspace.resizeContents();
+    } else {
+      for (var i = blocks.length - 1; i >= 0; i--) {
+        blocks[i].initModel();
+      }
+    }
+  } finally {
+    Blockly.Events.enable();
+  }
+  if (Blockly.Events.isEnabled()) {
+    var newVariables = Blockly.Variables.getAddedVariables(workspace,
+        variablesBeforeCreation);
+    // Fire a VarCreate event for each (if any) new variable created.
+    for (var i = 0; i < newVariables.length; i++) {
+      var thisVariable = newVariables[i];
+      Blockly.Events.fire(new Blockly.Events.VarCreate(thisVariable));
+    }
+    // Block events come after var events, in case they refer to newly created
+    // variables.
+    Blockly.Events.fire(new Blockly.Events.BlockCreate(topBlock));
+  }
+  change_disconnted_color(topBlock) //ny
+  return topBlock;
+};
+
+/**
+ * Decode an XML list of variables and add the variables to the workspace.
+ * @param {!Element} xmlVariables List of XML variable elements.
+ * @param {!Blockly.Workspace} workspace The workspace to which the variable
+ *     should be added.
+ */
+Blockly.Xml.domToVariables = function(xmlVariables, workspace) {
+  for (var i = 0, xmlChild; xmlChild = xmlVariables.children[i]; i++) {
+    var type = xmlChild.getAttribute('type');
+    var id = xmlChild.getAttribute('id');
+    var name = xmlChild.textContent;
+
+    if (type == null) {
+      throw Error('Variable with id, ' + id + ' is without a type');
+    }
+    workspace.createVariable(name, type, id);
+  }
+};
+
+/**
+ * Decode an XML block tag and create a block (and possibly sub blocks) on the
+ * workspace.
+ * @param {!Element} xmlBlock XML block element.
+ * @param {!Blockly.Workspace} workspace The workspace.
+ * @return {!Blockly.Block} The root block created.
+ * @private
+ */
+Blockly.Xml.domToBlockHeadless_ = function(xmlBlock, workspace) {
+  var block = null;
+  var prototypeName = xmlBlock.getAttribute('type');
+  goog.asserts.assert(
+      prototypeName, 'Block type unspecified: %s', xmlBlock.outerHTML);
+  var id = xmlBlock.getAttribute('id');
+  block = workspace.newBlock(prototypeName, id);
+
+  var blockChild = null;
+  for (var i = 0, xmlChild; xmlChild = xmlBlock.childNodes[i]; i++) {
+    if (xmlChild.nodeType == 3) {
+      // Ignore any text at the <block> level.  It's all whitespace anyway.
+      continue;
+    }
+    var input;
+
+    // Find any enclosed blocks or shadows in this tag.
+    var childBlockElement = null;
+    var childShadowElement = null;
+    for (var j = 0, grandchild; grandchild = xmlChild.childNodes[j]; j++) {
+      if (grandchild.nodeType == 1) {
+        if (grandchild.nodeName.toLowerCase() == 'block') {
+          childBlockElement = /** @type {!Element} */ (grandchild);
+        } else if (grandchild.nodeName.toLowerCase() == 'shadow') {
+          childShadowElement = /** @type {!Element} */ (grandchild);
+        }
+      }
+    }
+    // Use the shadow block if there is no child block.
+    if (!childBlockElement && childShadowElement) {
+      childBlockElement = childShadowElement;
+    }
+
+    var name = xmlChild.getAttribute('name');
+    switch (xmlChild.nodeName.toLowerCase()) {
+      case 'mutation':
+        // Custom data for an advanced block.
+        if (block.domToMutation) {
+          block.domToMutation(xmlChild);
+          if (block.initSvg) {
+            // Mutation may have added some elements that need initializing.
+            block.initSvg();
+          }
+        }
+        break;
+      case 'comment':
+        block.setCommentText(xmlChild.textContent);
+        var visible = xmlChild.getAttribute('pinned');
+        if (visible && !block.isInFlyout) {
+          // Give the renderer a millisecond to render and position the block
+          // before positioning the comment bubble.
+          setTimeout(function() {
+            if (block.comment && block.comment.setVisible) {
+              block.comment.setVisible(visible == 'true');
+            }
+          }, 1);
+        }
+        var bubbleW = parseInt(xmlChild.getAttribute('w'), 10);
+        var bubbleH = parseInt(xmlChild.getAttribute('h'), 10);
+        if (!isNaN(bubbleW) && !isNaN(bubbleH) &&
+            block.comment && block.comment.setVisible) {
+          block.comment.setBubbleSize(bubbleW, bubbleH);
+        }
+        break;
+      case 'data':
+        block.data = xmlChild.textContent;
+        break;
+      case 'title':
+        // Titles were renamed to field in December 2013.
+        // Fall through.
+      case 'field':
+        Blockly.Xml.domToField_(block, name, xmlChild);
+        break;
+      case 'value':
+      case 'statement':
+        input = block.getInput(name);
+        if (!input) {
+          console.warn('Ignoring non-existent input ' + name + ' in block ' +
+                       prototypeName);
+          break;
+        }
+        if (childShadowElement) {
+          input.connection.setShadowDom(childShadowElement);
+        }
+        if (childBlockElement) {
+          blockChild = Blockly.Xml.domToBlockHeadless_(childBlockElement,
+              workspace);
+          if (blockChild.outputConnection) {
+            input.connection.connect(blockChild.outputConnection);
+          } else if (blockChild.previousConnection) {
+            input.connection.connect(blockChild.previousConnection);
+          } else {
+            goog.asserts.fail(
+                'Child block does not have output or previous statement.');
+          }
+        }
+        break;
+      case 'next':
+        if (childShadowElement && block.nextConnection) {
+          block.nextConnection.setShadowDom(childShadowElement);
+        }
+        if (childBlockElement) {
+          goog.asserts.assert(block.nextConnection,
+              'Next statement does not exist.');
+          // If there is more than one XML 'next' tag.
+          goog.asserts.assert(!block.nextConnection.isConnected(),
+              'Next statement is already connected.');
+          blockChild = Blockly.Xml.domToBlockHeadless_(childBlockElement,
+              workspace);
+          goog.asserts.assert(blockChild.previousConnection,
+              'Next block does not have previous statement.');
+          block.nextConnection.connect(blockChild.previousConnection);
+        }
+        break;
+      default:
+        // Unknown tag; ignore.  Same principle as HTML parsers.
+        console.warn('Ignoring unknown tag: ' + xmlChild.nodeName);
+    }
+  }
+
+  var inline = xmlBlock.getAttribute('inline');
+  if (inline) {
+    block.setInputsInline(inline == 'true');
+  }
+  var disabled = xmlBlock.getAttribute('disabled');
+  if (disabled) {
+    block.setDisabled(disabled == 'true' || disabled == 'disabled');
+  }
+  var deletable = xmlBlock.getAttribute('deletable');
+  if (deletable) {
+    block.setDeletable(deletable == 'true');
+  }
+  var movable = xmlBlock.getAttribute('movable');
+  if (movable) {
+    block.setMovable(movable == 'true');
+  }
+  var editable = xmlBlock.getAttribute('editable');
+  if (editable) {
+    block.setEditable(editable == 'true');
+  }
+  var collapsed = xmlBlock.getAttribute('collapsed');
+  if (collapsed) {
+    block.setCollapsed(collapsed == 'true');
+  }
+  if (xmlBlock.nodeName.toLowerCase() == 'shadow') {
+    // Ensure all children are also shadows.
+    var children = block.getChildren();
+    for (var i = 0, child; child = children[i]; i++) {
+      goog.asserts.assert(
+          child.isShadow(), 'Shadow block not allowed non-shadow child.');
+    }
+    // Ensure this block doesn't have any variable inputs.
+    goog.asserts.assert(block.getVarModels().length == 0,
+        'Shadow blocks cannot have variable references.');
+    block.setShadow(true);
+  }
+  return block;
+};
+
+/**
+ * Decode an XML variable field tag and set the value of that field.
+ * @param {!Blockly.Workspace} workspace The workspace that is currently being
+ *     deserialized.
+ * @param {!Element} xml The field tag to decode.
+ * @param {string} text The text content of the XML tag.
+ * @param {!Blockly.FieldVariable} field The field on which the value will be
+ *     set.
+ * @private
+ */
+Blockly.Xml.domToFieldVariable_ = function(workspace, xml, text, field) {
+  var type = xml.getAttribute('variabletype') || '';
+  // TODO (fenichel): Does this need to be explicit or not?
+  if (type == '\'\'') {
+    type = '';
+  }
+
+  var variable = Blockly.Variables.getOrCreateVariablePackage(workspace, xml.id,
+      text, type);
+
+  // This should never happen :)
+  if (type != null && type !== variable.type) {
+    throw Error('Serialized variable type with id \'' +
+      variable.getId() + '\' had type ' + variable.type + ', and ' +
+      'does not match variable field that references it: ' +
+      Blockly.Xml.domToText(xml) + '.');
+  }
+
+  field.setValue(variable.getId());
+};
+
+/**
+ * Decode an XML field tag and set the value of that field on the given block.
+ * @param {!Blockly.Block} block The block that is currently being deserialized.
+ * @param {string} fieldName The name of the field on the block.
+ * @param {!Element} xml The field tag to decode.
+ * @private
+ */
+Blockly.Xml.domToField_ = function(block, fieldName, xml) {
+  var field = block.getField(fieldName);
+  if (!field) {
+    console.warn('Ignoring non-existent field ' + fieldName + ' in block ' +
+                 block.type);
+    return;
+  }
+
+  var workspace = block.workspace;
+  var text = xml.textContent;
+  if (field instanceof Blockly.FieldVariable) {
+    Blockly.Xml.domToFieldVariable_(workspace, xml, text, field);
+  } else {
+    field.setValue(text);
+  }
+};
+
+/**
+ * Remove any 'next' block (statements in a stack).
+ * @param {!Element} xmlBlock XML block element.
+ */
+Blockly.Xml.deleteNext = function(xmlBlock) {
+  for (var i = 0, child; child = xmlBlock.childNodes[i]; i++) {
+    if (child.nodeName.toLowerCase() == 'next') {
+      xmlBlock.removeChild(child);
+      break;
+    }
+  }
+};
+
+goog.global.Blockly||(goog.global.Blockly={});goog.global.Blockly.Xml||(goog.global.Blockly.Xml={});
 goog.global.Blockly.Xml.domToText=Blockly.Xml.domToText;goog.global.Blockly.Xml.domToWorkspace=Blockly.Xml.domToWorkspace;goog.global.Blockly.Xml.textToDom=Blockly.Xml.textToDom;goog.global.Blockly.Xml.workspaceToDom=Blockly.Xml.workspaceToDom;
 Blockly.ZoomControls=function(a){this.workspace_=a};Blockly.ZoomControls.prototype.WIDTH_=32;Blockly.ZoomControls.prototype.HEIGHT_=110;Blockly.ZoomControls.prototype.MARGIN_BOTTOM_=20;Blockly.ZoomControls.prototype.MARGIN_SIDE_=20;Blockly.ZoomControls.prototype.svgGroup_=null;Blockly.ZoomControls.prototype.left_=0;Blockly.ZoomControls.prototype.top_=0;
 Blockly.ZoomControls.prototype.createDom=function(){var a=this.workspace_;this.svgGroup_=Blockly.utils.createSvgElement("g",{"class":"blocklyZoom"},null);var b=String(Math.random()).substring(2);var c=Blockly.utils.createSvgElement("clipPath",{id:"blocklyZoomoutClipPath"+b},this.svgGroup_);Blockly.utils.createSvgElement("rect",{width:32,height:32,y:77},c);var d=Blockly.utils.createSvgElement("image",{width:Blockly.SPRITE.width,height:Blockly.SPRITE.height,x:-64,y:-15,"clip-path":"url(#blocklyZoomoutClipPath"+
@@ -1776,6 +2543,7 @@ a=this.bubble_.getBubbleSize();this.bubble_.setBubbleSize(a.width,a.height)}else
 Blockly.Warning.prototype.dispose=function(){this.block_.warning=null;Blockly.Icon.prototype.dispose.call(this)};Blockly.Block=function(a,b,c){"undefined"!==typeof Blockly.Generator.prototype[b]&&console.warn('FUTURE ERROR: Block prototypeName "'+b+'" conflicts with Blockly.Generator members. Registering Generators for this block type will incur errors.\nThis name will be DISALLOWED (throwing an error) in future versions of Blockly.');this.id=c&&!a.getBlockById(c)?c:Blockly.utils.genUid();a.blockDB_[this.id]=this;this.previousConnection=this.nextConnection=this.outputConnection=null;this.inputList=[];this.inputsInline=
 void 0;this.disabled=!1;this.tooltip="";this.contextMenu=!0;this.parentBlock_=null;this.childBlocks_=[];this.editable_=this.movable_=this.deletable_=!0;this.collapsed_=this.isShadow_=!1;this.comment=null;this.xy_=new goog.math.Coordinate(0,0);this.workspace=a;this.isInFlyout=a.isFlyout;this.isInMutator=a.isMutator;this.RTL=a.RTL;b&&(this.type=b,c=Blockly.Blocks[b],goog.asserts.assertObject(c,'Error: Unknown block type "%s".',b),goog.mixin(this,c));a.addTopBlock(this);goog.isFunction(this.init)&&this.init();
 this.inputsInlineDefault=this.inputsInline;if(Blockly.Events.isEnabled()){(a=Blockly.Events.getGroup())||Blockly.Events.setGroup(!0);try{Blockly.Events.fire(new Blockly.Events.BlockCreate(this))}finally{a||Blockly.Events.setGroup(!1)}}goog.isFunction(this.onchange)&&this.setOnChange(this.onchange)};Blockly.Block.obtain=function(a,b){console.warn("Deprecated call to Blockly.Block.obtain, use workspace.newBlock instead.");return a.newBlock(b)};Blockly.Block.prototype.data=null;
+
 Blockly.Block.prototype.colour_="#000000";Blockly.Block.prototype.hue_=null;
 Blockly.Block.prototype.dispose=function(a){if(this.workspace){this.onchangeWrapper_&&this.workspace.removeChangeListener(this.onchangeWrapper_);this.unplug(a);Blockly.Events.isEnabled()&&Blockly.Events.fire(new Blockly.Events.BlockDelete(this));Blockly.Events.disable();try{this.workspace&&(this.workspace.removeTopBlock(this),delete this.workspace.blockDB_[this.id],this.workspace=null);for(var b=this.childBlocks_.length-1;0<=b;b--)this.childBlocks_[b].dispose(!1);b=0;for(var c;c=this.inputList[b];b++)c.dispose();
 this.inputList.length=0;var d=this.getConnections_(!0);for(b=0;b<d.length;b++){var e=d[b];e.isConnected()&&e.disconnect();d[b].dispose()}}finally{Blockly.Events.enable()}}};Blockly.Block.prototype.initModel=function(){for(var a=0,b;b=this.inputList[a];a++)for(var c=0,d;d=b.fieldRow[c];c++)d.initModel&&d.initModel()};
@@ -1791,7 +2559,11 @@ Blockly.Block.prototype.setHelpUrl=function(a){this.helpUrl=a};Blockly.Block.pro
 Blockly.Block.prototype.setColour=function(a){var b=goog.isString(a)?Blockly.utils.replaceMessageReferences(a):a,c=Number(b);if(!isNaN(c)&&0<=c&&360>=c)this.hue_=c,this.colour_=Blockly.hueToRgb(c);else if(goog.isString(b)&&/^#[0-9a-fA-F]{6}$/.test(b))this.colour_=b,this.hue_=null;else throw c='Invalid colour: "'+b+'"',a!=b&&(c+=' (from "'+a+'")'),c;};
 Blockly.Block.prototype.setOnChange=function(a){if(a&&!goog.isFunction(a))throw Error("onchange must be a function.");this.onchangeWrapper_&&this.workspace.removeChangeListener(this.onchangeWrapper_);if(this.onchange=a)this.onchangeWrapper_=a.bind(this),this.workspace.addChangeListener(this.onchangeWrapper_)};Blockly.Block.prototype.getField=function(a){for(var b=0,c;c=this.inputList[b];b++)for(var d=0,e;e=c.fieldRow[d];d++)if(e.name===a)return e;return null};
 Blockly.Block.prototype.getVars=function(){for(var a=[],b=0,c;c=this.inputList[b];b++)for(var d=0,e;e=c.fieldRow[d];d++)e instanceof Blockly.FieldVariable&&a.push(e.getValue());return a};Blockly.Block.prototype.getVarModels=function(){for(var a=[],b=0,c;c=this.inputList[b];b++)for(var d=0,e;e=c.fieldRow[d];d++)e instanceof Blockly.FieldVariable&&(e=this.workspace.getVariableById(e.getValue()))&&a.push(e);return a};
-Blockly.Block.prototype.updateVarName=function(a){for(var b=0,c;c=this.inputList[b];b++)for(var d=0,e;e=c.fieldRow[d];d++)e instanceof Blockly.FieldVariable&&a.getId()==e.getValue()&&e.setText(a.name)};Blockly.Block.prototype.renameVarById=function(a,b){for(var c=0,d;d=this.inputList[c];c++)for(var e=0,f;f=d.fieldRow[e];e++)f instanceof Blockly.FieldVariable&&a==f.getValue()&&f.setValue(b)};Blockly.Block.prototype.getFieldValue=function(a){return(a=this.getField(a))?a.getValue():null};
+Blockly.Block.prototype.updateVarName=function(a){for(var b=0,c;c=this.inputList[b];b++)for(var d=0,e;e=c.fieldRow[d];d++)e instanceof Blockly.FieldVariable&&a.getId()==e.getValue()&&e.setText(a.name)};Blockly.Block.prototype.renameVarById=function(a,b){for(var c=0,d;d=this.inputList[c];c++)for(var e=0,f;f=d.fieldRow[e];e++)f instanceof Blockly.FieldVariable&&a==f.getValue()&&f.setValue(b)};
+
+Blockly.Block.prototype.getFieldValue=function(a){return(a=this.getField(a))?a.getValue():null};
+Blockly.Block.prototype.getFieldText=function(a){return(a=this.getField(a))?a.getText():null};//ny
+
 Blockly.Block.prototype.setFieldValue=function(a,b){var c=this.getField(b);goog.asserts.assertObject(c,'Field "%s" not found.',b);c.setValue(a)};
 Blockly.Block.prototype.setPreviousStatement=function(a,b){a?(void 0===b&&(b=null),this.previousConnection||(goog.asserts.assert(!this.outputConnection,"Remove output connection prior to adding previous connection."),this.previousConnection=this.makeConnection_(Blockly.PREVIOUS_STATEMENT)),this.previousConnection.setCheck(b)):this.previousConnection&&(goog.asserts.assert(!this.previousConnection.isConnected(),"Must disconnect previous statement before removing connection."),this.previousConnection.dispose(),
 this.previousConnection=null)};Blockly.Block.prototype.setNextStatement=function(a,b){a?(void 0===b&&(b=null),this.nextConnection||(this.nextConnection=this.makeConnection_(Blockly.NEXT_STATEMENT)),this.nextConnection.setCheck(b)):this.nextConnection&&(goog.asserts.assert(!this.nextConnection.isConnected(),"Must disconnect next statement before removing connection."),this.nextConnection.dispose(),this.nextConnection=null)};
@@ -1815,7 +2587,12 @@ Blockly.Block.prototype.moveNumberedInputBefore=function(a,b){goog.asserts.asser
 Blockly.Block.prototype.removeInput=function(a,b){for(var c=0,d;d=this.inputList[c];c++)if(d.name==a){if(d.connection&&d.connection.isConnected()){d.connection.setShadowDom(null);var e=d.connection.targetBlock();e.isShadow()?e.dispose():e.unplug()}d.dispose();this.inputList.splice(c,1);return}b||goog.asserts.fail('Input "%s" not found.',a)};Blockly.Block.prototype.getInput=function(a){for(var b=0,c;c=this.inputList[b];b++)if(c.name==a)return c;return null};
 Blockly.Block.prototype.getInputTargetBlock=function(a){return(a=this.getInput(a))&&a.connection&&a.connection.targetBlock()};Blockly.Block.prototype.getCommentText=function(){return this.comment||""};Blockly.Block.prototype.setCommentText=function(a){this.comment!=a&&(Blockly.Events.fire(new Blockly.Events.BlockChange(this,"comment",null,this.comment,a||"")),this.comment=a)};Blockly.Block.prototype.setWarningText=function(a,b){};Blockly.Block.prototype.setMutator=function(a){};
 Blockly.Block.prototype.getRelativeToSurfaceXY=function(){return this.xy_};Blockly.Block.prototype.moveBy=function(a,b){goog.asserts.assert(!this.parentBlock_,"Block has parent.");var c=new Blockly.Events.BlockMove(this);this.xy_.translate(a,b);c.recordNew();Blockly.Events.fire(c)};Blockly.Block.prototype.makeConnection_=function(a){return new Blockly.Connection(this,a)};
-Blockly.Block.prototype.allInputsFilled=function(a){void 0===a&&(a=!0);if(!a&&this.isShadow())return!1;for(var b=0,c;c=this.inputList[b];b++)if(c.connection&&(c=c.connection.targetBlock(),!c||!c.allInputsFilled(a)))return!1;return(b=this.getNextBlock())?b.allInputsFilled(a):!0};Blockly.Block.prototype.toDevString=function(){var a=this.type?'"'+this.type+'" block':"Block";this.id&&(a+=' (id="'+this.id+'")');return a};Blockly.BlockDragSurfaceSvg=function(a){this.container_=a;this.createDom()};Blockly.BlockDragSurfaceSvg.prototype.SVG_=null;Blockly.BlockDragSurfaceSvg.prototype.dragGroup_=null;Blockly.BlockDragSurfaceSvg.prototype.container_=null;Blockly.BlockDragSurfaceSvg.prototype.scale_=1;Blockly.BlockDragSurfaceSvg.prototype.surfaceXY_=null;
+Blockly.Block.prototype.allInputsFilled=function(a){void 0===a&&(a=!0);if(!a&&this.isShadow())return!1;for(var b=0,c;c=this.inputList[b];b++)if(c.connection&&(c=c.connection.targetBlock(),!c||!c.allInputsFilled(a)))return!1;return(b=this.getNextBlock())?b.allInputsFilled(a):!0
+};
+
+Blockly.Block.prototype.toDevString=function(){var a=this.type?'"'+this.type+'" block':"Block";this.id&&(a+=' (id="'+this.id+'")');return a};
+Blockly.BlockDragSurfaceSvg=function(a){this.container_=a;this.createDom()};
+Blockly.BlockDragSurfaceSvg.prototype.SVG_=null;Blockly.BlockDragSurfaceSvg.prototype.dragGroup_=null;Blockly.BlockDragSurfaceSvg.prototype.container_=null;Blockly.BlockDragSurfaceSvg.prototype.scale_=1;Blockly.BlockDragSurfaceSvg.prototype.surfaceXY_=null;
 Blockly.BlockDragSurfaceSvg.prototype.createDom=function(){this.SVG_||(this.SVG_=Blockly.utils.createSvgElement("svg",{xmlns:Blockly.SVG_NS,"xmlns:html":Blockly.HTML_NS,"xmlns:xlink":"http://www.w3.org/1999/xlink",version:"1.1","class":"blocklyBlockDragSurface"},this.container_),this.dragGroup_=Blockly.utils.createSvgElement("g",{},this.SVG_))};
 Blockly.BlockDragSurfaceSvg.prototype.setBlocksAndShow=function(a){goog.asserts.assert(0==this.dragGroup_.childNodes.length,"Already dragging a block.");this.dragGroup_.appendChild(a);this.SVG_.style.display="block";this.surfaceXY_=new goog.math.Coordinate(0,0)};Blockly.BlockDragSurfaceSvg.prototype.translateAndScaleGroup=function(a,b,c){this.scale_=c;a=a.toFixed(0);b=b.toFixed(0);this.dragGroup_.setAttribute("transform","translate("+a+","+b+") scale("+c+")")};
 Blockly.BlockDragSurfaceSvg.prototype.translateSurfaceInternal_=function(){var a=this.surfaceXY_.x,b=this.surfaceXY_.y;a=a.toFixed(0);b=b.toFixed(0);this.SVG_.style.display="block";Blockly.utils.setCssTransform(this.SVG_,"translate3d("+a+"px, "+b+"px, 0px)")};Blockly.BlockDragSurfaceSvg.prototype.translateSurface=function(a,b){this.surfaceXY_=new goog.math.Coordinate(a*this.scale_,b*this.scale_);this.translateSurfaceInternal_()};
@@ -1906,7 +2683,17 @@ Blockly.NEXT_STATEMENT)&&(a.push("v",Blockly.BlockSvg.SEP_SPACE_Y),this.RTL&&b.p
 Blockly.BlockSvg.prototype.renderDrawBottom_=function(a,b,c){this.height+=c+1;this.nextConnection&&(a.push("H",Blockly.BlockSvg.NOTCH_WIDTH+(this.RTL?.5:-.5)+" "+Blockly.BlockSvg.NOTCH_PATH_RIGHT),this.nextConnection.setOffsetInBlock(this.RTL?-Blockly.BlockSvg.NOTCH_WIDTH:Blockly.BlockSvg.NOTCH_WIDTH,c+1),this.height+=4);this.squareBottomLeftCorner_?(a.push("H 0"),this.RTL||b.push("M","0.5,"+(c-.5))):(a.push("H",Blockly.BlockSvg.CORNER_RADIUS),a.push("a",Blockly.BlockSvg.CORNER_RADIUS+","+Blockly.BlockSvg.CORNER_RADIUS+
 " 0 0,1 -"+Blockly.BlockSvg.CORNER_RADIUS+",-"+Blockly.BlockSvg.CORNER_RADIUS),this.RTL||(b.push("M",Blockly.BlockSvg.DISTANCE_45_INSIDE+","+(c-Blockly.BlockSvg.DISTANCE_45_INSIDE)),b.push("A",Blockly.BlockSvg.CORNER_RADIUS-.5+","+(Blockly.BlockSvg.CORNER_RADIUS-.5)+" 0 0,1 0.5,"+(c-Blockly.BlockSvg.CORNER_RADIUS))))};
 Blockly.BlockSvg.prototype.renderDrawLeft_=function(a,b){this.outputConnection?(this.outputConnection.setOffsetInBlock(0,0),a.push("V",Blockly.BlockSvg.TAB_HEIGHT),a.push("c 0,-10 -"+Blockly.BlockSvg.TAB_WIDTH+",8 -"+Blockly.BlockSvg.TAB_WIDTH+",-7.5 s "+Blockly.BlockSvg.TAB_WIDTH+",2.5 "+Blockly.BlockSvg.TAB_WIDTH+",-7.5"),this.RTL?(b.push("M",-.25*Blockly.BlockSvg.TAB_WIDTH+",8.4"),b.push("l",-.45*Blockly.BlockSvg.TAB_WIDTH+",-2.1")):(b.push("V",Blockly.BlockSvg.TAB_HEIGHT-1.5),b.push("m",-.92*
-Blockly.BlockSvg.TAB_WIDTH+",-0.5 q "+-.19*Blockly.BlockSvg.TAB_WIDTH+",-5.5 0,-11"),b.push("m",.92*Blockly.BlockSvg.TAB_WIDTH+",1 V 0.5 H 1")),this.width+=Blockly.BlockSvg.TAB_WIDTH):this.RTL||(this.squareTopLeftCorner_?b.push("V",.5):b.push("V",Blockly.BlockSvg.CORNER_RADIUS));a.push("z")};Blockly.Msg={};goog.getMsgOrig=goog.getMsg;goog.getMsg=function(a,b){var c=goog.getMsg.blocklyMsgMap[a];c&&(a=Blockly.Msg[c]);return goog.getMsgOrig(a,b)};goog.getMsg.blocklyMsgMap={Today:"TODAY"};Blockly.FieldTextInput=function(a,b){Blockly.FieldTextInput.superClass_.constructor.call(this,a,b)};goog.inherits(Blockly.FieldTextInput,Blockly.Field);Blockly.FieldTextInput.fromJson=function(a){var b=Blockly.utils.replaceMessageReferences(a.text);b=new Blockly.FieldTextInput(b,a["class"]);"boolean"===typeof a.spellcheck&&b.setSpellcheck(a.spellcheck);return b};Blockly.FieldTextInput.FONTSIZE=11;Blockly.FieldTextInput.htmlInput_=null;Blockly.FieldTextInput.prototype.CURSOR="text";
+Blockly.BlockSvg.TAB_WIDTH+",-0.5 q "+-.19*Blockly.BlockSvg.TAB_WIDTH+",-5.5 0,-11"),b.push("m",.92*Blockly.BlockSvg.TAB_WIDTH+",1 V 0.5 H 1")),this.width+=Blockly.BlockSvg.TAB_WIDTH):this.RTL||(this.squareTopLeftCorner_?b.push("V",.5):b.push("V",Blockly.BlockSvg.CORNER_RADIUS));a.push("z")};
+
+Blockly.Msg={};
+goog.getMsgOrig=goog.getMsg;
+goog.getMsg=function(a,b){
+	var c=goog.getMsg.blocklyMsgMap[a];c&&(a=Blockly.Msg[c]);
+	return goog.getMsgOrig(a,b)
+};
+goog.getMsg.blocklyMsgMap={Today:"TODAY"};
+
+Blockly.FieldTextInput=function(a,b){Blockly.FieldTextInput.superClass_.constructor.call(this,a,b)};goog.inherits(Blockly.FieldTextInput,Blockly.Field);Blockly.FieldTextInput.fromJson=function(a){var b=Blockly.utils.replaceMessageReferences(a.text);b=new Blockly.FieldTextInput(b,a["class"]);"boolean"===typeof a.spellcheck&&b.setSpellcheck(a.spellcheck);return b};Blockly.FieldTextInput.FONTSIZE=11;Blockly.FieldTextInput.htmlInput_=null;Blockly.FieldTextInput.prototype.CURSOR="text";
 Blockly.FieldTextInput.prototype.spellcheck_=!0;Blockly.FieldTextInput.prototype.dispose=function(){Blockly.WidgetDiv.hideIfOwner(this);Blockly.FieldTextInput.superClass_.dispose.call(this)};Blockly.FieldTextInput.prototype.setValue=function(a){if(null!==a){if(this.sourceBlock_){var b=this.callValidator(a);null!==b&&(a=b)}Blockly.Field.prototype.setValue.call(this,a)}};
 Blockly.FieldTextInput.prototype.setText=function(a){null!==a&&(a=String(a),a!==this.text_&&(this.sourceBlock_&&Blockly.Events.isEnabled()&&Blockly.Events.fire(new Blockly.Events.BlockChange(this.sourceBlock_,"field",this.name,this.text_,a)),Blockly.Field.prototype.setText.call(this,a)))};Blockly.FieldTextInput.prototype.setSpellcheck=function(a){this.spellcheck_=a};
 Blockly.FieldTextInput.prototype.showEditor_=function(a){this.workspace_=this.sourceBlock_.workspace;a=a||!1;!a&&(goog.userAgent.MOBILE||goog.userAgent.ANDROID||goog.userAgent.IPAD)?this.showPromptEditor_():this.showInlineEditor_(a)};Blockly.FieldTextInput.prototype.showPromptEditor_=function(){var a=this;Blockly.prompt(Blockly.Msg.CHANGE_VALUE_TITLE,this.text_,function(b){a.sourceBlock_&&(b=a.callValidator(b));a.setValue(b)})};
@@ -1972,7 +2759,8 @@ Blockly.FieldDropdown.prototype.createMenu_=function(){
 		a.addChild(d,!0)
 		;d.setChecked(e==this.value_)
 	}
-	return a};
+	return a
+};
 
 Blockly.FieldDropdown.prototype.positionMenu_=function(a){var b=Blockly.utils.getViewportBBox(),c=this.getAnchorDimensions_();this.createWidget_(a);var d=Blockly.utils.uiMenu.getSize(a);d.height>Blockly.FieldDropdown.MAX_MENU_HEIGHT&&(d.height=Blockly.FieldDropdown.MAX_MENU_HEIGHT);this.sourceBlock_.RTL&&Blockly.utils.uiMenu.adjustBBoxesForRTL(b,c,d);Blockly.WidgetDiv.positionWithAnchor(b,c,d,this.sourceBlock_.RTL);a.getElement().focus()};
 Blockly.FieldDropdown.prototype.createWidget_=function(a){a.render(Blockly.WidgetDiv.DIV);Blockly.utils.addClass(a.getElement(),"blocklyDropdownMenu");a.setAllowAutoFocus(!0)};Blockly.FieldDropdown.prototype.getAnchorDimensions_=function(){var a=this.getScaledBBox_();this.sourceBlock_.RTL?a.right+=Blockly.FieldDropdown.CHECKMARK_OVERHANG:a.left-=Blockly.FieldDropdown.CHECKMARK_OVERHANG;return a};
@@ -1994,8 +2782,6 @@ Blockly.FieldImage.prototype.setValue=function(a){null!==a&&(this.src_=a,this.im
 Blockly.Field.register("field_image",Blockly.FieldImage);Blockly.FieldNumber=function(a,b,c,d,e){a=a&&!isNaN(a)?String(a):"0";Blockly.FieldNumber.superClass_.constructor.call(this,a,e);this.setConstraints(b,c,d)};goog.inherits(Blockly.FieldNumber,Blockly.FieldTextInput);Blockly.FieldNumber.fromJson=function(a){return new Blockly.FieldNumber(a.value,a.min,a.max,a.precision)};
 Blockly.FieldNumber.prototype.setConstraints=function(a,b,c){c=parseFloat(c);this.precision_=isNaN(c)?0:c;a=parseFloat(a);this.min_=isNaN(a)?-Infinity:a;b=parseFloat(b);this.max_=isNaN(b)?Infinity:b;this.setValue(this.callValidator(this.getValue()))};
 Blockly.FieldNumber.prototype.classValidator=function(a){if(null===a)return null;a=String(a);a=a.replace(/O/ig,"0");a=a.replace(/,/g,"");a=parseFloat(a||0);if(isNaN(a))return null;this.precision_&&isFinite(a)&&(a=Math.round(a/this.precision_)*this.precision_);a=goog.math.clamp(a,this.min_,this.max_);return String(a)};Blockly.Field.register("field_number",Blockly.FieldNumber);
-
-
 Blockly.FieldVariable=function(a,b,c,d){this.menuGenerator_=Blockly.FieldVariable.dropdownCreate;this.size_=new goog.math.Size(0,Blockly.BlockSvg.MIN_BLOCK_Y);this.setValidator(b);this.defaultVariableName=a||"";this.setTypes_(c,d);this.value_=null};goog.inherits(Blockly.FieldVariable,Blockly.FieldDropdown);Blockly.FieldVariable.fromJson=function(a){var b=Blockly.utils.replaceMessageReferences(a.variable);return new Blockly.FieldVariable(b,null,a.variableTypes,a.defaultType)};
 Blockly.FieldVariable.prototype.init=function(){this.fieldGroup_||(Blockly.FieldVariable.superClass_.init.call(this),this.initModel())};Blockly.FieldVariable.prototype.initModel=function(){if(!this.variable_){this.workspace_=this.sourceBlock_.workspace;var a=Blockly.Variables.getOrCreateVariablePackage(this.workspace_,null,this.defaultVariableName,this.defaultType_);Blockly.Events.disable();try{this.setValue(a.getId())}finally{Blockly.Events.enable()}}};
 Blockly.FieldVariable.prototype.dispose=function(){Blockly.FieldVariable.superClass_.dispose.call(this);this.variableMap_=this.workspace_=null};Blockly.FieldVariable.prototype.setSourceBlock=function(a){goog.asserts.assert(!a.isShadow(),"Variable fields are not allowed to exist on shadow blocks.");Blockly.FieldVariable.superClass_.setSourceBlock.call(this,a)};Blockly.FieldVariable.prototype.getValue=function(){return this.variable_?this.variable_.getId():null};
@@ -2032,9 +2818,9 @@ Blockly.FieldVariable.dropdownCreate=function(){
 	b=[];
 	for(e=0;e<c.length;e++)
 		b[e]=[c[e].name,c[e].getId()];
-	b.push([Blockly.Msg.RENAME_VARIABLE,Blockly.RENAME_VARIABLE_ID]);
+	b.push(["Rename this "+defaultType+" named '"+a+"'",Blockly.RENAME_VARIABLE_ID]);
 	b.push(["Creat New "+defaultType+"!" ,"CREATE_VARIABLE_BLOCK"]); // ny
-	Blockly.Msg.DELETE_VARIABLE&&b.push([Blockly.Msg.DELETE_VARIABLE.replace("%1",a),Blockly.DELETE_VARIABLE_ID]);
+	Blockly.Msg.DELETE_VARIABLE&&b.push(["Delete this "+defaultType+" named '"+a+"'",Blockly.DELETE_VARIABLE_ID]);
 	
 	return b
 };
@@ -2050,25 +2836,27 @@ Blockly.FieldVariable.prototype.onItemSelected=function(a,b){
 				var Blocktype = block.type
 
 				deviceCount.up(this.defaultType_)// ny create new Block
-
 				var newBlock = d.newBlock(Blocktype, null);
-				var b=Blockly.clipboardXml_;
-				var c=Blockly.clipboardSource_;
 
-				change_disconnted_color(newBlock);
-				Blockly.copy_(newBlock);
-				newBlock.workspace.paste(Blockly.clipboardXml_);
-				Blockly.clipboardXml_=b;
-				Blockly.clipboardSource_=c
-				change_disconnted_color(newBlock);
+				Blockly.make_newBlock(newBlock)
+
+
 				
 				return
 			}
 		}
 		
 		this.setValue(c)
+};
 
-		
+Blockly.make_newBlock=function(a){
+	var b=Blockly.clipboardXml_,c=Blockly.clipboardSource_;
+	Blockly.copy_(a);
+	colour=true;
+	a.workspace.paste(Blockly.clipboardXml_);
+	colour=false;
+	Blockly.clipboardXml_=b;
+	Blockly.clipboardSource_=c
 };
 
 
@@ -2171,10 +2959,30 @@ Blockly.Generator.prototype.valueToCode=function(a,b,c){
 Blockly.Generator.prototype.statementToCode=function(a,b){var c=a.getInputTargetBlock(b),d=this.blockToCode(c);goog.asserts.assertString(d,'Expecting code from statement block "%s".',c&&c.type);d&&(d=this.prefixLines(d,this.INDENT));return d};
 Blockly.Generator.prototype.addLoopTrap=function(a,b){b=b.replace(/\$/g,"$$$$");this.INFINITE_LOOP_TRAP&&(a=this.INFINITE_LOOP_TRAP.replace(/%1/g,"'"+b+"'")+a);this.STATEMENT_PREFIX&&(a+=this.prefixLines(this.STATEMENT_PREFIX.replace(/%1/g,"'"+b+"'"),this.INDENT));return a};Blockly.Generator.prototype.RESERVED_WORDS_="";Blockly.Generator.prototype.addReservedWords=function(a){this.RESERVED_WORDS_+=a+","};Blockly.Generator.prototype.FUNCTION_NAME_PLACEHOLDER_="{leCUI8hutHZI4480Dc}";
 Blockly.Generator.prototype.provideFunction_=function(a,b){if(!this.definitions_[a]){var c=this.variableDB_.getDistinctName(a,Blockly.Procedures.NAME_TYPE);this.functionNames_[a]=c;c=b.join("\n").replace(this.FUNCTION_NAME_PLACEHOLDER_REGEXP_,c);for(var d;d!=c;)d=c,c=c.replace(/^(( {2})*) {2}/gm,"$1\x00");c=c.replace(/\0/g,this.INDENT);this.definitions_[a]=c}return this.functionNames_[a]};Blockly.Generator.prototype.init=function(a){};Blockly.Generator.prototype.scrub_=function(a,b){return b};
-Blockly.Generator.prototype.finish=function(a){return a};Blockly.Generator.prototype.scrubNakedValue=function(a){return a};Blockly.Names=function(a,b){this.variablePrefix_=b||"";this.reservedDict_=Object.create(null);if(a)for(var c=a.split(","),d=0;d<c.length;d++)this.reservedDict_[c[d]]=!0;this.reset()};Blockly.Names.DEVELOPER_VARIABLE_TYPE="DEVELOPER_VARIABLE";Blockly.Names.prototype.reset=function(){this.db_=Object.create(null);this.dbReverse_=Object.create(null);this.variableMap_=null};Blockly.Names.prototype.setVariableMap=function(a){this.variableMap_=a};
+Blockly.Generator.prototype.finish=function(a){return a};Blockly.Generator.prototype.scrubNakedValue=function(a){return a};Blockly.Names=function(a,b){this.variablePrefix_=b||"";this.reservedDict_=Object.create(null);if(a)for(var c=a.split(","),d=0;d<c.length;d++)this.reservedDict_[c[d]]=!0;this.reset()};Blockly.Names.DEVELOPER_VARIABLE_TYPE="DEVELOPER_VARIABLE";Blockly.Names.prototype.reset=function(){this.db_=Object.create(null);this.dbReverse_=Object.create(null);this.variableMap_=null};
+
+Blockly.Names.prototype.setVariableMap=function(a){this.variableMap_=a};
+
 Blockly.Names.prototype.getNameForUserVariable_=function(a){return this.variableMap_?(a=this.variableMap_.getVariableById(a))?a.name:null:(console.log("Deprecated call to Blockly.Names.prototype.getName without defining a variable map. To fix, add the folowing code in your generator's init() function:\nBlockly.YourGeneratorName.variableDB_.setVariableMap(workspace.getVariableMap());"),null)};
-Blockly.Names.prototype.getName=function(a,b){if(b==Blockly.Variables.NAME_TYPE){var c=this.getNameForUserVariable_(a);c&&(a=c)}c=a.toLowerCase()+"_"+b;var d=b==Blockly.Variables.NAME_TYPE||b==Blockly.Names.DEVELOPER_VARIABLE_TYPE?this.variablePrefix_:"";if(c in this.db_)return d+this.db_[c];var e=this.getDistinctName(a,b);this.db_[c]=e.substr(d.length);return e};
-Blockly.Names.prototype.getDistinctName=function(a,b){for(var c=this.safeName_(a),d="";this.dbReverse_[c+d]||c+d in this.reservedDict_;)d=d?d+1:2;c+=d;this.dbReverse_[c]=!0;return(b==Blockly.Variables.NAME_TYPE||b==Blockly.Names.DEVELOPER_VARIABLE_TYPE?this.variablePrefix_:"")+c};Blockly.Names.prototype.safeName_=function(a){a?(a=encodeURI(a.replace(/ /g,"_")).replace(/[^\w]/g,"_"),-1!="0123456789".indexOf(a[0])&&(a="my_"+a)):a="unnamed";return a};
+
+Blockly.Names.prototype.getName=function(a,b){
+	if(b==Blockly.Variables.NAME_TYPE){
+		var c=this.getNameForUserVariable_(a);
+		c&&(a=c)
+	}
+	c=a.toLowerCase()+"_"+b;
+	var d=b==Blockly.Variables.NAME_TYPE||b==Blockly.Names.DEVELOPER_VARIABLE_TYPE?this.variablePrefix_:"";
+	if(c in this.db_)
+		return d+this.db_[c];
+	var e=this.getDistinctName(a,b);
+	this.db_[c]=e.substr(d.length);
+	return e
+};
+Blockly.Names.prototype.getDistinctName=function(a,b){for(var c=this.safeName_(a),d="";this.dbReverse_[c+d]||c+d in this.reservedDict_;)d=d?d+1:2;c+=d;this.dbReverse_[c]=!0;return(b==Blockly.Variables.NAME_TYPE||b==Blockly.Names.DEVELOPER_VARIABLE_TYPE?this.variablePrefix_:"")+c};
+
+Blockly.Names.prototype.safeName_=function(a){
+	a?(a=encodeURI(a.replace(/ /g,"_")).replace(/[^\w]/g,"_"),-1!="0123456789".indexOf(a[0])&&(a=a)):a="unnamed";return a
+};
 Blockly.Names.equals=function(a,b){return a.toLowerCase()==b.toLowerCase()};Blockly.Procedures={};Blockly.Procedures.NAME_TYPE=Blockly.PROCEDURE_CATEGORY_NAME;Blockly.Procedures.allProcedures=function(a){a=a.getAllBlocks();for(var b=[],c=[],d=0;d<a.length;d++)if(a[d].getProcedureDef){var e=a[d].getProcedureDef();e&&(e[2]?b.push(e):c.push(e))}c.sort(Blockly.Procedures.procTupleComparator_);b.sort(Blockly.Procedures.procTupleComparator_);return[c,b]};Blockly.Procedures.procTupleComparator_=function(a,b){return a[0].toLowerCase().localeCompare(b[0].toLowerCase())};
 Blockly.Procedures.findLegalName=function(a,b){if(b.isInFlyout)return a;for(;!Blockly.Procedures.isLegalName_(a,b.workspace,b);){var c=a.match(/^(.*?)(\d+)$/);a=c?c[1]+(parseInt(c[2],10)+1):a+"2"}return a};Blockly.Procedures.isLegalName_=function(a,b,c){return!Blockly.Procedures.isNameUsed(a,b,c)};Blockly.Procedures.isNameUsed=function(a,b,c){b=b.getAllBlocks();for(var d=0;d<b.length;d++)if(b[d]!=c&&b[d].getProcedureDef){var e=b[d].getProcedureDef();if(Blockly.Names.equals(e[0],a))return!0}return!1};
 Blockly.Procedures.rename=function(a){a=a.replace(/^[\s\xa0]+|[\s\xa0]+$/g,"");var b=Blockly.Procedures.findLegalName(a,this.sourceBlock_),c=this.text_;if(c!=a&&c!=b){a=this.sourceBlock_.workspace.getAllBlocks();for(var d=0;d<a.length;d++)a[d].renameProcedure&&a[d].renameProcedure(c,b)}return b};
@@ -3118,11 +3926,24 @@ Blockly.updateToolbox=function(a){console.warn("Deprecated call to Blockly.updat
 Blockly.svgResize=function(a){for(;a.options.parentWorkspace;)a=a.options.parentWorkspace;var b=a.getParentSvg(),c=b.parentNode;if(c){var d=c.offsetWidth;c=c.offsetHeight;b.cachedWidth_!=d&&(b.setAttribute("width",d+"px"),b.cachedWidth_=d);b.cachedHeight_!=c&&(b.setAttribute("height",c+"px"),b.cachedHeight_=c);a.resize()}};
 Blockly.onKeyDown_=function(a){if(!Blockly.mainWorkspace.options.readOnly&&!Blockly.utils.isTargetInput(a)){var b=!1;if(27==a.keyCode)Blockly.hideChaff();else if(8==a.keyCode||46==a.keyCode){a.preventDefault();if(Blockly.mainWorkspace.isDragging())return;Blockly.selected&&Blockly.selected.isDeletable()&&(b=!0)}else if(a.altKey||a.ctrlKey||a.metaKey){if(Blockly.mainWorkspace.isDragging())return;Blockly.selected&&Blockly.selected.isDeletable()&&Blockly.selected.isMovable()&&(67==a.keyCode?(Blockly.hideChaff(),
 Blockly.copy_(Blockly.selected)):88!=a.keyCode||Blockly.selected.workspace.isFlyout||(Blockly.copy_(Blockly.selected),b=!0));86==a.keyCode?Blockly.clipboardXml_&&(Blockly.Events.setGroup(!0),a=Blockly.clipboardSource_,a.isFlyout&&(a=a.targetWorkspace),a.paste(Blockly.clipboardXml_),Blockly.Events.setGroup(!1)):90==a.keyCode&&(Blockly.hideChaff(),Blockly.mainWorkspace.undo(a.shiftKey))}b&&!Blockly.selected.workspace.isFlyout&&(Blockly.Events.setGroup(!0),Blockly.hideChaff(),Blockly.selected.dispose(!0,
-!0),Blockly.Events.setGroup(!1))}};Blockly.copy_=function(a){var b=Blockly.Xml.blockToDom(a);Blockly.Xml.deleteNext(b);var c=a.getRelativeToSurfaceXY();b.setAttribute("x",a.RTL?-c.x:c.x);b.setAttribute("y",c.y);Blockly.clipboardXml_=b;Blockly.clipboardSource_=a.workspace};
+!0),Blockly.Events.setGroup(!1))}};
+
+Blockly.copy_=function(a){
+	var b=Blockly.Xml.blockToDom(a);
+	Blockly.Xml.deleteNext(b);
+	var c=a.getRelativeToSurfaceXY();
+	b.setAttribute("x",a.RTL?-c.x:c.x);
+	b.setAttribute("y",c.y);
+	Blockly.clipboardXml_=b;
+	Blockly.clipboardSource_=a.workspace
+};
 
 Blockly.duplicate_=function(a){
 	var b=Blockly.clipboardXml_,c=Blockly.clipboardSource_;
-	Blockly.copy_(a);a.workspace.paste(Blockly.clipboardXml_);
+	Blockly.copy_(a);
+	colour = true
+	a.workspace.paste(Blockly.clipboardXml_);
+	colour = false
 	Blockly.clipboardXml_=b;
 	Blockly.clipboardSource_=c
 };
