@@ -4,6 +4,7 @@ function action_block(device){
 	    var dropdown_commands = block.getFieldValue('Command');
 		var actionList = Blockly.SmartThings.valueToCode(block, device, Blockly.SmartThings.ORDER_ATOMIC);
 		// TODO: Assemble SmartThings into code variable.
+		var result
 		
 		var smartAction = new Action();
 		if(dropdown_commands){
@@ -17,18 +18,24 @@ function action_block(device){
 				smartAction.command= smartAction.devname+'.'+command.id+'('+dropdown_commands+')';
 				smartAction.device = device;	
 			}
-		}else{
+
+			if(goog.isArray(actionList))
+				result = actionList.concat(smartAction);
+			else
+				result = [smartAction];
+
+		}else{ // groupig
 			smartAction.devname = device+variable_name;
 			smartAction.device = device;	
 
+			if(goog.isArray(actionList))
+				result = actionList.concat(smartAction);
+			else
+				result = smartAction;
 		}
 
-		if(goog.isArray(actionList))
-			var result = actionList.concat(smartAction);
-		else
-			var result = [smartAction];
-	
 		return result;
+
 	};
 	
 	Blockly.Blocks['a_'+device] = {
@@ -73,57 +80,16 @@ function action_block(device){
 				else
 					block.appendField(new Blockly.FieldTextInput(""), "Command");
 
-			}
-			/*if(event.type == Blockly.Events.BLOCK_MOVE){
+			}else if(event.type == Blockly.Events.BLOCK_MOVE){
+				if(this.id == event.blockId){
+					if(this.parentBlock_ && this.parentBlock_.type =="group")
+						block.removeField("Command")
+					else if(event.oldInputName && event.oldInputName.includes("ADD"))
+						appendComm(device, block)
 
-				if(this.parentBlock_ && event.newParentId == this.parentBlock_.id){
-					//map - action
-					block.removeField("Command");
-				}
-				else if(event.oldParentId){
-					if(this.id == event.blockId){
-						//map - action
-						//disconneted
-						appendComm(device, block);
-					}
-				}
-				if(this.parentBlock_ && this.parentBlock_.type.includes("map")){
-					//init action with map
-					var parentBlock = this.parentBlock_
-					var length = parentBlock.inputList.length-1
-					var deviceList = new Set()
-					
-					for(var i = 0; i< length; i++){
-						var block = parentBlock.getInputTargetBlock("ADD"+i)
-						if(block){
-							var device = block.getField("device").text_
-							deviceList.add(device)
-						}
-					}
-
-					var action = parentBlock.getInputTargetBlock("p")
-					if(action){
-						var newComm = new Set()
-
-						for(let device of deviceList){
-							if(commMap.isSingleCommad(device)){
-								for(let comm of commMap.getCommad(device))
-								{
-									newComm.add(comm)
-								}
-							}
-						}
-
-						var command = []
-						for(let c of newComm){
-							command.push([c, c])
-						}
-						action.getInput("type").removeField("type")
-						action.getInput("type").appendField(new Blockly.FieldDropdown(command), "type");
-					}
 				}
 			}
-*/
+		
 		}
 	};
 }
@@ -163,25 +129,6 @@ function setMethodField(block, device){
 	
 
 }
-
-Blockly.SmartThings['map'] = function(block) {
-    var length = block.inputList.length-1
-	var i = 0;
-	var groupingDevice = new Grouping();
-	
-	groupingDevice.type = "map"
-
-	groupingDevice.p = Blockly.SmartThings.valueToCode(block, 'p', Blockly.SmartThings.ORDER_ATOMIC);
-
-	while(i < length){
-	 	var device = Blockly.SmartThings.valueToCode(block, 'ADD'+i, Blockly.SmartThings.ORDER_ATOMIC);
-	 	groupingDevice.list = groupingDevice.list.concat(device)
-		i++;
-	}
-
-  return groupingDevice;
-};
-
 Blockly.Blocks['option'] = {
   init: function() {
     this.appendDummyInput("type")
@@ -297,17 +244,16 @@ Blockly.SmartThings['sendpush'] = function(block) {
 	var actionList = Blockly.SmartThings.valueToCode(block, 'action', Blockly.SmartThings.ORDER_ATOMIC);
   // TODO: Assemble SmartThings into code variable.
   console.log("sendPush");
-
-  if(text_text && !value_message){
-	  var smartAction = new Action();
-	  smartAction.method = 'sendPush(\"'+text_text+'\")';
-  }else if(!text_text && value_message){
-	  var smartAction = new Action();
-	  smartAction.method = 'sendPush('+value_message.capname+')';
+  
+  var smartAction = new Action();
+   if(!text_text && value_message){
+	  smartAction.method = 'sendPush('+value_message.name+')';
 	  smartAction.args.push(value_message)
+  }else{
+	  smartAction.method = 'sendPush(\"'+text_text+'\")';
   }
   
-	if(goog.isArray(actionList)){
+	if(goog.isArray(actionList) || actionList.constructor == Grouping){
 		var result = actionList.concat(smartAction);
 	}else{
 		var result = [smartAction];

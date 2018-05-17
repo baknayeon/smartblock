@@ -110,6 +110,44 @@ Blockly.Blocks['compare'] = {
       };
       return TOOLTIPS[op];
     });
+  }, 
+  forgrouping_: function(device, attr) {
+    var OPERATORS = this.RTL ? [
+          ['=', 'EQ'],
+          ['>', 'LT'],
+          ['<', 'GT'],
+          ['ϵ', 'EO'],
+        ] : [
+          ['=', 'EQ'],
+          ['<', 'LT'],
+          ['>', 'GT'],
+          ['ϵ', 'EO'],
+        ];
+     this.removeInput('A');
+     this.removeInput('B');
+    this.appendDummyInput('A')
+	     .appendField(device+"s");
+    this.appendDummyInput('B')
+		.appendField(new Blockly.FieldDropdown(OPERATORS), 'OP')
+		 .appendField(new Blockly.FieldDropdown(attr), 'attribute');
+    this.setInputsInline(true);
+    // Assign 'this' to a variable for use in the tooltip closure below.
+    var thisBlock = this;
+    this.prevBlocks_ = [null, null];
+    this.setOutput(true, "Condition");
+	this.setTooltip("");
+	this.setHelpUrl("");
+    this.setColour(Block_colour_condition);
+    this.setTooltip(function() {
+      var op = thisBlock.getFieldValue('OP');
+      var TOOLTIPS = {
+        'EQ': Blockly.Msg.LOGIC_COMPARE_TOOLTIP_EQ,
+        'LT': Blockly.Msg.LOGIC_COMPARE_TOOLTIP_LT,
+        //'GT': Blockly.Msg.LOGIC_COMPARE_TOOLTIP_GT,
+        'EO': Blockly.Msg.LOGIC_COMPARE_TOOLTIP_GT,
+      };
+      return TOOLTIPS[op];
+    });
   },
  onchange: function(event) {
 	var dropdown = this.getFieldValue('OP');
@@ -117,10 +155,12 @@ Blockly.Blocks['compare'] = {
     var blockA = this.getInputTargetBlock('A');
     var blockB = this.getInputTargetBlock('B');
 
+if(this.id == event.newParentId && event.newInputName == "B")
 	if(dropdown.value_ =='EO'){
 		blockB.setCheck(["Device"]);
 	}else if(dropdown =='EQ'|| dropdown =='LT' || dropdown =='GT'){
-		this.getInput('B').setCheck(["c_dev","attribute", "number"]);
+		if(this.getInput('B'))
+			this.getInput('B').setCheck(["c_dev","attribute", "number"]);
 		if(typeof event.element == "string"){
 		}else{
 			if(blockA && blockB){
@@ -166,63 +206,6 @@ Blockly.Blocks['compare'] = {
 			}
 		}
 	}
-	/*if(event.type == Blockly.Events.BLOCK_MOVE && this.parentBlock_){ // operator with all and exists
-		var parentBlock = this.parentBlock_
-		if(parentBlock.type =="all" || parentBlock.type=="exists" ){
-			if(event.newInputName == "p" || event.newInputName == "A" || event.newInputName == "B"){
-				eliminate_A(this)
-			}
-			else if(event.oldInputName == "p" || event.oldInputName == "A" || event.oldInputName == "B"){
-				if(event.oldParentId == this.id){
-					var pblock =  demoWorkspace.getBlockById(event.blockId)
-					//append_A(pblock)
-				}
-			}
-
-			if("ADD".indexOf(event.newInputName) || "ADD".indexOf(event.oldInputName)){		
-					var length = parentBlock.inputList.length-1
-					var attrs = new Set()
-					
-					for(var i = 0; i< length; i++){
-						var block = parentBlock.getInputTargetBlock("ADD"+i)
-						if(block){
-							var device = block.getField("type").text_
-							if(attrMap.isOnlyENUM(device)){
-								var newAttr = attrMap.getENUM(device);
-								for(let new_a of newAttr.value){
-									attrs.add(new_a)
-
-								}
-							}else if(attrMap.hasMultiTypeENUM(device)){
-								var attribute_id = parentBlock.getField("attribute_id").text_;
-								var newAttr = attrMap.getENUMById(device, attribute_id);
-								for(let new_a of newAttr.value){
-									attrs.add(new_a)
-
-								}
-
-							}
-						}
-						
-					}
-					var newAttr = []
-					for(let attr of attrs){
-						newAttr.push([attr, attr])
-					}
-
-					var p = parentBlock.getInputTargetBlock("p")
-					if(p){
-						var blockB = p.getInputTargetBlock("B")
-						if(blockB.type == 'dev_attr'){
-							blockB.getInput("dev_attr").removeField('attribute');
-							blockB.getInput("dev_attr").appendField(new Blockly.FieldDropdown(newAttr), "attribute");
-							
-						}
-					}
-			}
-
-		}
-	}*/
 
     // Disconnect blocks that existed prior to this change if they don't match.
     if (blockA && blockB &&
@@ -266,7 +249,7 @@ function condition_block(device){
 	  var variable_name = Blockly.SmartThings.variableDB_.getName(block.getFieldText('name'), Blockly.Variables.NAME_TYPE);
 	  // TODO: Assemble SmartThings into code variable.
 	  
-	  var c = new inputc();
+	  var c = new Inputc();
 	  c.device = type;
 	  c.devname =device+variable_name;
 	  c.input = 'input \"'+c.devname+'\", \"capability.'+type +'\", title:\"'+c.devname+'\"' ;
@@ -303,64 +286,20 @@ function condition_block(device){
 		onchange: function(event) {
 
 	 		 if(!this.squareBottomLeftCorner_ && event.element == "field" && event.name ==="attribute_id"){
-					if(event.blockId == this.id){
-						var device = this.getField("device").text_;
-						var block = this.getInput(device);
-						block.removeField("attribute")
-						var attribute_id = this.getField("attribute_id").text_;
-						block.appendField(new Blockly.FieldDropdown(attrMap.getENUM_vaulesById(device, attribute_id)),"attribute");
-					}
+				if(event.blockId == this.id){
+					var device = this.getField("device").text_;
+					var block = this.getInput(device);
+					block.removeField("attribute")
+					var attribute_id = this.getField("attribute_id").text_;
+					block.appendField(new Blockly.FieldDropdown(attrMap.getENUM_vaulesById(device, attribute_id)),"attribute");
 				}
+			}
+			
 
 		}
 	};
 }
 
-
-Blockly.Blocks['boolean'] = {
-  /**
-   * Block for boolean data type: true and false.
-   * @this Blockly.Block
-   */
-  init: function() {
-    var BOOLEANS =
-        [[Blockly.Msg.LOGIC_BOOLEAN_TRUE, 'TRUE'],
-         [Blockly.Msg.LOGIC_BOOLEAN_FALSE, 'FALSE']];
-    this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
-    this.appendDummyInput()
-        .appendField(new Blockly.FieldDropdown(BOOLEANS), 'BOOL');
-    this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
-    this.setColour(Block_colour_condition);
-    this.setOutput(true, "Condition");
-  }
-};
-
-Blockly.Blocks['negate'] = {
-	init: function() {
-    this.appendValueInput("not")
-		.setCheck("Condition")
-        .appendField("not");
-    this.setInputsInline(true);
-    this.setOutput(true, "Condition");
-    this.setColour(Block_colour_condition);
- this.setTooltip("");
- this.setHelpUrl("");
-  }
-};
-
-
-
-Blockly.Blocks['device_list'] = {
-    init : function() {
-        this.appendDummyInput('device_list')
-		.appendField(new Blockly.FieldDropdown(Array.from(deviceSet.entries())), 'device')
-        .appendField("Device");
-		this.setInputsInline(true);
-		this.setColour(Block_colour_condition);
-        this.setOutput(true, 'Device');
-        var thisBlock = this;
-    }
-};
 
 Blockly.Blocks['dev_attr'] = {
     init : function() {
@@ -376,31 +315,6 @@ Blockly.Blocks['dev_attr'] = {
 
 
 
-
-/**
- * @license
- * Visual Blocks Language
- *
- * Copyright 2012 Google Inc.
- * https://developers.google.com/blockly/
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-/**
- * @fileoverview Generating SmartThings for logic blocks.
- * @author q.neutron@gmail.com (Quynh Neutron)
- */
 'use strict';
 
 goog.provide('Blockly.SmartThings.logic');
@@ -447,13 +361,25 @@ Blockly.SmartThings['compare'] = function(block) {
   var operator = OPERATORS[block.getFieldValue('OP')];
   var order = (operator == '==' || operator == '!=') ?
       Blockly.SmartThings.ORDER_EQUALITY : Blockly.SmartThings.ORDER_RELATIONAL;
-  var argument0 = Blockly.SmartThings.valueToCode(block, 'A', order) || '0';
-  var argument1 = Blockly.SmartThings.valueToCode(block, 'B', order) || '0';
-  
-  var c = new Condition();
-  c.right = argument0;
-  c.left = argument1;
-  c.operator = operator;
+  var argument0 = Blockly.SmartThings.valueToCode(block, 'A', order) || "%grouping";
+  var argument1 = Blockly.SmartThings.valueToCode(block, 'B', order) || 0;
+  var argument12 = block.getFieldValue('attribute');
+ 
+  if(argument0 != "%grouping"  && argument1 != 0 && argument12 == null){
+	  //not grouping
+	  var c = new Condition();
+	  c.right = argument0;
+	  c.left = argument1;
+	  c.operator = operator;	
+ 
+  }else if(argument0 == "%grouping"  && argument1 == 0 && argument12 != null){
+	  //grouping
+	  var c = new Condition();
+	  c.right = argument0;
+	  c.left = argument12;
+	  c.operator = operator;	
+
+  }
   
   return c;
 };
@@ -529,39 +455,47 @@ Blockly.SmartThings['number'] = function(block) {
 };
 
 
-Blockly.SmartThings['all'] = function(block) {
-    var length = block.inputList.length-1
-	var i = 0;
-	var groupingDevice = new Grouping();
-	
-	groupingDevice.type = "all"
+Blockly.Blocks['boolean'] = {
+  /**
+   * Block for boolean data type: true and false.
+   * @this Blockly.Block
+   */
+  init: function() {
+    var BOOLEANS =
+        [[Blockly.Msg.LOGIC_BOOLEAN_TRUE, 'TRUE'],
+         [Blockly.Msg.LOGIC_BOOLEAN_FALSE, 'FALSE']];
+    this.setHelpUrl(Blockly.Msg.LOGIC_BOOLEAN_HELPURL);
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldDropdown(BOOLEANS), 'BOOL');
+    this.setTooltip(Blockly.Msg.LOGIC_BOOLEAN_TOOLTIP);
+    this.setColour(Block_colour_condition);
+    this.setOutput(true, "Condition");
+  }
+};
 
-	groupingDevice.p = Blockly.SmartThings.valueToCode(block, 'p', Blockly.SmartThings.ORDER_ATOMIC);
-
-	while(i < length){
-	 	var device = Blockly.SmartThings.valueToCode(block, 'ADD'+i, Blockly.SmartThings.ORDER_ATOMIC);
-	 	groupingDevice.list = groupingDevice.list.concat(device)
-		i++;
-	}
-
-  return groupingDevice;
+Blockly.Blocks['negate'] = {
+	init: function() {
+    this.appendValueInput("not")
+		.setCheck("Condition")
+        .appendField("not");
+    this.setInputsInline(true);
+    this.setOutput(true, "Condition");
+    this.setColour(Block_colour_condition);
+ this.setTooltip("");
+ this.setHelpUrl("");
+  }
 };
 
 
-Blockly.SmartThings['exists'] = function(block) {
-  var length = block.inputList.length-1
-	var i = 0;
-	var groupingDevice = new Grouping();
-	
-	groupingDevice.type = "exists"
 
-	groupingDevice.p = Blockly.SmartThings.valueToCode(block, 'p', Blockly.SmartThings.ORDER_ATOMIC);
-
-	while(i < length){
-	 	var device = Blockly.SmartThings.valueToCode(block, 'ADD'+i, Blockly.SmartThings.ORDER_ATOMIC);
-	 	groupingDevice.list = groupingDevice.list.concat(device)
-		i++;
-	}
-
-  return groupingDevice;
+Blockly.Blocks['device_list'] = {
+    init : function() {
+        this.appendDummyInput('device_list')
+		.appendField(new Blockly.FieldDropdown(Array.from(deviceSet.entries())), 'device')
+        .appendField("Device");
+		this.setInputsInline(true);
+		this.setColour(Block_colour_condition);
+        this.setOutput(true, 'Device');
+        var thisBlock = this;
+    }
 };

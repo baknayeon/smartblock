@@ -1599,17 +1599,317 @@ Blockly.TouchGesture.prototype.handleUp=function(a){Blockly.Touch.isTouchEvent(a
 Blockly.TouchGesture.prototype.dispose=function(){Blockly.TouchGesture.superClass_.dispose.call(this);this.onStartWrapper_&&Blockly.unbindEvent_(this.onStartWrapper_)};Blockly.TouchGesture.prototype.handleTouchStart=function(a){var b=Blockly.Touch.getTouchIdentifierFromEvent(a);this.cachedPoints_[b]=this.getTouchPoint(a);b=Object.keys(this.cachedPoints_);2==b.length&&(this.startDistance_=goog.math.Coordinate.distance(this.cachedPoints_[b[0]],this.cachedPoints_[b[1]]),this.isMultiTouch_=!0,a.preventDefault())};
 Blockly.TouchGesture.prototype.handleTouchMove=function(a){var b=Blockly.Touch.getTouchIdentifierFromEvent(a);this.cachedPoints_[b]=this.getTouchPoint(a);b=Object.keys(this.cachedPoints_);if(2==b.length){b=this.touchScale_=goog.math.Coordinate.distance(this.cachedPoints_[b[0]],this.cachedPoints_[b[1]])/this.startDistance_;if(0<this.previousScale_&&Infinity>this.previousScale_){var c=b-this.previousScale_;c=0<c?c*Blockly.TouchGesture.ZOOM_IN_MULTIPLIER:c*Blockly.TouchGesture.ZOOM_OUT_MULTIPLIER;var d=
 this.startWorkspace_,e=Blockly.utils.mouseToSvg(a,d.getParentSvg(),d.getInverseScreenCTM());d.zoom(e.x,e.y,c)}this.previousScale_=b;a.preventDefault()}};Blockly.TouchGesture.prototype.handleTouchEnd=function(a){a=Blockly.Touch.getTouchIdentifierFromEvent(a);this.cachedPoints_[a]&&delete this.cachedPoints_[a];2>Object.keys(this.cachedPoints_).length&&(this.cachedPoints_={},this.previousScale_=0)};
-Blockly.TouchGesture.prototype.getTouchPoint=function(a){return this.startWorkspace_?new goog.math.Coordinate(a.pageX?a.pageX:a.changedTouches[0].pageX,a.pageY?a.pageY:a.changedTouches[0].pageY):null};Blockly.Trashcan=function(a){this.workspace_=a};Blockly.Trashcan.prototype.WIDTH_=47;Blockly.Trashcan.prototype.BODY_HEIGHT_=44;Blockly.Trashcan.prototype.LID_HEIGHT_=16;Blockly.Trashcan.prototype.MARGIN_BOTTOM_=20;Blockly.Trashcan.prototype.MARGIN_SIDE_=20;Blockly.Trashcan.prototype.MARGIN_HOTSPOT_=10;Blockly.Trashcan.prototype.SPRITE_LEFT_=0;Blockly.Trashcan.prototype.SPRITE_TOP_=32;Blockly.Trashcan.prototype.isOpen=!1;Blockly.Trashcan.prototype.svgGroup_=null;
-Blockly.Trashcan.prototype.svgLid_=null;Blockly.Trashcan.prototype.lidTask_=0;Blockly.Trashcan.prototype.lidOpen_=0;Blockly.Trashcan.prototype.left_=0;Blockly.Trashcan.prototype.top_=0;
-Blockly.Trashcan.prototype.createDom=function(){this.svgGroup_=Blockly.utils.createSvgElement("g",{"class":"blocklyTrash"},null);var a=String(Math.random()).substring(2);var b=Blockly.utils.createSvgElement("clipPath",{id:"blocklyTrashBodyClipPath"+a},this.svgGroup_);Blockly.utils.createSvgElement("rect",{width:this.WIDTH_,height:this.BODY_HEIGHT_,y:this.LID_HEIGHT_},b);Blockly.utils.createSvgElement("image",{width:Blockly.SPRITE.width,x:-this.SPRITE_LEFT_,height:Blockly.SPRITE.height,y:-this.SPRITE_TOP_,
-"clip-path":"url(#blocklyTrashBodyClipPath"+a+")"},this.svgGroup_).setAttributeNS("http://www.w3.org/1999/xlink","xlink:href",this.workspace_.options.pathToMedia+Blockly.SPRITE.url);b=Blockly.utils.createSvgElement("clipPath",{id:"blocklyTrashLidClipPath"+a},this.svgGroup_);Blockly.utils.createSvgElement("rect",{width:this.WIDTH_,height:this.LID_HEIGHT_},b);this.svgLid_=Blockly.utils.createSvgElement("image",{width:Blockly.SPRITE.width,x:-this.SPRITE_LEFT_,height:Blockly.SPRITE.height,y:-this.SPRITE_TOP_,
-"clip-path":"url(#blocklyTrashLidClipPath"+a+")"},this.svgGroup_);this.svgLid_.setAttributeNS("http://www.w3.org/1999/xlink","xlink:href",this.workspace_.options.pathToMedia+Blockly.SPRITE.url);Blockly.bindEventWithChecks_(this.svgGroup_,"mouseup",this,this.click);this.animateLid_();return this.svgGroup_};Blockly.Trashcan.prototype.init=function(a){this.bottom_=this.MARGIN_BOTTOM_+a;this.setOpen_(!1);return this.bottom_+this.BODY_HEIGHT_+this.LID_HEIGHT_};
-Blockly.Trashcan.prototype.dispose=function(){this.svgGroup_&&(goog.dom.removeNode(this.svgGroup_),this.svgGroup_=null);this.workspace_=this.svgLid_=null;goog.Timer.clear(this.lidTask_)};
-Blockly.Trashcan.prototype.position=function(){var a=this.workspace_.getMetrics();a&&(this.workspace_.RTL?(this.left_=this.MARGIN_SIDE_+Blockly.Scrollbar.scrollbarThickness,a.toolboxPosition==Blockly.TOOLBOX_AT_LEFT&&(this.left_+=a.flyoutWidth,this.workspace_.toolbox_&&(this.left_+=a.absoluteLeft))):(this.left_=a.viewWidth+a.absoluteLeft-this.WIDTH_-this.MARGIN_SIDE_-Blockly.Scrollbar.scrollbarThickness,a.toolboxPosition==Blockly.TOOLBOX_AT_RIGHT&&(this.left_-=a.flyoutWidth)),this.top_=a.viewHeight+
-a.absoluteTop-(this.BODY_HEIGHT_+this.LID_HEIGHT_)-this.bottom_,a.toolboxPosition==Blockly.TOOLBOX_AT_BOTTOM&&(this.top_-=a.flyoutHeight),this.svgGroup_.setAttribute("transform","translate("+this.left_+","+this.top_+")"))};
-Blockly.Trashcan.prototype.getClientRect=function(){if(!this.svgGroup_)return null;var a=this.svgGroup_.getBoundingClientRect();return new goog.math.Rect(a.left+this.SPRITE_LEFT_-this.MARGIN_HOTSPOT_,a.top+this.SPRITE_TOP_-this.MARGIN_HOTSPOT_,this.WIDTH_+2*this.MARGIN_HOTSPOT_,this.LID_HEIGHT_+this.BODY_HEIGHT_+2*this.MARGIN_HOTSPOT_)};Blockly.Trashcan.prototype.setOpen_=function(a){this.isOpen!=a&&(goog.Timer.clear(this.lidTask_),this.isOpen=a,this.animateLid_())};
-Blockly.Trashcan.prototype.animateLid_=function(){this.lidOpen_+=this.isOpen?.2:-.2;this.lidOpen_=goog.math.clamp(this.lidOpen_,0,1);var a=45*this.lidOpen_;this.svgLid_.setAttribute("transform","rotate("+(this.workspace_.RTL?-a:a)+","+(this.workspace_.RTL?4:this.WIDTH_-4)+","+(this.LID_HEIGHT_-2)+")");a=goog.math.lerp(.4,.8,this.lidOpen_);this.svgGroup_.style.opacity=a;0<this.lidOpen_&&1>this.lidOpen_&&(this.lidTask_=goog.Timer.callOnce(this.animateLid_,20,this))};
-Blockly.Trashcan.prototype.close=function(){this.setOpen_(!1)};Blockly.Trashcan.prototype.click=function(){var a=this.workspace_.startScrollX-this.workspace_.scrollX,b=this.workspace_.startScrollY-this.workspace_.scrollY;Math.sqrt(a*a+b*b)>Blockly.DRAG_RADIUS||console.log("TODO: Inspect trash.")};Blockly.VariableModel=function(a,b,c,d){this.workspace=a;this.name=b;this.type=c||"";this.id_=d||Blockly.utils.genUid();Blockly.Events.fire(new Blockly.Events.VarCreate(this))};Blockly.VariableModel.prototype.getId=function(){return this.id_};Blockly.VariableModel.compareByName=function(a,b){return goog.string.caseInsensitiveCompare(a.name,b.name)};Blockly.Variables={};Blockly.Variables.NAME_TYPE=Blockly.VARIABLE_CATEGORY_NAME;Blockly.Variables.allUsedVarModels=function(a){var b=a.getAllBlocks();a=Object.create(null);for(var c=0;c<b.length;c++){var d=b[c].getVarModels();if(d)for(var e=0;e<d.length;e++){var f=d[e];f.getId()&&(a[f.getId()]=f)}}b=[];for(var g in a)b.push(a[g]);return b};Blockly.Variables.allUsedVariables=function(){console.warn("Deprecated call to Blockly.Variables.allUsedVariables. Use Blockly.Variables.allUsedVarModels instead.\nIf this is a major issue please file a bug on GitHub.")};
+Blockly.TouchGesture.prototype.getTouchPoint=function(a){return this.startWorkspace_?new goog.math.Coordinate(a.pageX?a.pageX:a.changedTouches[0].pageX,a.pageY?a.pageY:a.changedTouches[0].pageY):null};
+
+Blockly.Trashcan = function(workspace) {
+  this.workspace_ = workspace;
+};
+
+/**
+ * Width of both the trash can and lid images.
+ * @type {number}
+ * @private
+ */
+Blockly.Trashcan.prototype.WIDTH_ = 47;
+
+/**
+ * Height of the trashcan image (minus lid).
+ * @type {number}
+ * @private
+ */
+Blockly.Trashcan.prototype.BODY_HEIGHT_ = 44;
+
+/**
+ * Height of the lid image.
+ * @type {number}
+ * @private
+ */
+Blockly.Trashcan.prototype.LID_HEIGHT_ = 16;
+
+/**
+ * Distance between trashcan and bottom edge of workspace.
+ * @type {number}
+ * @private
+ */
+Blockly.Trashcan.prototype.MARGIN_BOTTOM_ = 20;
+
+/**
+ * Distance between trashcan and right edge of workspace.
+ * @type {number}
+ * @private
+ */
+Blockly.Trashcan.prototype.MARGIN_SIDE_ = 20;
+
+/**
+ * Extent of hotspot on all sides beyond the size of the image.
+ * @type {number}
+ * @private
+ */
+Blockly.Trashcan.prototype.MARGIN_HOTSPOT_ = 10;
+
+/**
+ * Location of trashcan in sprite image.
+ * @type {number}
+ * @private
+ */
+Blockly.Trashcan.prototype.SPRITE_LEFT_ = 0;
+
+/**
+ * Location of trashcan in sprite image.
+ * @type {number}
+ * @private
+ */
+Blockly.Trashcan.prototype.SPRITE_TOP_ = 32;
+
+/**
+ * Current open/close state of the lid.
+ * @type {boolean}
+ */
+Blockly.Trashcan.prototype.isOpen = false;
+
+/**
+ * The SVG group containing the trash can.
+ * @type {Element}
+ * @private
+ */
+Blockly.Trashcan.prototype.svgGroup_ = null;
+
+/**
+ * The SVG image element of the trash can lid.
+ * @type {Element}
+ * @private
+ */
+Blockly.Trashcan.prototype.svgLid_ = null;
+
+/**
+ * Task ID of opening/closing animation.
+ * @type {number}
+ * @private
+ */
+Blockly.Trashcan.prototype.lidTask_ = 0;
+
+/**
+ * Current state of lid opening (0.0 = closed, 1.0 = open).
+ * @type {number}
+ * @private
+ */
+Blockly.Trashcan.prototype.lidOpen_ = 0;
+
+/**
+ * Left coordinate of the trash can.
+ * @type {number}
+ * @private
+ */
+Blockly.Trashcan.prototype.left_ = 0;
+
+/**
+ * Top coordinate of the trash can.
+ * @type {number}
+ * @private
+ */
+Blockly.Trashcan.prototype.top_ = 0;
+
+/**
+ * Create the trash can elements.
+ * @return {!Element} The trash can's SVG group.
+ */
+Blockly.Trashcan.prototype.createDom = function() {
+  /* Here's the markup that will be generated:
+  <g class="blocklyTrash">
+    <clippath id="blocklyTrashBodyClipPath837493">
+      <rect width="47" height="45" y="15"></rect>
+    </clippath>
+    <image width="64" height="92" y="-32" xlink:href="media/sprites.png"
+        clip-path="url(#blocklyTrashBodyClipPath837493)"></image>
+    <clippath id="blocklyTrashLidClipPath837493">
+      <rect width="47" height="15"></rect>
+    </clippath>
+    <image width="84" height="92" y="-32" xlink:href="media/sprites.png"
+        clip-path="url(#blocklyTrashLidClipPath837493)"></image>
+  </g>
+  */
+  this.svgGroup_ = Blockly.utils.createSvgElement('g',
+      {'class': 'blocklyTrash'}, null);
+  var clip;
+  var rnd = String(Math.random()).substring(2);
+  clip = Blockly.utils.createSvgElement('clipPath',
+      {'id': 'blocklyTrashBodyClipPath' + rnd},
+      this.svgGroup_);
+  Blockly.utils.createSvgElement('rect',
+      {
+        'width': this.WIDTH_,
+        'height': this.BODY_HEIGHT_,
+        'y': this.LID_HEIGHT_
+      },
+      clip);
+  var body = Blockly.utils.createSvgElement('image',
+      {
+        'width': Blockly.SPRITE.width,
+        'x': -this.SPRITE_LEFT_,
+        'height': Blockly.SPRITE.height,
+        'y': -this.SPRITE_TOP_,
+        'clip-path': 'url(#blocklyTrashBodyClipPath' + rnd + ')'
+      },
+      this.svgGroup_);
+  body.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href',
+      this.workspace_.options.pathToMedia + Blockly.SPRITE.url);
+
+  clip = Blockly.utils.createSvgElement('clipPath',
+      {'id': 'blocklyTrashLidClipPath' + rnd},
+      this.svgGroup_);
+  Blockly.utils.createSvgElement('rect',
+      {'width': this.WIDTH_, 'height': this.LID_HEIGHT_}, clip);
+  this.svgLid_ = Blockly.utils.createSvgElement('image',
+      {
+        'width': Blockly.SPRITE.width,
+        'x': -this.SPRITE_LEFT_,
+        'height': Blockly.SPRITE.height,
+        'y': -this.SPRITE_TOP_,
+        'clip-path': 'url(#blocklyTrashLidClipPath' + rnd + ')'
+      },
+      this.svgGroup_);
+  this.svgLid_.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href',
+      this.workspace_.options.pathToMedia + Blockly.SPRITE.url);
+
+  Blockly.bindEventWithChecks_(this.svgGroup_, 'mouseup', this, this.click);
+  this.animateLid_();
+  return this.svgGroup_;
+};
+
+/**
+ * Initialize the trash can.
+ * @param {number} bottom Distance from workspace bottom to bottom of trashcan.
+ * @return {number} Distance from workspace bottom to the top of trashcan.
+ */
+Blockly.Trashcan.prototype.init = function(bottom) {
+  this.bottom_ = this.MARGIN_BOTTOM_ + bottom;
+  this.setOpen_(false);
+  return this.bottom_ + this.BODY_HEIGHT_ + this.LID_HEIGHT_;
+};
+
+/**
+ * Dispose of this trash can.
+ * Unlink from all DOM elements to prevent memory leaks.
+ */
+Blockly.Trashcan.prototype.dispose = function() {
+  if (this.svgGroup_) {
+    goog.dom.removeNode(this.svgGroup_);
+    this.svgGroup_ = null;
+  }
+  this.svgLid_ = null;
+  this.workspace_ = null;
+  goog.Timer.clear(this.lidTask_);
+};
+
+/**
+ * Move the trash can to the bottom-right corner.
+ */
+Blockly.Trashcan.prototype.position = function() {
+  var metrics = this.workspace_.getMetrics();
+  if (!metrics) {
+    // There are no metrics available (workspace is probably not visible).
+    return;
+  }
+  if (this.workspace_.RTL) {
+    this.left_ = this.MARGIN_SIDE_ + Blockly.Scrollbar.scrollbarThickness;
+    if (metrics.toolboxPosition == Blockly.TOOLBOX_AT_LEFT) {
+      this.left_ += metrics.flyoutWidth;
+      if (this.workspace_.toolbox_) {
+        this.left_ += metrics.absoluteLeft;
+      }
+    }
+  } else {
+    this.left_ = metrics.viewWidth + metrics.absoluteLeft -
+        this.WIDTH_ - this.MARGIN_SIDE_ - Blockly.Scrollbar.scrollbarThickness;
+
+    if (metrics.toolboxPosition == Blockly.TOOLBOX_AT_RIGHT) {
+      this.left_ -= metrics.flyoutWidth;
+    }
+  }
+  this.top_ = metrics.viewHeight + metrics.absoluteTop -
+      (this.BODY_HEIGHT_ + this.LID_HEIGHT_) - this.bottom_;
+
+  if (metrics.toolboxPosition == Blockly.TOOLBOX_AT_BOTTOM) {
+    this.top_ -= metrics.flyoutHeight;
+  }
+  this.svgGroup_.setAttribute('transform',
+      'translate(' + this.left_ + ',' + this.top_ + ')');
+};
+
+/**
+ * Return the deletion rectangle for this trash can.
+ * @return {goog.math.Rect} Rectangle in which to delete.
+ */
+Blockly.Trashcan.prototype.getClientRect = function() {
+  if (!this.svgGroup_) {
+    return null;
+  }
+
+  var trashRect = this.svgGroup_.getBoundingClientRect();
+  var left = trashRect.left + this.SPRITE_LEFT_ - this.MARGIN_HOTSPOT_;
+  var top = trashRect.top + this.SPRITE_TOP_ - this.MARGIN_HOTSPOT_;
+  var width = this.WIDTH_ + 2 * this.MARGIN_HOTSPOT_;
+  var height = this.LID_HEIGHT_ + this.BODY_HEIGHT_ + 2 * this.MARGIN_HOTSPOT_;
+  return new goog.math.Rect(left, top, width, height);
+
+};
+
+/**
+ * Flip the lid open or shut.
+ * @param {boolean} state True if open.
+ * @private
+ */
+Blockly.Trashcan.prototype.setOpen_ = function(state) {
+  if (this.isOpen == state) {
+    return;
+  }
+  goog.Timer.clear(this.lidTask_);
+  this.isOpen = state;
+  this.animateLid_();
+};
+
+/**
+ * Rotate the lid open or closed by one step.  Then wait and recurse.
+ * @private
+ */
+Blockly.Trashcan.prototype.animateLid_ = function() {
+  this.lidOpen_ += this.isOpen ? 0.2 : -0.2;
+  this.lidOpen_ = goog.math.clamp(this.lidOpen_, 0, 1);
+  var lidAngle = this.lidOpen_ * 45;
+  this.svgLid_.setAttribute('transform', 'rotate(' +
+      (this.workspace_.RTL ? -lidAngle : lidAngle) + ',' +
+      (this.workspace_.RTL ? 4 : this.WIDTH_ - 4) + ',' +
+      (this.LID_HEIGHT_ - 2) + ')');
+  var opacity = goog.math.lerp(0.4, 0.8, this.lidOpen_);
+  this.svgGroup_.style.opacity = opacity;
+  if (this.lidOpen_ > 0 && this.lidOpen_ < 1) {
+    this.lidTask_ = goog.Timer.callOnce(this.animateLid_, 20, this);
+  }
+};
+
+/**
+ * Flip the lid shut.
+ * Called externally after a drag.
+ */
+Blockly.Trashcan.prototype.close = function() {
+  this.setOpen_(false);
+};
+
+/**
+ * Inspect the contents of the trash.
+ */
+Blockly.Trashcan.prototype.click = function() {
+  var dx = this.workspace_.startScrollX - this.workspace_.scrollX;
+  var dy = this.workspace_.startScrollY - this.workspace_.scrollY;
+  if (Math.sqrt(dx * dx + dy * dy) > Blockly.DRAG_RADIUS) {
+    return;
+  }
+  console.log('TODO: Inspect trash.');
+};
+Blockly.VariableModel=function(a,b,c,d){this.workspace=a;this.name=b;this.type=c||"";this.id_=d||Blockly.utils.genUid();
+Blockly.Events.fire(new Blockly.Events.VarCreate(this))};
+Blockly.VariableModel.prototype.getId=function(){return this.id_};Blockly.VariableModel.compareByName=function(a,b){return goog.string.caseInsensitiveCompare(a.name,b.name)};Blockly.Variables={};Blockly.Variables.NAME_TYPE=Blockly.VARIABLE_CATEGORY_NAME;Blockly.Variables.allUsedVarModels=function(a){var b=a.getAllBlocks();a=Object.create(null);for(var c=0;c<b.length;c++){var d=b[c].getVarModels();if(d)for(var e=0;e<d.length;e++){var f=d[e];f.getId()&&(a[f.getId()]=f)}}b=[];for(var g in a)b.push(a[g]);return b};
+Blockly.Variables.allUsedVariables=function(){console.warn("Deprecated call to Blockly.Variables.allUsedVariables. Use Blockly.Variables.allUsedVarModels instead.\nIf this is a major issue please file a bug on GitHub.")};
 Blockly.Variables.allDeveloperVariables=function(a){var b=a.getAllBlocks();a={};for(var c=0;c<b.length;c++){var d=b[c];if(d.getDeveloperVars){d=d.getDeveloperVars();for(var e=0;e<d.length;e++)a[d[e]]=d[e]}}b=[];for(var f in a)b.push(a[f]);return b};
 Blockly.Variables.flyoutCategory=function(a){var b=[],c=goog.dom.createDom("button");c.setAttribute("text",Blockly.Msg.NEW_VARIABLE);c.setAttribute("callbackKey","CREATE_VARIABLE");a.registerButtonCallback("CREATE_VARIABLE",function(a){Blockly.Variables.createVariableButtonHandler(a.getTargetWorkspace())});b.push(c);a=Blockly.Variables.flyoutCategoryBlocks(a);return b=b.concat(a)};
 Blockly.Variables.flyoutCategoryBlocks=function(a){a=a.getVariablesOfType("");a.sort(Blockly.VariableModel.compareByName);var b=[];if(0<a.length){var c=a[0];if(Blockly.Blocks.variables_set){var d=Blockly.Blocks.math_change?8:24;d='<xml><block type="variables_set" gap="'+d+'">'+Blockly.Variables.generateVariableFieldXmlString(c)+"</block></xml>";d=Blockly.Xml.textToDom(d).firstChild;b.push(d)}Blockly.Blocks.math_change&&(d=Blockly.Blocks.variables_get?20:8,d='<xml><block type="math_change" gap="'+
@@ -2656,7 +2956,9 @@ Blockly.BlockSvg.TAB_PATH_DOWN_HIGHLIGHT_RTL="v 6.5 m -"+.97*Blockly.BlockSvg.TA
 Blockly.BlockSvg.TOP_LEFT_CORNER_START_HIGHLIGHT_LTR="m 0.5,"+(Blockly.BlockSvg.CORNER_RADIUS-.5);Blockly.BlockSvg.TOP_LEFT_CORNER="A "+Blockly.BlockSvg.CORNER_RADIUS+","+Blockly.BlockSvg.CORNER_RADIUS+" 0 0,1 "+Blockly.BlockSvg.CORNER_RADIUS+",0";Blockly.BlockSvg.TOP_LEFT_CORNER_HIGHLIGHT="A "+(Blockly.BlockSvg.CORNER_RADIUS-.5)+","+(Blockly.BlockSvg.CORNER_RADIUS-.5)+" 0 0,1 "+Blockly.BlockSvg.CORNER_RADIUS+",0.5";
 Blockly.BlockSvg.INNER_TOP_LEFT_CORNER=Blockly.BlockSvg.NOTCH_PATH_RIGHT+" h -"+(Blockly.BlockSvg.NOTCH_WIDTH-15-Blockly.BlockSvg.CORNER_RADIUS)+" a "+Blockly.BlockSvg.CORNER_RADIUS+","+Blockly.BlockSvg.CORNER_RADIUS+" 0 0,0 -"+Blockly.BlockSvg.CORNER_RADIUS+","+Blockly.BlockSvg.CORNER_RADIUS;Blockly.BlockSvg.INNER_BOTTOM_LEFT_CORNER="a "+Blockly.BlockSvg.CORNER_RADIUS+","+Blockly.BlockSvg.CORNER_RADIUS+" 0 0,0 "+Blockly.BlockSvg.CORNER_RADIUS+","+Blockly.BlockSvg.CORNER_RADIUS;
 Blockly.BlockSvg.INNER_TOP_LEFT_CORNER_HIGHLIGHT_RTL="a "+Blockly.BlockSvg.CORNER_RADIUS+","+Blockly.BlockSvg.CORNER_RADIUS+" 0 0,0 "+(-Blockly.BlockSvg.DISTANCE_45_OUTSIDE-.5)+","+(Blockly.BlockSvg.CORNER_RADIUS-Blockly.BlockSvg.DISTANCE_45_OUTSIDE);Blockly.BlockSvg.INNER_BOTTOM_LEFT_CORNER_HIGHLIGHT_RTL="a "+(Blockly.BlockSvg.CORNER_RADIUS+.5)+","+(Blockly.BlockSvg.CORNER_RADIUS+.5)+" 0 0,0 "+(Blockly.BlockSvg.CORNER_RADIUS+.5)+","+(Blockly.BlockSvg.CORNER_RADIUS+.5);
-Blockly.BlockSvg.INNER_BOTTOM_LEFT_CORNER_HIGHLIGHT_LTR="a "+(Blockly.BlockSvg.CORNER_RADIUS+.5)+","+(Blockly.BlockSvg.CORNER_RADIUS+.5)+" 0 0,0 "+(Blockly.BlockSvg.CORNER_RADIUS-Blockly.BlockSvg.DISTANCE_45_OUTSIDE)+","+(Blockly.BlockSvg.DISTANCE_45_OUTSIDE+.5);Blockly.BlockSvg.prototype.getHeightWidth=function(){var a=this.height,b=this.width,c=this.getNextBlock();c?(c=c.getHeightWidth(),a+=c.height-4,b=Math.max(b,c.width)):this.nextConnection||this.outputConnection||(a+=2);return{height:a,width:b}};
+Blockly.BlockSvg.INNER_BOTTOM_LEFT_CORNER_HIGHLIGHT_LTR="a "+(Blockly.BlockSvg.CORNER_RADIUS+.5)+","+(Blockly.BlockSvg.CORNER_RADIUS+.5)+" 0 0,0 "+(Blockly.BlockSvg.CORNER_RADIUS-Blockly.BlockSvg.DISTANCE_45_OUTSIDE)+","+(Blockly.BlockSvg.DISTANCE_45_OUTSIDE+.5);
+
+Blockly.BlockSvg.prototype.getHeightWidth=function(){var a=this.height,b=this.width,c=this.getNextBlock();c?(c=c.getHeightWidth(),a+=c.height-4,b=Math.max(b,c.width)):this.nextConnection||this.outputConnection||(a+=2);return{height:a,width:b}};
 Blockly.BlockSvg.prototype.render=function(a){Blockly.Field.startCache();this.rendered=!0;var b=Blockly.BlockSvg.SEP_SPACE_X;this.RTL&&(b=-b);for(var c=this.getIcons(),d=0;d<c.length;d++)b=c[d].renderIcon(b);b+=this.RTL?Blockly.BlockSvg.SEP_SPACE_X:-Blockly.BlockSvg.SEP_SPACE_X;c=this.renderCompute_(b);this.renderDraw_(b,c);this.renderMoveConnections_();!1!==a&&((a=this.getParent())?a.render(!0):this.workspace.resizeContents());Blockly.Field.stopCache()};
 Blockly.BlockSvg.prototype.renderFields_=function(a,b,c){c+=Blockly.BlockSvg.INLINE_PADDING_Y;this.RTL&&(b=-b);for(var d=0,e;e=a[d];d++){var f=e.getSvgRoot();f&&(this.RTL?(b-=e.renderSep+e.renderWidth,f.setAttribute("transform","translate("+b+","+c+")"),e.renderWidth&&(b-=Blockly.BlockSvg.SEP_SPACE_X)):(f.setAttribute("transform","translate("+(b+e.renderSep)+","+c+")"),e.renderWidth&&(b+=e.renderSep+e.renderWidth+Blockly.BlockSvg.SEP_SPACE_X)))}return this.RTL?-b:b};
 Blockly.BlockSvg.prototype.renderCompute_=function(a){var b=this.inputList,c=[];c.rightEdge=a+2*Blockly.BlockSvg.SEP_SPACE_X;if(this.previousConnection||this.nextConnection)c.rightEdge=Math.max(c.rightEdge,Blockly.BlockSvg.NOTCH_WIDTH+Blockly.BlockSvg.SEP_SPACE_X);for(var d=0,e=0,f=!1,g=!1,h=!1,k=void 0,m=this.getInputsInline()&&!this.isCollapsed(),p=0,l;l=b[p];p++)if(l.isVisible()){if(m&&k&&k!=Blockly.NEXT_STATEMENT&&l.type!=Blockly.NEXT_STATEMENT)var n=c[c.length-1];else k=l.type,n=[],n.type=m&&
@@ -2664,12 +2966,108 @@ l.type!=Blockly.NEXT_STATEMENT?Blockly.BlockSvg.INLINE:l.type,n.height=0,c.push(
 Blockly.NEXT_STATEMENT&&l.renderHeight--:l.renderHeight--;n.height=Math.max(n.height,l.renderHeight);l.fieldWidth=0;1==c.length&&(l.fieldWidth+=this.RTL?-a:a);q=!1;for(var t=0,r;r=l.fieldRow[t];t++){0!=t&&(l.fieldWidth+=Blockly.BlockSvg.SEP_SPACE_X);var u=r.getSize();r.renderWidth=u.width;r.renderSep=q&&r.EDITABLE?Blockly.BlockSvg.SEP_SPACE_X:0;l.fieldWidth+=r.renderWidth+r.renderSep;n.height=Math.max(n.height,u.height);q=r.EDITABLE}n.type!=Blockly.BlockSvg.INLINE&&(n.type==Blockly.NEXT_STATEMENT?
 (g=!0,e=Math.max(e,l.fieldWidth)):(n.type==Blockly.INPUT_VALUE?f=!0:n.type==Blockly.DUMMY_INPUT&&(h=!0),d=Math.max(d,l.fieldWidth)))}for(a=0;n=c[a];a++)if(n.thicker=!1,n.type==Blockly.BlockSvg.INLINE)for(b=0;l=n[b];b++)if(l.type==Blockly.INPUT_VALUE){n.height+=2*Blockly.BlockSvg.INLINE_PADDING_Y;n.thicker=!0;break}c.statementEdge=2*Blockly.BlockSvg.SEP_SPACE_X+e;g&&(c.rightEdge=Math.max(c.rightEdge,c.statementEdge+Blockly.BlockSvg.NOTCH_WIDTH));f?c.rightEdge=Math.max(c.rightEdge,d+2*Blockly.BlockSvg.SEP_SPACE_X+
 Blockly.BlockSvg.TAB_WIDTH):h&&(c.rightEdge=Math.max(c.rightEdge,d+2*Blockly.BlockSvg.SEP_SPACE_X));c.hasValue=f;c.hasStatement=g;c.hasDummy=h;return c};
-Blockly.BlockSvg.prototype.renderDraw_=function(a,b){this.startHat_=!1;this.height=0;if(this.outputConnection)this.squareBottomLeftCorner_=this.squareTopLeftCorner_=!0;else{this.squareBottomLeftCorner_=this.squareTopLeftCorner_=!1;if(this.previousConnection){var c=this.previousConnection.targetBlock();c&&c.getNextBlock()==this&&(this.squareTopLeftCorner_=!0)}else Blockly.BlockSvg.START_HAT&&(this.startHat_=this.squareTopLeftCorner_=!0,this.height+=Blockly.BlockSvg.START_HAT_HEIGHT,b.rightEdge=Math.max(b.rightEdge,
-100));this.getNextBlock()&&(this.squareBottomLeftCorner_=!0)}var d=[],e=[];c=[];var f=[];this.renderDrawTop_(d,c,b.rightEdge);var g=this.renderDrawRight_(d,c,e,f,b,a);this.renderDrawBottom_(d,c,g);this.renderDrawLeft_(d,c);d=d.join(" ")+"\n"+e.join(" ");this.svgPath_.setAttribute("d",d);this.svgPathDark_.setAttribute("d",d);d=c.join(" ")+"\n"+f.join(" ");this.svgPathLight_.setAttribute("d",d);this.RTL&&(this.svgPath_.setAttribute("transform","scale(-1 1)"),this.svgPathLight_.setAttribute("transform",
-"scale(-1 1)"),this.svgPathDark_.setAttribute("transform","translate(1,1) scale(-1 1)"))};
+
+Blockly.BlockSvg.prototype.renderDraw_ = function(iconWidth, inputRows) {
+  this.startHat_ = false;
+  // Reset the height to zero and let the rendering process add in
+  // portions of the block height as it goes. (e.g. hats, inputs, etc.)
+  this.height = 0;
+  // Should the top and bottom left corners be rounded or square?
+  if (this.outputConnection) {
+    this.squareTopLeftCorner_ = true;
+    this.squareBottomLeftCorner_ = true;
+  } else {
+    this.squareTopLeftCorner_ = false;
+    this.squareBottomLeftCorner_ = false;
+    // If this block is in the middle of a stack, square the corners.
+    if (this.previousConnection) {
+      var prevBlock = this.previousConnection.targetBlock();
+      if (prevBlock && prevBlock.getNextBlock() == this) {
+        this.squareTopLeftCorner_ = true;
+      }
+    } else if (Blockly.BlockSvg.START_HAT) {
+      // No output or previous connection.
+      this.squareTopLeftCorner_ = true;
+      this.startHat_ = true;
+      this.height += Blockly.BlockSvg.START_HAT_HEIGHT;
+      inputRows.rightEdge = Math.max(inputRows.rightEdge, 100);
+    }
+    var nextBlock = this.getNextBlock();
+    if (nextBlock) {
+      this.squareBottomLeftCorner_ = true;
+    }
+  }
+
+  // Assemble the block's path.
+  var steps = [];
+  var inlineSteps = [];
+  // The highlighting applies to edges facing the upper-left corner.
+  // Since highlighting is a two-pixel wide border, it would normally overhang
+  // the edge of the block by a pixel. So undersize all measurements by a pixel.
+  var highlightSteps = [];
+  var highlightInlineSteps = [];
+
+  this.renderDrawTop_(steps, highlightSteps, inputRows.rightEdge);
+  var cursorY = this.renderDrawRight_(steps, highlightSteps, inlineSteps,
+      highlightInlineSteps, inputRows, iconWidth);
+  this.renderDrawBottom_(steps, highlightSteps, cursorY);
+  this.renderDrawLeft_(steps, highlightSteps);
+
+  var pathString = steps.join(' ') + '\n' + inlineSteps.join(' ');
+  this.svgPath_.setAttribute('d', pathString);
+  this.svgPathDark_.setAttribute('d', pathString);
+  pathString = highlightSteps.join(' ') + '\n' + highlightInlineSteps.join(' ');
+  this.svgPathLight_.setAttribute('d', pathString);
+  if (this.RTL) {
+    // Mirror the block's path.
+    this.svgPath_.setAttribute('transform', 'scale(-1 1)');
+    this.svgPathLight_.setAttribute('transform', 'scale(-1 1)');
+    this.svgPathDark_.setAttribute('transform', 'translate(1,1) scale(-1 1)');
+  }
+};
+
+
+
 Blockly.BlockSvg.prototype.renderMoveConnections_=function(){var a=this.getRelativeToSurfaceXY();this.previousConnection&&this.previousConnection.moveToOffset(a);this.outputConnection&&this.outputConnection.moveToOffset(a);for(var b=0;b<this.inputList.length;b++){var c=this.inputList[b].connection;c&&(c.moveToOffset(a),c.isConnected()&&c.tighten_())}this.nextConnection&&(this.nextConnection.moveToOffset(a),this.nextConnection.isConnected()&&this.nextConnection.tighten_())};
-Blockly.BlockSvg.prototype.renderDrawTop_=function(a,b,c){this.squareTopLeftCorner_?(a.push("m 0,0"),b.push("m 0.5,0.5"),this.startHat_&&(a.push(Blockly.BlockSvg.START_HAT_PATH),b.push(this.RTL?Blockly.BlockSvg.START_HAT_HIGHLIGHT_RTL:Blockly.BlockSvg.START_HAT_HIGHLIGHT_LTR))):(a.push(Blockly.BlockSvg.TOP_LEFT_CORNER_START),b.push(this.RTL?Blockly.BlockSvg.TOP_LEFT_CORNER_START_HIGHLIGHT_RTL:Blockly.BlockSvg.TOP_LEFT_CORNER_START_HIGHLIGHT_LTR),a.push(Blockly.BlockSvg.TOP_LEFT_CORNER),b.push(Blockly.BlockSvg.TOP_LEFT_CORNER_HIGHLIGHT));
-this.previousConnection&&(a.push("H",Blockly.BlockSvg.NOTCH_WIDTH-15),b.push("H",Blockly.BlockSvg.NOTCH_WIDTH-15),a.push(Blockly.BlockSvg.NOTCH_PATH_LEFT),b.push(Blockly.BlockSvg.NOTCH_PATH_LEFT_HIGHLIGHT),this.previousConnection.setOffsetInBlock(this.RTL?-Blockly.BlockSvg.NOTCH_WIDTH:Blockly.BlockSvg.NOTCH_WIDTH,0));a.push("H",c);b.push("H",c-.5);this.width=c};
+
+Blockly.BlockSvg.prototype.renderDrawTop_ = function(steps,
+    highlightSteps, rightEdge) {
+  // Position the cursor at the top-left starting point.
+  if (this.squareTopLeftCorner_) {
+    steps.push('m 0,0');
+    highlightSteps.push('m 0.5,0.5');
+    if (this.startHat_) {
+      steps.push(Blockly.BlockSvg.START_HAT_PATH);
+      highlightSteps.push(this.RTL ?
+          Blockly.BlockSvg.START_HAT_HIGHLIGHT_RTL :
+          Blockly.BlockSvg.START_HAT_HIGHLIGHT_LTR);
+    }
+  } else {
+    steps.push(Blockly.BlockSvg.TOP_LEFT_CORNER_START);
+    highlightSteps.push(this.RTL ?
+        Blockly.BlockSvg.TOP_LEFT_CORNER_START_HIGHLIGHT_RTL :
+        Blockly.BlockSvg.TOP_LEFT_CORNER_START_HIGHLIGHT_LTR);
+    // Top-left rounded corner.
+    steps.push(Blockly.BlockSvg.TOP_LEFT_CORNER);
+    highlightSteps.push(Blockly.BlockSvg.TOP_LEFT_CORNER_HIGHLIGHT);
+  }
+
+  // Top edge.
+  if (this.previousConnection) {
+    steps.push('H', Blockly.BlockSvg.NOTCH_WIDTH - 15);
+    highlightSteps.push('H', Blockly.BlockSvg.NOTCH_WIDTH - 15);
+    steps.push(Blockly.BlockSvg.NOTCH_PATH_LEFT);
+    highlightSteps.push(Blockly.BlockSvg.NOTCH_PATH_LEFT_HIGHLIGHT);
+
+    var connectionX = (this.RTL ?
+        -Blockly.BlockSvg.NOTCH_WIDTH : Blockly.BlockSvg.NOTCH_WIDTH);
+    this.previousConnection.setOffsetInBlock(connectionX, 0);
+  }
+  steps.push('H', rightEdge);
+  highlightSteps.push('H', rightEdge - 0.5);
+  this.width = rightEdge;
+};
+
 Blockly.BlockSvg.prototype.renderDrawRight_=function(a,b,c,d,e,f){for(var g,h=0,k,m,p=0,l;l=e[p];p++){g=Blockly.BlockSvg.SEP_SPACE_X;0==p&&(g+=this.RTL?-f:f);b.push("M",e.rightEdge-.5+","+(h+.5));if(this.isCollapsed()){var n=l[0];k=h;this.renderFields_(n.fieldRow,g,k);a.push(Blockly.BlockSvg.JAGGED_TEETH);b.push("h 8");n=l.height-Blockly.BlockSvg.JAGGED_TEETH_HEIGHT;a.push("v",n);this.RTL&&(b.push("v 3.9 l 7.2,3.4 m -14.5,8.9 l 7.3,3.5"),b.push("v",n-.7));this.width+=Blockly.BlockSvg.JAGGED_TEETH_WIDTH}else if(l.type==
 Blockly.BlockSvg.INLINE){for(var q=0;n=l[q];q++)k=h,l.thicker&&(k+=Blockly.BlockSvg.INLINE_PADDING_Y),g=this.renderFields_(n.fieldRow,g,k),n.type!=Blockly.DUMMY_INPUT&&(g+=n.renderWidth+Blockly.BlockSvg.SEP_SPACE_X),n.type==Blockly.INPUT_VALUE&&(c.push("M",g-Blockly.BlockSvg.SEP_SPACE_X+","+(h+Blockly.BlockSvg.INLINE_PADDING_Y)),c.push("h",Blockly.BlockSvg.TAB_WIDTH-2-n.renderWidth),c.push(Blockly.BlockSvg.TAB_PATH_DOWN),c.push("v",n.renderHeight+1-Blockly.BlockSvg.TAB_HEIGHT),c.push("h",n.renderWidth+
 2-Blockly.BlockSvg.TAB_WIDTH),c.push("z"),this.RTL?(d.push("M",g-Blockly.BlockSvg.SEP_SPACE_X-2.5+Blockly.BlockSvg.TAB_WIDTH-n.renderWidth+","+(h+Blockly.BlockSvg.INLINE_PADDING_Y+.5)),d.push(Blockly.BlockSvg.TAB_PATH_DOWN_HIGHLIGHT_RTL),d.push("v",n.renderHeight-Blockly.BlockSvg.TAB_HEIGHT+2.5),d.push("h",n.renderWidth-Blockly.BlockSvg.TAB_WIDTH+2)):(d.push("M",g-Blockly.BlockSvg.SEP_SPACE_X+.5+","+(h+Blockly.BlockSvg.INLINE_PADDING_Y+.5)),d.push("v",n.renderHeight+1),d.push("h",Blockly.BlockSvg.TAB_WIDTH-
@@ -2680,8 +3078,46 @@ n.align==Blockly.ALIGN_RIGHT?g+=q:n.align==Blockly.ALIGN_CENTRE&&(g+=q/2)),this.
 q/2)),this.renderFields_(n.fieldRow,g,k),g=e.statementEdge+Blockly.BlockSvg.NOTCH_WIDTH,a.push("H",g),a.push(Blockly.BlockSvg.INNER_TOP_LEFT_CORNER),a.push("v",l.height-2*Blockly.BlockSvg.CORNER_RADIUS),a.push(Blockly.BlockSvg.INNER_BOTTOM_LEFT_CORNER),a.push("H",e.rightEdge),this.RTL?(b.push("M",g-Blockly.BlockSvg.NOTCH_WIDTH+Blockly.BlockSvg.DISTANCE_45_OUTSIDE+","+(h+Blockly.BlockSvg.DISTANCE_45_OUTSIDE)),b.push(Blockly.BlockSvg.INNER_TOP_LEFT_CORNER_HIGHLIGHT_RTL),b.push("v",l.height-2*Blockly.BlockSvg.CORNER_RADIUS),
 b.push(Blockly.BlockSvg.INNER_BOTTOM_LEFT_CORNER_HIGHLIGHT_RTL)):(b.push("M",g-Blockly.BlockSvg.NOTCH_WIDTH+Blockly.BlockSvg.DISTANCE_45_OUTSIDE+","+(h+l.height-Blockly.BlockSvg.DISTANCE_45_OUTSIDE)),b.push(Blockly.BlockSvg.INNER_BOTTOM_LEFT_CORNER_HIGHLIGHT_LTR)),b.push("H",e.rightEdge-.5),k=this.RTL?-g:g+1,n.connection.setOffsetInBlock(k,h+1),n.connection.isConnected()&&(this.width=Math.max(this.width,e.statementEdge+n.connection.targetBlock().getHeightWidth().width)),p==e.length-1||e[p+1].type==
 Blockly.NEXT_STATEMENT)&&(a.push("v",Blockly.BlockSvg.SEP_SPACE_Y),this.RTL&&b.push("v",Blockly.BlockSvg.SEP_SPACE_Y-1),h+=Blockly.BlockSvg.SEP_SPACE_Y);h+=l.height}e.length||(h=Blockly.BlockSvg.MIN_BLOCK_Y,a.push("V",h),this.RTL&&b.push("V",h-1));return h};
-Blockly.BlockSvg.prototype.renderDrawBottom_=function(a,b,c){this.height+=c+1;this.nextConnection&&(a.push("H",Blockly.BlockSvg.NOTCH_WIDTH+(this.RTL?.5:-.5)+" "+Blockly.BlockSvg.NOTCH_PATH_RIGHT),this.nextConnection.setOffsetInBlock(this.RTL?-Blockly.BlockSvg.NOTCH_WIDTH:Blockly.BlockSvg.NOTCH_WIDTH,c+1),this.height+=4);this.squareBottomLeftCorner_?(a.push("H 0"),this.RTL||b.push("M","0.5,"+(c-.5))):(a.push("H",Blockly.BlockSvg.CORNER_RADIUS),a.push("a",Blockly.BlockSvg.CORNER_RADIUS+","+Blockly.BlockSvg.CORNER_RADIUS+
-" 0 0,1 -"+Blockly.BlockSvg.CORNER_RADIUS+",-"+Blockly.BlockSvg.CORNER_RADIUS),this.RTL||(b.push("M",Blockly.BlockSvg.DISTANCE_45_INSIDE+","+(c-Blockly.BlockSvg.DISTANCE_45_INSIDE)),b.push("A",Blockly.BlockSvg.CORNER_RADIUS-.5+","+(Blockly.BlockSvg.CORNER_RADIUS-.5)+" 0 0,1 0.5,"+(c-Blockly.BlockSvg.CORNER_RADIUS))))};
+
+Blockly.BlockSvg.prototype.renderDrawBottom_ = function(steps,
+    highlightSteps, cursorY) {
+  this.height += cursorY + 1;  // Add one for the shadow.
+  if (this.nextConnection) {
+    steps.push('H', (Blockly.BlockSvg.NOTCH_WIDTH + (this.RTL ? 0.5 : - 0.5)) +
+        ' ' + Blockly.BlockSvg.NOTCH_PATH_RIGHT);
+    // Create next block connection.
+    var connectionX;
+    if (this.RTL) {
+      connectionX = -Blockly.BlockSvg.NOTCH_WIDTH;
+    } else {
+      connectionX = Blockly.BlockSvg.NOTCH_WIDTH;
+    }
+    this.nextConnection.setOffsetInBlock(connectionX, cursorY + 1);
+    this.height += 1.8;  // Height of tab. // ny
+  }
+
+  // Should the bottom-left corner be rounded or square?
+  if (this.squareBottomLeftCorner_) {
+    steps.push('H 0');
+    if (!this.RTL) {
+      highlightSteps.push('M', '0.5,' + (cursorY - 0.5));
+    }
+  } else {
+    steps.push('H', Blockly.BlockSvg.CORNER_RADIUS);
+    steps.push('a', Blockly.BlockSvg.CORNER_RADIUS + ',' +
+               Blockly.BlockSvg.CORNER_RADIUS + ' 0 0,1 -' +
+               Blockly.BlockSvg.CORNER_RADIUS + ',-' +
+               Blockly.BlockSvg.CORNER_RADIUS);
+    if (!this.RTL) {
+      highlightSteps.push('M', Blockly.BlockSvg.DISTANCE_45_INSIDE + ',' +
+          (cursorY - Blockly.BlockSvg.DISTANCE_45_INSIDE));
+      highlightSteps.push('A', (Blockly.BlockSvg.CORNER_RADIUS - 0.5) + ',' +
+          (Blockly.BlockSvg.CORNER_RADIUS - 0.5) + ' 0 0,1 ' +
+          '0.5,' + (cursorY - Blockly.BlockSvg.CORNER_RADIUS));
+    }
+  }
+};
+
 Blockly.BlockSvg.prototype.renderDrawLeft_=function(a,b){this.outputConnection?(this.outputConnection.setOffsetInBlock(0,0),a.push("V",Blockly.BlockSvg.TAB_HEIGHT),a.push("c 0,-10 -"+Blockly.BlockSvg.TAB_WIDTH+",8 -"+Blockly.BlockSvg.TAB_WIDTH+",-7.5 s "+Blockly.BlockSvg.TAB_WIDTH+",2.5 "+Blockly.BlockSvg.TAB_WIDTH+",-7.5"),this.RTL?(b.push("M",-.25*Blockly.BlockSvg.TAB_WIDTH+",8.4"),b.push("l",-.45*Blockly.BlockSvg.TAB_WIDTH+",-2.1")):(b.push("V",Blockly.BlockSvg.TAB_HEIGHT-1.5),b.push("m",-.92*
 Blockly.BlockSvg.TAB_WIDTH+",-0.5 q "+-.19*Blockly.BlockSvg.TAB_WIDTH+",-5.5 0,-11"),b.push("m",.92*Blockly.BlockSvg.TAB_WIDTH+",1 V 0.5 H 1")),this.width+=Blockly.BlockSvg.TAB_WIDTH):this.RTL||(this.squareTopLeftCorner_?b.push("V",.5):b.push("V",Blockly.BlockSvg.CORNER_RADIUS));a.push("z")};
 
@@ -2818,10 +3254,17 @@ Blockly.FieldVariable.dropdownCreate=function(){
 	b=[];
 	for(e=0;e<c.length;e++)
 		b[e]=[c[e].name,c[e].getId()];
-	b.push(["Rename this "+defaultType+" named '"+a+"'",Blockly.RENAME_VARIABLE_ID]);
-	b.push(["Creat New "+defaultType+"!" ,"CREATE_VARIABLE_BLOCK"]); // ny
-	Blockly.Msg.DELETE_VARIABLE&&b.push(["Delete this "+defaultType+" named '"+a+"'",Blockly.DELETE_VARIABLE_ID]);
+ // ny
+	if(defaultType != "timer" && defaultType !="after"){
+		b.push(["Rename "+defaultType+a,Blockly.RENAME_VARIABLE_ID]);
+		b.push(["New "+defaultType+"" ,"CREATE_VARIABLE_BLOCK"]); // ny
+		Blockly.Msg.DELETE_VARIABLE&&b.push(["Delete "+defaultType+a,Blockly.DELETE_VARIABLE_ID]);
+	}
+	else if(defaultType == "timer" || defaultType =="after"){
+		b.push(["Rename "+defaultType+" "+a,Blockly.RENAME_VARIABLE_ID]);
+		Blockly.Msg.DELETE_VARIABLE&&b.push(["Delete "+defaultType+" "+a,Blockly.DELETE_VARIABLE_ID]);
 	
+	}
 	return b
 };
 		
@@ -2852,9 +3295,9 @@ Blockly.FieldVariable.prototype.onItemSelected=function(a,b){
 Blockly.make_newBlock=function(a){
 	var b=Blockly.clipboardXml_,c=Blockly.clipboardSource_;
 	Blockly.copy_(a);
-	colour=true;
+	//colour=true;
 	a.workspace.paste(Blockly.clipboardXml_);
-	colour=false;
+	//colour=false;
 	Blockly.clipboardXml_=b;
 	Blockly.clipboardSource_=c
 };
@@ -2883,10 +3326,13 @@ Blockly.Generator.prototype.workspaceToCode=function(a){
 		}
 		//goog.isArray(e)&&(e=e[0]);e&&(d.outputConnection&&(e=this.scrubNakedValue(e)),b.push(e))
 	}
-	return e
+	return e.reverse()
 	//b=b.join("\n");b=this.finish(b);b=b.replace(/^\s+\n/,"");b=b.replace(/\n\s+$/,"\n");return b=b.replace(/[ \t]+\n/g,"\n")
 };
-Blockly.Generator.prototype.prefixLines=function(a,b){return b+a.replace(/(?!\n$)\n/g,"\n"+b)};Blockly.Generator.prototype.allNestedComments=function(a){var b=[];a=a.getDescendants();for(var c=0;c<a.length;c++){var d=a[c].getCommentText();d&&b.push(d)}b.length&&b.push("");return b.join("\n")};
+Blockly.Generator.prototype.prefixLines=function(a,b){
+	return b+a.replace(/(?!\n$)\n/g,"\n"+b)
+};
+Blockly.Generator.prototype.allNestedComments=function(a){var b=[];a=a.getDescendants();for(var c=0;c<a.length;c++){var d=a[c].getCommentText();d&&b.push(d)}b.length&&b.push("");return b.join("\n")};
 
 Blockly.Generator.prototype.blockToCode=function(a){
 	if(!a)return"";if(a.disabled)return this.blockToCode(a.getNextBlock());var b=this[a.type];goog.asserts.assertFunction(b,'Language "%s" does not know how to generate code for block type "%s".',this.name_,a.type);
@@ -2913,9 +3359,10 @@ Blockly.Generator.prototype.blockToCode=function(a){
 		return"";
 	goog.asserts.fail("Invalid code generated: %s",b)
 };
+
 function isit(b){
 	// ny
-	if(b.constructor == Condition || b.constructor == inputc ||b.constructor == Device_attr ||b.constructor == Args)
+	if(b.constructor == Condition || b.constructor == Inputc ||b.constructor == Device_attr ||b.constructor == Args )
 		return true
 	else if (b.constructor == Event)
 		return true
@@ -2924,39 +3371,89 @@ function isit(b){
 	else if(goog.isArray(b)){
 		var action = b[0]
 		if(action.constructor == Action)
-			return true
-	}
+		return true
+	}else if (b.constructor ==Action)
+		return true // actionGoruping
 	else
 		return false
-
 }
 
-Blockly.Generator.prototype.valueToCode=function(a,b,c){
-	isNaN(c)&&goog.asserts.fail('Expecting valid order from block "%s".',a.type);var d=a.getInputTargetBlock(b);if(!d)return"";
-	
-	b=this.blockToCode(d);
 
-	if(isit(b))
-		return b;
+Blockly.Generator.prototype.valueToCode = function(block, name, outerOrder) {
+  if (isNaN(outerOrder)) {
+    goog.asserts.fail('Expecting valid order from block "%s".', block.type);
+  }
+  var targetBlock = block.getInputTargetBlock(name);
+  if (!targetBlock) {
+    return '';
+  }
+  var tuple = this.blockToCode(targetBlock);
+  if (tuple === '') {
+    // Disabled block.
+    return '';
+  }
+	return tuple //ny
 
-	if(""===b)
-		return"";
+  // Value blocks must return code and order of operations info.
+  // Statement blocks must only return code.
+  /*goog.asserts.assertArray(tuple, 'Expecting tuple from value block "%s".',targetBlock.type);
+  var code = tuple[0];
+  var innerOrder = tuple[1];
+  if (isNaN(innerOrder)) {
+    goog.asserts.fail('Expecting valid order from value block "%s".',
+        targetBlock.type);
+  }
+  if (!code) {
+    return '';
+  }
 
-	goog.asserts.assertArray(b,'Expecting tuple from value block "%s".',d.type);
-	a=b[0];b=b[1];isNaN(b)&&goog.asserts.fail('Expecting valid order from value block "%s".',d.type);
-	if(!a)return"";
-	d=!1;var e=Math.floor(c),f=Math.floor(b);
-	if(e<=f&&(e!=f||0!=e&&99!=e))
-		for(d=!0,e=0;e<this.ORDER_OVERRIDES.length;e++)
-			if(this.ORDER_OVERRIDES[e][0]==c&&this.ORDER_OVERRIDES[e][1]==b){
-				d=!1;
-				break
-			}
-	d&&(a="("+a+")");
-	return a
+  // Add parentheses if needed.
+  var parensNeeded = false;
+  var outerOrderClass = Math.floor(outerOrder);
+  var innerOrderClass = Math.floor(innerOrder);
+  if (outerOrderClass <= innerOrderClass) {
+    if (outerOrderClass == innerOrderClass &&
+        (outerOrderClass == 0 || outerOrderClass == 99)) {
+      // Don't generate parens around NONE-NONE and ATOMIC-ATOMIC pairs.
+      // 0 is the atomic order, 99 is the none order.  No parentheses needed.
+      // In all known languages multiple such code blocks are not order
+      // sensitive.  In fact in Python ('a' 'b') 'c' would fail.
+    } else {
+      // The operators outside this code are stronger than the operators
+      // inside this code.  To prevent the code from being pulled apart,
+      // wrap the code in parentheses.
+      parensNeeded = true;
+      // Check for special exceptions.
+      for (var i = 0; i < this.ORDER_OVERRIDES.length; i++) {
+        if (this.ORDER_OVERRIDES[i][0] == outerOrder &&
+            this.ORDER_OVERRIDES[i][1] == innerOrder) {
+          parensNeeded = false;
+          break;
+        }
+      }
+    }
+  }
+  if (parensNeeded) {
+    // Technically, this should be handled on a language-by-language basis.
+    // However all known (sane) languages use parentheses for grouping.
+    code = '(' + code + ')';
+  }
+  return code;*/
 };
 
-Blockly.Generator.prototype.statementToCode=function(a,b){var c=a.getInputTargetBlock(b),d=this.blockToCode(c);goog.asserts.assertString(d,'Expecting code from statement block "%s".',c&&c.type);d&&(d=this.prefixLines(d,this.INDENT));return d};
+Blockly.Generator.prototype.statementToCode = function(block, name) {
+  var targetBlock = block.getInputTargetBlock(name);
+  var code = this.blockToCode(targetBlock);
+  // Value blocks must return code and order of operations info.
+  // Statement blocks must only return code.
+  goog.asserts.assertString(code, 'Expecting code from statement block "%s".',targetBlock && targetBlock.type);
+  if (code) {
+    //code = this.prefixLines(/** @type {string} */ (code), this.INDENT); ny
+	return code;
+  }
+  return code;
+};
+
 Blockly.Generator.prototype.addLoopTrap=function(a,b){b=b.replace(/\$/g,"$$$$");this.INFINITE_LOOP_TRAP&&(a=this.INFINITE_LOOP_TRAP.replace(/%1/g,"'"+b+"'")+a);this.STATEMENT_PREFIX&&(a+=this.prefixLines(this.STATEMENT_PREFIX.replace(/%1/g,"'"+b+"'"),this.INDENT));return a};Blockly.Generator.prototype.RESERVED_WORDS_="";Blockly.Generator.prototype.addReservedWords=function(a){this.RESERVED_WORDS_+=a+","};Blockly.Generator.prototype.FUNCTION_NAME_PLACEHOLDER_="{leCUI8hutHZI4480Dc}";
 Blockly.Generator.prototype.provideFunction_=function(a,b){if(!this.definitions_[a]){var c=this.variableDB_.getDistinctName(a,Blockly.Procedures.NAME_TYPE);this.functionNames_[a]=c;c=b.join("\n").replace(this.FUNCTION_NAME_PLACEHOLDER_REGEXP_,c);for(var d;d!=c;)d=c,c=c.replace(/^(( {2})*) {2}/gm,"$1\x00");c=c.replace(/\0/g,this.INDENT);this.definitions_[a]=c}return this.functionNames_[a]};Blockly.Generator.prototype.init=function(a){};Blockly.Generator.prototype.scrub_=function(a,b){return b};
 Blockly.Generator.prototype.finish=function(a){return a};Blockly.Generator.prototype.scrubNakedValue=function(a){return a};Blockly.Names=function(a,b){this.variablePrefix_=b||"";this.reservedDict_=Object.create(null);if(a)for(var c=a.split(","),d=0;d<c.length;d++)this.reservedDict_[c[d]]=!0;this.reset()};Blockly.Names.DEVELOPER_VARIABLE_TYPE="DEVELOPER_VARIABLE";Blockly.Names.prototype.reset=function(){this.db_=Object.create(null);this.dbReverse_=Object.create(null);this.variableMap_=null};
@@ -3121,7 +3618,7 @@ Blockly.Toolbox.TreeControl.prototype.setSelectedItem=function(a){
 Blockly.Toolbox.TreeNode=function(a,b,c,d){goog.ui.tree.TreeNode.call(this,b,c,d);a&&(b=function(){Blockly.svgResize(a.workspace_)},goog.events.listen(a.tree_,goog.ui.tree.BaseNode.EventType.EXPAND,b),goog.events.listen(a.tree_,goog.ui.tree.BaseNode.EventType.COLLAPSE,b))};goog.inherits(Blockly.Toolbox.TreeNode,goog.ui.tree.TreeNode);
 Blockly.Toolbox.TreeNode.prototype.getExpandIconSafeHtml=function(){return goog.html.SafeHtml.create("span")};
 
-var colour //ny
+var colour=true; //ny
 Blockly.Toolbox.TreeNode.prototype.onClick_=function(a){
 	colour=false;
 	this.hasChildren()&&this.isUserCollapsible_?(this.toggle(),this.select()):this.isSelected()?this.getTree().setSelectedItem(null):this.select();this.updateRow()

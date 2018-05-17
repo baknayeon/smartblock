@@ -19,7 +19,7 @@ function condition_input(condition, array){
 			var field_right = right
 			array.push(new Condition(field_right.devname, field_right.device));
 			
-			if(left.constructor == inputc){ // field =< field
+			if(left.constructor == Inputc){ // field =< field
 				var field_left = left
 				array.push(new Condition(field_right.devname, field_right.device));
 			}
@@ -86,12 +86,16 @@ function device_table(){
 function things_table(){
 	var table = '<strong><p class="cta">Things</p></strong>'+
 				'<button class= "close"></button> '+
-				'<div class="social" id = "Things">';
+				'<div class="social" id = "Things"> \n';
 	for(var c = 0; c < comman_uesed.length; c++){
-		
-		table += '<button onClick = change_devbutton_color(this) id ="'+comman_uesed[c]+'">'+ comman_uesed[c]+'</button>'
+		var device = comman_uesed[c]
+	
+		if(selected_dev.has(device))
+			table += '<button onClick = change_devbutton_color(this) id ="'+device+'" style = "background:rgb(205, 239, 244)">'+ device+'</button>\n'
+		else	
+			table += '<button onClick = change_devbutton_color(this) id ="'+device+'">'+ device+'</button>\n'
 	}
-	table += '<button onClick = "setting_things(this)" id ="setting_things_open"></button>'
+	table += '\n<button onClick = "setting_things(this)" id ="setting_things_open"></button>'
 	table += '</div>'
 
 	return table
@@ -229,7 +233,7 @@ function change_devbutton_color(x){
 
 
 function app_info(x){
-	var openWin = window.open("./app_info.html", 'myWindow', 'scrollbars=no,toolbar=no,resizable=no,width=430px,height=450px,left=400,top=100');
+	var openWin = window.open("support/app_info.html", 'myWindow', 'scrollbars=no,toolbar=no,resizable=no,width=430px,height=450px,left=400,top=100');
 }
 
 function change_connted_color(block){

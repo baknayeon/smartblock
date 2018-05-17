@@ -148,7 +148,7 @@ Blockly.SmartThings['option_title'] = function(block) {
   else
      var code = 'title : \"'+ text_title+'\"';
   // TODO: Change ORDER_NONE to the correct strength.
- return [code, Blockly.SmartThings.ORDER_NONE];
+ return code;
 };
 
 Blockly.SmartThings['option_name'] = function(block) {

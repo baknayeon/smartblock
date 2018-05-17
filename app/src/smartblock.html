@@ -15,7 +15,7 @@
   <script src="cap/cap_help.js"></script>
   <script src="help.js"></script>
   <script src="codegenerate.js"></script>
-  <script src="xml.js"></script>
+  <script src="toolbox.js"></script>
 
   <script src="block/rule_definer.js"></script>
   <script src="block/rule_generator.js"></script>
@@ -25,6 +25,7 @@
   <script src="block/option.js"></script>
   <script src="block/preference.js"></script>
   <script src="block/timer.js"></script>
+  <script src="block/grouping.js"></script>
   <link rel="stylesheet" type="text/css" href="css/main.css">
   <link rel="stylesheet" href="highlight/styles/default.css">
 
@@ -133,7 +134,7 @@
 	<input type="text" id = "iconUrl" hidden></input>
 	<script>
 
-	document.getElementById("click1").click();
+	//document.getElementById("click1").click();
 
 	
 	var demoWorkspace = Blockly.inject('blocklyDiv', { 
@@ -164,7 +165,7 @@
 		
 		_("in_box1").style.display = "none"
 		_("in_box2").style.display = "none"
-		_("in_box3").style.display = "block"
+		_("in_box3").style.display = ""
 		_("save_but").style.visibility  = "visible"
 	
 		_("click1").style.background = "#fff"
@@ -194,7 +195,7 @@
 	function click2(){
 
 		_("in_box1").style.display = "none"
-		_("in_box2").style.display = "block"
+		_("in_box2").style.display = ""
 		_("in_box3").style.display = "none"
 		_("save_but").style.visibility  = "hidden"
 		
@@ -213,7 +214,8 @@
 	}
 
 	function click1(){
-		_("in_box1").style.display = "block"
+
+		_("in_box1").style.display = ""
 		_("in_box2").style.display = "none"
 		_("in_box3").style.display = "none"
 		_("save_but").style.visibility  = "hidden"
@@ -224,7 +226,7 @@
 	}
 
 	function all(){
-		_("in_box1").style.display = "block"
+		_("in_box1").style.display = ""
 		_("in_box2").style.display = "none"
 		_("in_box3").style.display = "none"
 
@@ -240,18 +242,14 @@
 
 	function sample(){
 	    var sample = '  <category name="Sample">\n'
-		//+' <block type="preference">\n'
-		//+ '   <statement name="page">'
+
 		+ '		<block type="page">'
 		+ '		<field name="name"></field>'
 		+'			<statement name="section">'
 		+'				<block type="section"></block>'
         +'          </statement>'
         +'      </block>'
-		//+'    </statement>'
-		//+'  </block>'
-		//+'<block type="preference">'
-		//+'    <statement name="page">'
+
 		+'      <block type="page">'
 		+'        <field name="name"></field>'
 		+'        <statement name="section">'
@@ -265,7 +263,7 @@
 		+'              <block type="section">'
 		+'                <value name="option">'
 		+'                  <block type="option_title">'
-		+'                    <field name="title">if..</field>'
+		+'                    <field name="title">then..</field>'
 		+'                  </block>'
 		+'                </value>'
 		+'              </block>'
@@ -274,7 +272,7 @@
 		+'              <block type="section">'
 		+'                <value name="option">'
 		+'                  <block type="option_title">'
-		+'                    <field name="title">then..</field>'
+		+'                    <field name="title">if..</field>'
 		+'                  </block>'
 		+'                </value>'
 		+'              </block>'
@@ -282,23 +280,12 @@
 		+'          </block>'
 		+'        </statement>'
 		+'      </block>'
-		//+'    </statement>'
-		//+'  </block>'
-		//+'  <block type="preference">'
-		//+'    <statement name="page">'
+
 		+'      <block type="page">'
 		+'        <field name="name">when..</field>'
 		+'        <statement name="section">'
 		+'          <block type="section"></block>'
 		+'        </statement>'
-		+'        <next>'
-		+'          <block type="page">'
-		+'            <field name="name">if..</field>'
-		+'            <statement name="section">'
-		+'              <block type="section"></block>'
-		+'            </statement>'
-		+'          </block>'
-		+'        </next>'
 		+'        <next>'
 		+'          <block type="page">'
 		+'            <field name="name">then..</field>'
@@ -307,9 +294,16 @@
 		+'            </statement>'
 		+'          </block>'
 		+'        </next>'
+		+'        <next>'
+		+'          <block type="page">'
+		+'            <field name="name">if..</field>'
+		+'            <statement name="section">'
+		+'              <block type="section"></block>'
+		+'            </statement>'
+		+'          </block>'
+		+'        </next>'
 		+'      </block>'
-		//+'    </statement>'
-	    //+' </block> '
+
 		+'</category>\n';
 		return sample
 	}

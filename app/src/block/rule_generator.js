@@ -37,7 +37,7 @@ function Condition(){
 }
 
 
-function inputc(){
+function Inputc(){
 	this.device;
 	this.devname;
 	this.input;
@@ -61,12 +61,13 @@ function ECA(statements_event, value_condition, statements_action) {
     this.input_c_make = new Array();
 
 	if(this.event.constructor != Grouping){
-		this.input_e_make.push(new inpute(this.event))
-	}else {
+		this.input_e_make.push(new Inpute(this.event))
+	}
+	else{
 		var device_list = this.event.list
 		for(i in device_list){
 			var event_dev = device_list[i]
-			this.input_e_make.push(new inpute(event_dev))
+			this.input_e_make.push(new Inpute(event_dev))
 		}
 	}
 
@@ -77,14 +78,22 @@ function ECA(statements_event, value_condition, statements_action) {
 
 	for(i in statements_action){ // input for action generate
 		if(statements_action[i].devname){
-			var a = new inputa(statements_action[i]);
+			var a = new Inputa(statements_action[i]);
 			this.input_a_make.push(a);
 		}
 		else if(statements_action[i].method){
 			var argument = statements_action[i].args
 			if(argument){
 				for(index in argument){
-					var a = new inputa(argument[index]);
+					var a = new Inputa(argument[index]);
+					this.input_a_make.push(a);
+				}
+			}
+		}else if(statements_action[i].constructor == Grouping){
+			var device_list = statements_action[i].list
+			if(device_list){
+				for(index in device_list){
+					var a = new Inputa(device_list[index]);
 					this.input_a_make.push(a);
 				}
 			}
@@ -101,44 +110,56 @@ function ECA(statements_event, value_condition, statements_action) {
 
 		for(i in coditionList){ // input for action generate
 			if(coditionList[i].devname){
-				var c = new inputa(coditionList[i]);
+				var c = new Inputa(coditionList[i]);
 				this.input_c_make.push(c);
 			}
 		}
 	}
 }  
 
-function inpute(e) {
-	this.name = e.devname;
-	this.device = e.device;
-	this.attr = e.attr;
-	this.input = 'input \"'+this.name+'\", \"capability.'+this.device +'\", title:\"'+this.name+'\"' ;
+function Inpute(e) {
+	if(e.timer == ""){
 	
-	var handler_name = "rule"+eca_num+"_handler";
-	this.handler = handler_name + "(evt)";
+		this.name = e.devname;
+		this.device = e.device;
+		this.attr = e.attr;
+		this.input = 'input \"'+this.name+'\", \"capability.'+this.device +'\", title:\"'+this.name+'\"' ;
+		
+		var handler_name = "rule"+eca_num+"_handler";
+		this.handler = handler_name + "(evt)";
 
-	if(e.event_handler){
-		this.attr = e.event_handler.to
-	}
+		if(e.event_handler){
+			if(e.event_handler.to != '.')
+				this.attr = e.event_handler.to
+			else 
+				this.attr = ""
 
-	if(attrMap.isOnlyENUM(this.device)){
-		var attr_obj = attrMap.getENUM(this.device)
-		this.subscribe = "subscribe("+this.name+', \"'+ attr_obj.id +'.'+this.attr+'\", '+ handler_name+")";
+		}
 
-	}else if(attrMap.isOnlyNUMBER(this.device)){
-		var attr_obj = attrMap.getNUMBER(this.device)
-		this.subscribe = "subscribe("+this.name+', \"'+ attr_obj.id+'\", '+ handler_name+")";
+		if(attrMap.isOnlyENUM(this.device)){
+			var attr_obj = attrMap.getENUM(this.device)
+			this.subscribe = "subscribe("+this.name+', \"'+ attr_obj.id +"."+this.attr+'\", '+ handler_name+")";
+
+		}else if(attrMap.isOnlyNUMBER(this.device)){
+			var attr_obj = attrMap.getNUMBER(this.device)
+			this.subscribe = "subscribe("+this.name+', \"'+ attr_obj.id+'\", '+ handler_name+")";
+		}
+	}else{
+		this.input = 'input \"'+e.time +'\", time, title : \"'+e.time+'\"';
+		var handler_name = "rule"+eca_num+"_handler";
+		this.handler = handler_name + "(evt)";
+		this.subscribe = 'schedule('+e.time+', '+ handler_name+")";
 	}
 }
 
-function inputa(a) {
+function Inputa(a) {
 	if(a.devname && a.device){
 		this.name = a.devname;
 		this.device = a.device;
 		this.input = 'input \"'+this.name+'\", \"capability.'+this.device +'\", title:\"'+this.name+'\"' ;
-	}else if(a.capname && a.capbility){
-		this.name = a.capname;
-		this.device = a.capbility;
+	}else if(a.name && a.function){
+		this.name = a.name;
+		this.device = a.function;
 		this.input = 'input \"'+this.name+'\", \"'+this.device +'\", title:\"'+this.name+'\"' ;
 	}
 
@@ -158,6 +179,9 @@ function Event() {
 	this.event_handler = false;
 	this.from;
 	this.to;
+
+	this.time;
+	
 }
 
 function Action() {

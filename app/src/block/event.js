@@ -54,54 +54,8 @@ Blockly.Blocks['event_handler'] = {
 							toBlock.removeField("dropDownTo");
 							toBlock.appendField(new Blockly.FieldTextInput(parentBlock_attr), "dropDownTo");
 						}
-					}else if(parentBlock.type.includes("any") ){
-						if(event.newParentId === this.parentBlock_.id || event.oldParentId === this.parentBlock_.id){
-							//init event_handler with any
-							var length = parentBlock.inputList.length-1
-							var deviceList = new Set()
-							for(var i = 0; i< length; i++){
-								var block = parentBlock.getInputTargetBlock("ADD"+i)
-								if(block){
-									var device = block.getField("device").text_
-									deviceList.add(device)
-								}
-							}
-							var event_handler = parentBlock.getInputTargetBlock("p")
-							var fromBlock = event_handler.getInput('from');
-							var toBlock = event_handler.getInput('to');
-							var attrs = new Set();
-
-							for(let device of deviceList){
-								if(attrMap.isOnlyENUM(device)){
-									var newAttr = attrMap.getENUM(device);
-									for(let new_a of newAttr.value){
-										attrs.add(new_a)
-
-									}
-								}else if(attrMap.hasMultiTypeENUM(device)){
-									var attribute_id = parentBlock.getField("attribute_id").text_;
-									var newAttr = attrMap.getENUMById(device, attribute_id);
-									for(let new_a of newAttr.value){
-										attrs.add(new_a)
-
-									}
-
-								}else if(attrMap.isOnlyNUMBER(device) || attrMap.hasMultiTypeNUMBER(device)){
-
-								}
-
-							}
-							var newAttr = [[".","."]]
-							for(let attr of attrs){
-								newAttr.push([attr, attr])
-							}
-							fromBlock.removeField('dropDownFrom');
-							fromBlock.appendField(new Blockly.FieldDropdown(newAttr), "dropDownFrom");
-							toBlock.removeField("dropDownTo");
-							toBlock.appendField(new Blockly.FieldDropdown(newAttr,parentBlock_attr), "dropDownTo");
-						}
-
 					}
+					
 				}else if(event.element == "field" && event.name ==="attribute_id"){
 					//event block attribute_id changed
 					var device = parentBlock.getField("device").text_
@@ -144,33 +98,12 @@ Blockly.SmartThings['event_handler'] = function(block) {
 };
 
 
-Blockly.SmartThings['any'] = function(block) {
-
-	var length = block.inputList.length-1
-	var i = 0;
-	var groupingDevice = new Grouping();
-	
-	groupingDevice.type = "any"
-
-	var event_handler = Blockly.SmartThings.valueToCode(block, 'p', Blockly.SmartThings.ORDER_ATOMIC);
-	groupingDevice.p = event_handler
-
-	while(i < length){
-	 	var device = Blockly.SmartThings.valueToCode(block, 'ADD'+i, Blockly.SmartThings.ORDER_ATOMIC);
-	 	groupingDevice.list.push(device)
-		i++;
-	}
-
-  return groupingDevice;
-};
-
 function event_block(device){
 	Blockly.SmartThings['e_'+device] = function(block) {
 	  var variable_name = Blockly.SmartThings.variableDB_.getName(block.getFieldText('name'), Blockly.Variables.NAME_TYPE);
 	  var dropdown_attributes = block.getFieldValue('attribute');
 	  var value_switch = Blockly.SmartThings.valueToCode(block, device, Blockly.SmartThings.ORDER_ATOMIC);
 	  // TODO: Assemble SmartThings into code variable.
-	  console.log("event_block"); 
 
 	  var smartevent = new Event();
 	  smartevent.devname = device+variable_name;
@@ -229,6 +162,12 @@ function event_block(device){
 						var attribute_id = this.getField("attribute_id").text_;
 						block.appendField(new Blockly.FieldDropdown(attrMap.getENUM_vaulesById(device, attribute_id)),"attribute");
 					}
+				}else if(this.id == event.blockId){
+					if(this.parentBlock_ && this.parentBlock_.type =="group")
+						block.removeField("attribute")
+					else if(event.oldInputName && event.oldInputName.includes("ADD"))
+						appendAttr(device, block)
+					
 				}
 				/*else if(this.parentBlock_ && event.newParentId == this.parentBlock_.id){
 					//any - event
