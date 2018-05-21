@@ -54,7 +54,7 @@ function device_table(){
 
 	for(var i =0; i < alphabet.length; i++){	
 		var alphabet_i = alphabet[i]
-		table += '<div class="share-btn" id = "'+alphabet_i +'" >'
+		table += '<div class="share-btn" id = "'+alphabet_i +'" onclick= "share_btn(this)">'
 
 		if(alphabet_i == "Things"){
 			table += things_table();
@@ -68,7 +68,7 @@ function device_table(){
  				while(index < deviceList.length){
 					var device =  deviceList[index];
 					if(device.startsWith(word)){
-						table += '<button onClick="change_devbutton_color(this)" id ="'+device+'">'+ device+'</button>';
+						table += '<button onClick="change_devbutton_color(this)" id ="'+device+'" class = "device_but">'+ device+'</button>';
 						index++;
 					}else
 						break;
@@ -91,9 +91,9 @@ function things_table(){
 		var device = comman_uesed[c]
 	
 		if(selected_dev.has(device))
-			table += '<button onClick = change_devbutton_color(this) id ="'+device+'" style = "background:rgb(205, 239, 244)">'+ device+'</button>\n'
+			table += '<button onClick = change_devbutton_color(this) id ="'+device+'" style = "background:rgb(205, 239, 244)" class = "device_but">'+ device+'</button>\n'
 		else	
-			table += '<button onClick = change_devbutton_color(this) id ="'+device+'">'+ device+'</button>\n'
+			table += '<button onClick = change_devbutton_color(this) id ="'+device+'" class = "device_but">'+ device+'</button>\n'
 	}
 	table += '\n<button onClick = "setting_things(this)" id ="setting_things_open"></button>'
 	table += '</div>'
@@ -221,16 +221,30 @@ function change_setbutton_color(x){
 
 }
 function change_devbutton_color(x){
-
+	var but = document.getElementById(x.id)
 	if( x.style.background == 'rgb(255, 255, 255)' || x.style.background == '' ){
 		selected_dev.set(x.id, x.id)
 		x.style.background = 'rgb(205, 239, 244)';
 	}else if(x.style.background == 'rgb(205, 239, 244)'){
 		selected_dev.delete(x.id)
 		x.style.background = 'rgb(255, 255, 255)';
+		
 	}
 }
 
+
+function share_btn(x){
+	var childNodes = document.getElementsByClassName("device_but")
+	for(let childNode of childNodes){
+		var but = childNode
+		if(selected_dev.has(but.id)) 
+			but.style.background = 'rgb(205, 239, 244)';
+		else 
+			but.style.background = 'rgb(255, 255, 255)';
+		
+	}
+
+}
 
 function app_info(x){
 	var openWin = window.open("support/app_info.html", 'myWindow', 'scrollbars=no,toolbar=no,resizable=no,width=430px,height=450px,left=400,top=100');

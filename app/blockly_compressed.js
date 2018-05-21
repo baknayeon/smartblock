@@ -3261,8 +3261,9 @@ Blockly.FieldVariable.dropdownCreate=function(){
 		Blockly.Msg.DELETE_VARIABLE&&b.push(["Delete "+defaultType+a,Blockly.DELETE_VARIABLE_ID]);
 	}
 	else if(defaultType == "timer" || defaultType =="after"){
-		b.push(["Rename "+defaultType+" "+a,Blockly.RENAME_VARIABLE_ID]);
-		Blockly.Msg.DELETE_VARIABLE&&b.push(["Delete "+defaultType+" "+a,Blockly.DELETE_VARIABLE_ID]);
+		b.push(["Rename "+a,Blockly.RENAME_VARIABLE_ID]);
+		b.push(["New "+defaultType, "CREATE_VARIABLE_BLOCK"]);
+		Blockly.Msg.DELETE_VARIABLE&&b.push(["Delete "+a,Blockly.DELETE_VARIABLE_ID]);
 	
 	}
 	return b
@@ -3277,14 +3278,11 @@ Blockly.FieldVariable.prototype.onItemSelected=function(a,b){
 		if(c=="CREATE_VARIABLE_BLOCK"){// ny new block
 				var block=this.sourceBlock_
 				var Blocktype = block.type
-
+				
 				deviceCount.up(this.defaultType_)// ny create new Block
 				var newBlock = d.newBlock(Blocktype, null);
-
 				Blockly.make_newBlock(newBlock)
 
-
-				
 				return
 			}
 		}
@@ -3310,23 +3308,25 @@ var scru_rule= new Array();
 var scru_page= new Array();
 Blockly.Generator.prototype.workspaceToCode=function(a){
 	a||(console.warn("No workspace specified in workspaceToCode call.  Guessing."),a=Blockly.getMainWorkspace());var b=[];this.init(a);a=a.getTopBlocks(!0);
-
+	
 	eca_num = 0;
 	scru_rule= new Array();
 	scru_page= new Array();
-
+	var rules 
 	for(var c=0,d;d=a[c];c++){//ny
 		if(d.type === "eca" || d.type === "ea"){
-			var e=this.blockToCode(d);
+			rules=this.blockToCode(d);
+			rules = rules.reverse()
 			break;
 		}
 		if(d.type === "page"){
-			var e=this.blockToCode(d);
+			rules=this.blockToCode(d);
+			rules = rules.reverse()
 			break;
 		}
 		//goog.isArray(e)&&(e=e[0]);e&&(d.outputConnection&&(e=this.scrubNakedValue(e)),b.push(e))
 	}
-	return e.reverse()
+	return rules
 	//b=b.join("\n");b=this.finish(b);b=b.replace(/^\s+\n/,"");b=b.replace(/\n\s+$/,"\n");return b=b.replace(/[ \t]+\n/g,"\n")
 };
 Blockly.Generator.prototype.prefixLines=function(a,b){

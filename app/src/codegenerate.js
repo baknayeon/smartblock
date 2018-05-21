@@ -135,7 +135,8 @@ function generating_pref(ecaList){
 				var eSt_e = event_input.indexOf(input_e[e].input);
 				var aSt_e = action_input.indexOf(input_e[e].input);
 				if(cSt_e == -1 && eSt_e == -1 && aSt_e == -1)
-					event_input += "\n\t\t\t"+input_e[e].input;
+					if(input_e[e].input)
+						event_input += "\n\t\t\t"+input_e[e].input;
 
 			}
 
@@ -144,7 +145,8 @@ function generating_pref(ecaList){
 				var eSt_a = event_input.indexOf(input_a[j].input);
 				var aSt_a = action_input.indexOf(input_a[j].input);
 				if(cSt_a == -1 && eSt_a == -1 && aSt_a == -1)
-					action_input += "\n\t\t\t"+input_a[j].input;
+					if(input_a[j].input)
+						action_input += "\n\t\t\t"+input_a[j].input;
 
 			}
 
@@ -155,7 +157,8 @@ function generating_pref(ecaList){
 					var eSt_c = event_input.indexOf(input_c[c].input);
 					var aSt_c = action_input.indexOf(input_c[c].input);
 					if(cSt_c == -1 && eSt_c == -1 && aSt_c == -1)
-						codition_input += "\n\t\t\t"+input_c[c].input;
+						if(input_c[c])
+							codition_input += "\n\t\t\t"+input_c[c];
 
 				}
 			}else{
@@ -165,7 +168,8 @@ function generating_pref(ecaList){
 					var eSt_c = event_input.indexOf(input_c[c]);
 					var aSt_c = action_input.indexOf(input_c[c]);
 					if(cSt_c == -1 && eSt_c == -1 && aSt_c == -1)
-						codition_input += "\n\t\t\t"+input_c[c];
+						if(input_c[c])
+							codition_input += "\n\t\t\t"+input_c[c];
 
 				}
 			}
@@ -222,20 +226,55 @@ function generating_eventHandler(ecaList){
 			handlerMethod +="\tif("+predicate+"){\n"
 
 			//action
-			for(a in actionList){
-				if(actionList[a].method)
-					handlerMethod += "\t\t"+actionList[a].method+"\n"			
-				else if(actionList[a].command)
-					handlerMethod += "\t\t"+actionList[a].command+"\n"			
+			var timer = new Map();
+			for(var action of actionList){
+				if(action.timerhandler){
+					
+					var time = action.timer
+					var timerhandler = action.timerhandler
+					if(timer.has(timerhandler)){
+						var timer_actions = timer.get(timerhandler)
+						timer_actions = timer_actions.concat(action)
+						timer.set(timerhandler,timer_actions)
+
+					}else{
+						timer.set(timerhandler,[action])
+						handlerMethod += "\t\trunIn("+time+", "+timerhandler+")\n"	
+					}
+						
+				}else if(action.method)
+					handlerMethod += "\t\t"+action.method+"\n"			
+				else if(action.command)
+					handlerMethod += "\t\t"+action.command+"\n"			
 			}
 
 			handlerMethod += "\t}\n";
 			handlerMethod += "}\n";
 
 			eventHandler += handlerMethod;
+			eventHandler += generating_timerhandler(timer)
+
 		//}
 	}
 	return eventHandler;	
+}
+
+function generating_timerhandler(timer){
+	var timerhandler = "" 
+
+	for (var [key, actionList] of timer) {	
+		timerhandler += "def "+key+"(){\n"	
+		for(var action of actionList){
+			if(action.method)
+				timerhandler += "\t"+action.method+"\n"			
+			else if(action.command)
+				timerhandler += "\t"+action.command+"\n"		
+		}
+		timerhandler += "}\n"	
+	}
+	
+		
+	return timerhandler
 }
 
 function generating_event_condition(event){

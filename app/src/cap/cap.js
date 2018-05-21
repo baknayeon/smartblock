@@ -52,5 +52,7 @@ function mapInit(){
 			]);*/
 		
 
+		deviceCount.set("timer", parseInt("1"))
+		deviceCount.set("time", parseInt("1"))
     }catch(e){alert(e);}
 } 

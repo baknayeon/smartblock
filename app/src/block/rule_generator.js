@@ -118,7 +118,7 @@ function ECA(statements_event, value_condition, statements_action) {
 }  
 
 function Inpute(e) {
-	if(e.timer == ""){
+	if(!e.time){
 	
 		this.name = e.devname;
 		this.device = e.device;
@@ -145,10 +145,12 @@ function Inpute(e) {
 			this.subscribe = "subscribe("+this.name+', \"'+ attr_obj.id+'\", '+ handler_name+")";
 		}
 	}else{
-		this.input = 'input \"'+e.time +'\", time, title : \"'+e.time+'\"';
 		var handler_name = "rule"+eca_num+"_handler";
 		this.handler = handler_name + "(evt)";
 		this.subscribe = 'schedule('+e.time+', '+ handler_name+")";
+
+		if(e.devname)
+			this.input = 'input \"'+e.devname+'\", \"'+e.device +'\", title:\"'+e.devname+'\"' ;
 	}
 }
 
@@ -189,6 +191,9 @@ function Action() {
     this.command;
 	this.device;
 	this.option;
+
+	this.timer;
+	this.timerhandler;
 
 	this.method;
 	this.args = new Array();

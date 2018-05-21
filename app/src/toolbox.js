@@ -49,9 +49,25 @@ Blockly.devicesFlyoutCallback_action = function(workspace) {
   return xmlList;
 };
 function add_schedule_xml(xmlList){
-	 if (Blockly.Blocks["schedule"]) {
+	 if (Blockly.Blocks["time"]) {
 		  var blockText = '<xml>' +
-			  '<block type="schedule">' +
+			  '<block type="time">' +
+			  '</block>' +
+			  '</xml>';
+		  var block = Blockly.Xml.textToDom(blockText).firstChild;
+		 xmlList.push(block)
+	} 
+	 if (Blockly.Blocks["day"]) {
+		  var blockText = '<xml>' +
+			  '<block type="day">' +
+			  '</block>' +
+			  '</xml>';
+		  var block = Blockly.Xml.textToDom(blockText).firstChild;
+		 xmlList.push(block)
+	} 
+	 if (Blockly.Blocks["year"]) {
+		  var blockText = '<xml>' +
+			  '<block type="year">' +
 			  '</block>' +
 			  '</xml>';
 		  var block = Blockly.Xml.textToDom(blockText).firstChild;
