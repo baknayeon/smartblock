@@ -193,7 +193,7 @@ Blockly.Blocks['sendsms'] = {
     this.appendValueInput("phone")
 		.setCheck("option")
         .appendField("phone")
-        .appendField(new Blockly.FieldTextInput("+82010"), "phone");
+        .appendField(new Blockly.FieldTextInput("+8210"), "phone");
     this.setOutput(true,  "Action");
     this.setColour(Block_colour_action);
  this.setTooltip("");
@@ -209,7 +209,7 @@ Blockly.Blocks['sendsms'] = {
   		if(event.oldInputName == "message")
   			this.getInput("message").appendField(new Blockly.FieldTextInput(""), "text");
   		else if(event.oldInputName == "phone")
-  			this.getInput("phone").appendField(new Blockly.FieldTextInput("+82010"), "phone");
+  			this.getInput("phone").appendField(new Blockly.FieldTextInput("+8210"), "phone");
   }
 };
 
@@ -270,7 +270,7 @@ Blockly.SmartThings['sendsms'] = function(block) {
 	var value_phone = Blockly.SmartThings.valueToCode(block, 'phone', Blockly.SmartThings.ORDER_ATOMIC);
 	var text_text = block.getFieldValue('text');
 	var value_message = Blockly.SmartThings.valueToCode(block, 'message', Blockly.SmartThings.ORDER_ATOMIC);
-	var nextAction = Blockly.SmartThings.valueToCode(block, 'action', Blockly.SmartThings.ORDER_ATOMIC);
+	var actionList = Blockly.SmartThings.valueToCode(block, 'action', Blockly.SmartThings.ORDER_ATOMIC);
 	// TODO: Assemble SmartThings into code variable.
 
 	var smartAction = new Action();
@@ -339,8 +339,8 @@ Blockly.SmartThings['option'] = function(block) {
 
   var args = new Args();
   args.function = dropdown_type;
-  args.name = dropdown_type+variable_num++;
-
+  args.name = dropdown_type+deviceCount.get(dropdown_type)
+deviceCount.up(dropdown_type)
   // TODO: Change ORDER_NONE to the correct strength.
   return args;
 };

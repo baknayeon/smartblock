@@ -169,17 +169,6 @@ function event_block(device){
 						appendAttr(device, block)
 					
 				}
-				/*else if(this.parentBlock_ && event.newParentId == this.parentBlock_.id){
-					//any - event
-					block.removeField("attribute");
-				}
-				else if(event.oldParentId){
-					if(this.id == event.blockId){
-						//any - event
-						//disconneted
-						appendAttr(device, block);
-					}
-				}*/
 			}
 			
 		}
@@ -198,3 +187,27 @@ function appendAttr(device, block){
 	}
 
 }
+
+Blockly.Blocks['e_location'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("location")
+        .appendField(new Blockly.FieldDropdown([["mode","mode"], ["position","position"], ["sunset","sunset"], ["sunrise","sunrise"], ["sunriseTime","sunriseTime"], ["sunsetTime","sunsetTime"]]), "attr");
+    this.setOutput(true, "Event");
+    this.setColour(Block_colour_event);
+ this.setTooltip("");
+ this.setHelpUrl("");
+  }
+};
+
+Blockly.SmartThings['e_location'] = function(block) {
+	 var dropdown_attr = block.getFieldValue('attr');
+	// TODO: Assemble SmartThings into code variable.
+
+	var smartevent = new Event();
+	smartevent.device = "location";
+	smartevent.attr = dropdown_attr	
+
+	// TODO: Change ORDER_NONE to the correct strength.
+	return smartevent;
+};

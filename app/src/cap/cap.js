@@ -54,5 +54,9 @@ function mapInit(){
 
 		deviceCount.set("timer", parseInt("1"))
 		deviceCount.set("time", parseInt("1"))
+		deviceCount.set("message", parseInt("1"))
+		deviceCount.set("phone", parseInt("1"))
+		deviceCount.set("box", parseInt("1"))
+
     }catch(e){alert(e);}
 } 

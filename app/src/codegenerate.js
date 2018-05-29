@@ -239,7 +239,13 @@ function generating_eventHandler(ecaList){
 
 					}else{
 						timer.set(timerhandler,[action])
-						handlerMethod += "\t\trunIn("+time+", "+timerhandler+")\n"	
+						if(time[0] == "0"){
+							time[0] = 0
+							handlerMethod += '\t\tschedule(\"'+time+'\", '+timerhandler+")\n"	
+
+						}
+						else
+							handlerMethod += "\t\trunIn("+time+", "+timerhandler+")\n"	
 					}
 						
 				}else if(action.method)

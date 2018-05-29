@@ -24,8 +24,10 @@
   <script src="block/action.js"></script>
   <script src="block/option.js"></script>
   <script src="block/preference.js"></script>
-  <script src="block/timer.js"></script>
+  <script src="block/a_timer.js"></script>
+  <script src="block/e_timer.js"></script>
   <script src="block/grouping.js"></script>
+  <script src="block/state.js"></script>
   <link rel="stylesheet" type="text/css" href="css/main.css">
   <link rel="stylesheet" href="highlight/styles/default.css">
 
@@ -64,8 +66,6 @@
 	var Block_colour_option = "#"+"8cd4db"
 	var Block_colour_option_disconnted = "#"+"cceef2"
 
-	var variable_num = 1;
-
 	var ecaList_g;
 	var eca_num;
 
@@ -81,6 +81,14 @@
 	<category name="Event" custom="SAMRT_DEVICE_E" colour ="#5eb7b5"></category>
 	<category name="Codition" custom="SAMRT_DEVICE_C" colour ="#A2CC0D"></category>
 	<category name="Action" custom="SAMRT_DEVICE_A" colour ="#efcd3f"></category>
+	<category name="State" colour ="#303030">
+		<block type="state"></block>
+		<block type="put_state"></block>
+		<block type="math_number"></block>
+		<block type="math_text"></block>
+		<block type="math_arithmetic"></block>
+	
+	</category>
 </xml>
 
 <body onload="all()">

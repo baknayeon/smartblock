@@ -118,12 +118,12 @@ function ECA(statements_event, value_condition, statements_action) {
 }  
 
 function Inpute(e) {
+
 	if(!e.time){
 	
 		this.name = e.devname;
 		this.device = e.device;
 		this.attr = e.attr;
-		this.input = 'input \"'+this.name+'\", \"capability.'+this.device +'\", title:\"'+this.name+'\"' ;
 		
 		var handler_name = "rule"+eca_num+"_handler";
 		this.handler = handler_name + "(evt)";
@@ -137,17 +137,20 @@ function Inpute(e) {
 		}
 
 		if(attrMap.isOnlyENUM(this.device)){
+			this.input = 'input \"'+this.name+'\", \"capability.'+this.device +'\", title:\"'+this.name+'\"' ;
 			var attr_obj = attrMap.getENUM(this.device)
 			this.subscribe = "subscribe("+this.name+', \"'+ attr_obj.id +"."+this.attr+'\", '+ handler_name+")";
-
 		}else if(attrMap.isOnlyNUMBER(this.device)){
+			this.input = 'input \"'+this.name+'\", \"capability.'+this.device +'\", title:\"'+this.name+'\"' ;
 			var attr_obj = attrMap.getNUMBER(this.device)
 			this.subscribe = "subscribe("+this.name+', \"'+ attr_obj.id+'\", '+ handler_name+")";
+		}else if(this.device == "location"){
+			this.subscribe = "subscribe("+this.device+', \"'+ this.attr+'\", '+ handler_name+")";
 		}
 	}else{
 		var handler_name = "rule"+eca_num+"_handler";
 		this.handler = handler_name + "(evt)";
-		this.subscribe = 'schedule('+e.time+', '+ handler_name+")";
+		this.subscribe = 'schedule(\"'+e.time+'\", '+ handler_name+")";
 
 		if(e.devname)
 			this.input = 'input \"'+e.devname+'\", \"'+e.device +'\", title:\"'+e.devname+'\"' ;
