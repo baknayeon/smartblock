@@ -55,7 +55,7 @@ function action_block(device){
 				block.appendField(new Blockly.FieldDropdown(commMap.getCommad_vaules(device)), "Command");
 			}else if(commMap.isSingleMethod(device)){
 				setMethodField(block, device);
-			}else if(commMap.isMultiMethod(device)){
+			}else if(commMap.isMultiple(device)){
 				block.appendField(new Blockly.FieldDropdown(commMap.getMultiType(device)), "Command_id");
 				setMethodField(block, device);
 			}

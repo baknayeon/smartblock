@@ -3,14 +3,13 @@ function smartApp(){
 	var name = document.getElementById("name").value;
 
 	if(name){
-
-		var ecaList = Blockly.SmartThings.workspaceToCode(demoWorkspace);
+		var ecaList = Blockly.SmartThings.workspaceToCode(workspace);
 	
 		//definition
 		var definition = generating_definition()
 		
-		//prferences
-		var prferences = generating_pref(ecaList)
+		//preferences
+		var preferences = generating_pref(ecaList)
 
 		//predefined_callback
 		var subscribe = generating_subscribe(ecaList)
@@ -19,10 +18,10 @@ function smartApp(){
 		var predefined_callback= installed+"\n"+updated;
 		
 		//eventHandler
-		var eventHandler = generating_eventHandler(ecaList)
+		var eventHandlers = generating_eventHandler(ecaList)
 	
-		//4 section combaine
-		code = definition +"\n\n"+ prferences +"\n\n"+ predefined_callback +"\n\n"+ eventHandler;
+		//combining 4 section 
+		code = definition +"\n\n"+ preferences +"\n\n"+ predefined_callback +"\n\n"+ eventHandlers;
 	}else{
 		alert("plz write the App name");
 	}
@@ -176,13 +175,13 @@ function generating_pref(ecaList){
 		}
 
 		prferences = 'preferences{ \n'+
-								'\tsection(title : "event"){'+
+								'\tsection(title : "When...(event)"){'+
 								event_input + '\n'+
 								'\t}\n'+
-								'\tsection(title : "codition"){'+
+								'\tsection(title : "If...(condition)"){'+
 								 codition_input + '\n'+
 								'\t}\n'+
-								'\tsection(title : "action"){'+
+								'\tsection(title : "Then...(action)"){'+
 								 action_input + '\n'+
 								'\t}\n'+
 							'}';
@@ -350,6 +349,9 @@ function generating_condition(condition, devList){
 							if_condition = field.devname+'.currentState("'+field_attr.id+'").value '+ operator+' "'+dev_attr.attr+'"';
 
 						}else if(attrMap.isOnlyNUMBER(field.device)){
+							var field_attr = attrMap.getNUMBER(field.device)
+							if_condition = field.devname+'.currentValue("'+field_attr.id+'") '+ operator+' '+dev_attr.attr;
+						}else if(attrMap.hasMultiTypeNUMBER(field.device)){
 							var field_attr = attrMap.getNUMBER(field.device)
 							if_condition = field.devname+'.currentValue("'+field_attr.id+'") '+ operator+' "'+dev_attr.attr+'"';
 						}

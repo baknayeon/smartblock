@@ -122,10 +122,10 @@ Blockly.SmartThings['e_time'] = function(block) {
   var dropdown_apm = block.getFieldValue('apm');
   var value_month_day_year = Blockly.SmartThings.valueToCode(block, 'time', Blockly.SmartThings.ORDER_ATOMIC);
   // TODO: Assemble SmartThings into code variable.
- 
+    var time =""
 	var smartevent = new Event();
 	if(value_month_day_year != ""){
-		var time = value_month_day_year
+		time = value_month_day_year
 
 		if(dropdown_apm == "PM")
 			text_hour = (parseInt(text_hour)+12).toString()

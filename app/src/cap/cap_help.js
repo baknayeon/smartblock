@@ -160,8 +160,8 @@ CommandMap.prototype = {
 		}
         return false  
     }, 
-	isMultiMethod : function(key){ 
-    	if(!this.commad[key] && this.method[key]){
+	isMultiple : function(key){ 
+    	if(this.commad[key] && this.method[key]){
 			var list = this.method[key];
 			if(goog.isArray(list))
 				return true;

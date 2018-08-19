@@ -155,57 +155,104 @@ Blockly.Blocks['compare'] = {
     var blockA = this.getInputTargetBlock('A');
     var blockB = this.getInputTargetBlock('B');
 
-if(this.id == event.newParentId && event.newInputName == "B")
-	if(dropdown.value_ =='EO'){
-		blockB.setCheck(["Device"]);
-	}else if(dropdown =='EQ'|| dropdown =='LT' || dropdown =='GT'){
-		if(this.getInput('B'))
-			this.getInput('B').setCheck(["c_dev","attribute", "number"]);
-		if(typeof event.element == "string"){
-		}else{
-			if(blockA && blockB){
-				var device = blockB.getFieldValue("device")
-				if(device === "device."){
-					if(blockA.type.includes("c_")&& blockB.type == "dev_attr"){
-						
-						var device = blockA.getFieldValue("type")
-						var device_type = blockA.getFieldValue('type');
-						var length = blockB.inputList.length
-						if(length != 0)
-							for(var i =0; i< length; i++)
-								blockB.removeInput(blockB.inputList[i].name);
-						
-						if(attrMap.isOnlyENUM(device)){
-							var newAttr = attrMap.getENUM_vaules(device);
+	if(this.id == event.newParentId && event.newInputName == "B"){
+		if(dropdown.value_ =='EO'){
+			blockB.setCheck(["Device"]);
+		}else if(dropdown =='EQ'|| dropdown =='LT' || dropdown =='GT'){
+			if(this.getInput('B'))
+				this.getInput('B').setCheck(["c_dev","attribute", "number"]);
+			if(typeof event.element == "string"){
+			}else{
+				if(blockA && blockB){
+					var device = blockB.getFieldValue("device")
+					if(device === "device."){
+						if(blockA.type.includes("c_")&& blockB.type == "dev_attr"){
 
-							blockB.appendDummyInput('dev_attr')
-								  .appendField(new Blockly.FieldLabel(device_type+".", "device"), "device")
-								  .appendField(new Blockly.FieldDropdown(newAttr), 'attribute');
-						}else if(attrMap.isOnlyNUMBER(device)){
-							
-							blockB.appendDummyInput('dev_attr')
-								  .appendField(new Blockly.FieldLabel(device_type+".", "device"), "device")
-								  .appendField(new Blockly.FieldTextInput("0"), "attribute");
-						}else if(attrMap.hasMultiTypeENUM(device)){
-						
-							blockB.appendDummyInput('dev_attr')
-								  .appendField(new Blockly.FieldLabel(device_type+".", "device"), "device")
-								  .appendField(new Blockly.FieldDropdown(attrMap.getMultiType(device)), "attribute_id")
-								  .appendField(new Blockly.FieldDropdown(attrMap.getENUM_vaules(device)), "attribute");
-						
-						}else if(attrMap.hasMultiTypeNUMBER(device)){
-						
-							blockB.appendDummyInput('dev_attr')
-								  .appendField(new Blockly.FieldLabel(device_type+".", "device"), "device")
-								  .appendField(new Blockly.FieldDropdown(attrMap.getMultiType(device)), "attribute_id")
-								  .appendField(new Blockly.FieldTextInput("0"), "attribute");
-						
+							var device = blockA.getFieldValue("type")
+							var device_type = blockA.getFieldValue('type');
+							var length = blockB.inputList.length
+							if(length != 0)
+								for(var i =0; i< length; i++)
+									blockB.removeInput(blockB.inputList[i].name);
+
+							if(attrMap.isOnlyENUM(device)){
+								var newAttr = attrMap.getENUM_vaules(device);
+
+								blockB.appendDummyInput('dev_attr')
+									  .appendField(new Blockly.FieldLabel(device_type+".", "device"), "device")
+									  .appendField(new Blockly.FieldDropdown(newAttr), 'attribute');
+							}else if(attrMap.isOnlyNUMBER(device)){
+
+								blockB.appendDummyInput('dev_attr')
+									  .appendField(new Blockly.FieldLabel(device_type+".", "device"), "device")
+									  .appendField(new Blockly.FieldTextInput("0"), "attribute");
+							}else if(attrMap.hasMultiTypeENUM(device)){
+
+								blockB.appendDummyInput('dev_attr')
+									  .appendField(new Blockly.FieldLabel(device_type+".", "device"), "device")
+									  .appendField(new Blockly.FieldDropdown(attrMap.getMultiType(device)), "attribute_id")
+									  .appendField(new Blockly.FieldDropdown(attrMap.getENUM_vaules(device)), "attribute");
+
+							}else if(attrMap.hasMultiTypeNUMBER(device)){
+
+								blockB.appendDummyInput('dev_attr')
+									  .appendField(new Blockly.FieldLabel(device_type+".", "device"), "device")
+									  .appendField(new Blockly.FieldDropdown(attrMap.getMultiType(device)), "attribute_id")
+									  .appendField(new Blockly.FieldTextInput("0"), "attribute");
+
+							}
 						}
+					}
+				}
+			}
+		}else{
+			
+
+		}
+	}if(event.type=="create"){
+		if(blockA && blockB){
+			var device = blockB.getFieldValue("device")
+			if(device === "device."){
+				if(blockA.type.includes("c_")&& blockB.type == "dev_attr"){
+
+					var device = blockA.getFieldValue("type")
+					var device_type = blockA.getFieldValue('type');
+					var length = blockB.inputList.length
+					if(length != 0)
+						for(var i =0; i< length; i++)
+							blockB.removeInput(blockB.inputList[i].name);
+
+					if(attrMap.isOnlyENUM(device)){
+						var newAttr = attrMap.getENUM_vaules(device);
+
+						blockB.appendDummyInput('dev_attr')
+							  .appendField(new Blockly.FieldLabel(device_type+".", "device"), "device")
+							  .appendField(new Blockly.FieldDropdown(newAttr), 'attribute');
+					}else if(attrMap.isOnlyNUMBER(device)){
+
+						blockB.appendDummyInput('dev_attr')
+							  .appendField(new Blockly.FieldLabel(device_type+".", "device"), "device")
+							  .appendField(new Blockly.FieldTextInput("0"), "attribute");
+					}else if(attrMap.hasMultiTypeENUM(device)){
+
+						blockB.appendDummyInput('dev_attr')
+							  .appendField(new Blockly.FieldLabel(device_type+".", "device"), "device")
+							  .appendField(new Blockly.FieldDropdown(attrMap.getMultiType(device)), "attribute_id")
+							  .appendField(new Blockly.FieldDropdown(attrMap.getENUM_vaules(device)), "attribute");
+
+					}else if(attrMap.hasMultiTypeNUMBER(device)){
+
+						blockB.appendDummyInput('dev_attr')
+							  .appendField(new Blockly.FieldLabel(device_type+".", "device"), "device")
+							  .appendField(new Blockly.FieldDropdown(attrMap.getMultiType(device)), "attribute_id")
+							  .appendField(new Blockly.FieldTextInput("0"), "attribute");
+
 					}
 				}
 			}
 		}
 	}
+
 
     // Disconnect blocks that existed prior to this change if they don't match.
     if (blockA && blockB &&
@@ -233,7 +280,6 @@ function shortName(device){
 	else if(device == "dishwasherOperatingState") new_devName = "dishwasherOper"
 	else if(device == "illuminanceMeasurement") new_devName = "illuminanceMeas"
 	else if(device == "relativeHumidityMeasurement") new_devName = "relativeHumidityMeas"
-	else if(device == "robotCleanerTurboMode") new_devName = "robotCleanerTurboMode"
 	else if(device == "temperatureMeasurement") new_devName = "temperature"
 	else if(device == "thermostatCoolingSetpoint") new_devName = "thermostatCoolSet"
 	else if(device == "thermostatHeatingSetpoint") new_devName = "thermostatHeatSet"
@@ -243,12 +289,29 @@ function shortName(device){
 	return new_devName
 }
 
+function returnName(device){
+	var new_devName = ""
+	if(device == "carbonDioxideMeas") new_devName = "carbonDioxideMeasurement"
+	else if(device == "carbonMonoxideDet")  new_devName = "carbonMonoxideDetector"
+	else if(device == "dishwasherOper") new_devName = "dishwasherOperatingState"
+	else if(device == "illuminanceMeas") new_devName = "illuminanceMeasurement"
+	else if(device == "relativeHumidityMeas") new_devName = "relativeHumidityMeasurement"
+	else if(device == "temperature") new_devName = "temperatureMeasurement"
+	else if(device == "thermostatCoolSet") new_devName = "thermostatCoolingSetpoint"
+	else if(device == "thermostatHeatSet") new_devName = "thermostatHeatingSetpoint"
+	else if(device == "thermostatOper") new_devName = "thermostatOperatingState"
+	else new_devName = device
+
+	return new_devName
+}
+
+
 function condition_block(device){
 	Blockly.SmartThings['c_'+device] = function(block) {
 	  var type = block.getFieldValue('type');
 	  var variable_name = Blockly.SmartThings.variableDB_.getName(block.getFieldText('name'), Blockly.Variables.NAME_TYPE);
 	  // TODO: Assemble SmartThings into code variable.
-	  
+	  type = returnName(type);
 	  var c = new Inputc();
 	  c.device = type;
 	  c.devname =device+variable_name;
@@ -310,7 +373,18 @@ Blockly.Blocks['dev_attr'] = {
 		this.setColour(Block_colour_condition);
         this.setOutput(true, 'attribute');
         var thisBlock = this;
-    }
+    },
+	onchange: function(event) {
+		if( this.type == "dev_attr" && event.type && event.type == "create"){
+			var device = this.getField("device");
+			var attribute = this.getField("attribute");
+			if(device.text_ == "device."){
+
+			}
+		}
+		 
+	}
+
 };
 
 
@@ -428,7 +502,7 @@ Blockly.SmartThings['dev_attr'] = function(block) {
   var dev_attr = new Device_attr();
   dev_attr.dev = dropdown_name
   dev_attr.attr_id = dropdown_attribute_id
-  dev_attr.attr = dropdown_attribute
+  dev_attr.attr = returnName(dropdown_attribute)
   // TODO: Change ORDER_NONE to the correct strength.
   return dev_attr
 
@@ -449,9 +523,13 @@ Blockly.Blocks['number'] = {
 Blockly.SmartThings['number'] = function(block) {
   var text_number = block.getFieldValue('number');
   // TODO: Assemble SmartThings into code variable.
-  var code = text_number;
   // TODO: Change ORDER_NONE to the correct strength.
-  return [code, Blockly.SmartThings.ORDER_NONE];
+
+  var dev_attr = new Device_attr();
+  dev_attr.attr_id = "number"
+  dev_attr.attr = text_number
+  
+  return dev_attr
 };
 
 

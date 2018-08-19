@@ -2,7 +2,7 @@ Blockly.SmartThings['eca'] = function(block) {
 	var value_event = Blockly.SmartThings.valueToCode(block, 'Event', Blockly.SmartThings.ORDER_ATOMIC);
 	var value_condition = Blockly.SmartThings.valueToCode(block, 'Condition', Blockly.SmartThings.ORDER_ATOMIC);
 	var value_action = Blockly.SmartThings.valueToCode(block, 'Action', Blockly.SmartThings.ORDER_ATOMIC);
-  // TODO: Assemble SmartThings into code variable.
+  // TODO: Assemble SmartThings into ECA node.
 		
 	var rule = new ECA(value_event, value_condition, value_action);
 	
@@ -12,8 +12,7 @@ Blockly.SmartThings['eca'] = function(block) {
 Blockly.SmartThings['ea'] = function(block) {
 	var value_event = Blockly.SmartThings.valueToCode(block, 'Event', Blockly.SmartThings.ORDER_ATOMIC);
 	var value_action = Blockly.SmartThings.valueToCode(block, 'Action', Blockly.SmartThings.ORDER_ATOMIC);
-
-  // TODO: Assemble SmartThings into code variable.
+  // TODO: Assemble SmartThings into EA node.
 
 	var condition = new Condition()
 	condition.result = 'true'

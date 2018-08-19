@@ -3964,12 +3964,12 @@ Blockly.Css.CONTENT = [
   '}',
 
   '.blocklyScrollbarHandle {', // ny
-    'fill: #f00;',
+    'fill: #DFF5F9;',
   '}',
 
   '.blocklyScrollbarBackground:hover+.blocklyScrollbarHandle,',
   '.blocklyScrollbarHandle:hover {',
-    'fill: #f00;',
+    'fill: #D7F2F7;',
   '}',
 
   '.blocklyZoom>image {',

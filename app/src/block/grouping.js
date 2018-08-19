@@ -119,7 +119,7 @@ function groupingBlock(color){
 					var p_block = parentBlock.getInputTargetBlock("p")
 					var children_block = this.getChildren()
 					
-					if(p_block.type == "event_handler"){
+					if(p_block.type == "specific_event"){
 						//event
 						var length = children_block.length
 						var deviceList = new Set()
@@ -451,7 +451,7 @@ function groupingBlock(color){
 Blockly.Blocks['any'] = {
   init: function() {
     this.appendValueInput("p")
-        .setCheck("Event_Handler")
+        .setCheck("specific_event")
         .appendField("any");
     this.appendStatementInput("group")
         .setCheck("group");

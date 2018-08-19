@@ -79,16 +79,16 @@
 		<block type="ea"></block>
 	</category>
 	<category name="Event" custom="SAMRT_DEVICE_E" colour ="#5eb7b5"></category>
-	<category name="Codition" custom="SAMRT_DEVICE_C" colour ="#A2CC0D"></category>
+	<category name="Condition" custom="SAMRT_DEVICE_C" colour ="#A2CC0D"></category>
 	<category name="Action" custom="SAMRT_DEVICE_A" colour ="#efcd3f"></category>
-	<category name="State" colour ="#303030">
+	<!--<category name="State" colour ="#303030">
 		<block type="state"></block>
 		<block type="put_state"></block>
 		<block type="math_number"></block>
 		<block type="math_text"></block>
 		<block type="math_arithmetic"></block>
-	
 	</category>
+	!-->
 </xml>
 
 <body onload="all()">
@@ -145,8 +145,7 @@
 	//document.getElementById("click1").click();
 
 	
-	var demoWorkspace = Blockly.inject('blocklyDiv', { 
-														toolbox : toolbox, 
+	var workspace = Blockly.inject('blocklyDiv', { toolbox : toolbox, 
 														collapse : false, 
 														comments : false, 
 														disable : false, 
@@ -163,9 +162,9 @@
 													});
 
 
-	demoWorkspace.registerToolboxCategoryCallback('SAMRT_DEVICE_C', Blockly.devicesFlyoutCallback_condition);
-	demoWorkspace.registerToolboxCategoryCallback('SAMRT_DEVICE_E', Blockly.devicesFlyoutCallback_event);
-	demoWorkspace.registerToolboxCategoryCallback('SAMRT_DEVICE_A', Blockly.devicesFlyoutCallback_action);
+	workspace.registerToolboxCategoryCallback('SAMRT_DEVICE_C', Blockly.devicesFlyoutCallback_condition);
+	workspace.registerToolboxCategoryCallback('SAMRT_DEVICE_E', Blockly.devicesFlyoutCallback_event);
+	workspace.registerToolboxCategoryCallback('SAMRT_DEVICE_A', Blockly.devicesFlyoutCallback_action);
 
 	var demoWorkspace2; 
      

@@ -49,7 +49,7 @@ function device_table(){
 	}*/
 
 	var deviceList = Array.from(deviceSet);
-
+	deviceList.sort()
 	var table = ""
 
 	for(var i =0; i < alphabet.length; i++){	
@@ -68,7 +68,7 @@ function device_table(){
  				while(index < deviceList.length){
 					var device =  deviceList[index];
 					if(device.startsWith(word)){
-						table += '<button onClick="change_devbutton_color(this)" id ="'+device+'" class = "device_but">'+ device+'</button>';
+						table += '<button onClick="change_devbutton_color(this)" id ="'+device+'" class = "device_but">'+ shortName(device)+'</button>';
 						index++;
 					}else
 						break;
@@ -144,7 +144,7 @@ function toolbox_pre(){
 	toolbox_pre += preference();
 	toolbox_pre += preference_option();
 
-	var ecaList = Blockly.SmartThings.workspaceToCode(demoWorkspace);
+	var ecaList = Blockly.SmartThings.workspaceToCode(workspace);
 	var event_block ="";
 	var action_block ="";
 	var condition_block ="";
@@ -208,10 +208,10 @@ function toolbox_pre(){
 }
 
 function change_setbutton_color(x){
-	if( x.style.background == 'rgb(255, 255, 255)' || x.style.background == '' ){
+	if(!comman_uesed.has(x.id)){
 		comman_uesed.push(x.id)
 		x.style.background = 'rgb(238, 238, 238)';
-	}else if(x.style.background == 'rgb(238, 238, 238)'){
+	}else if(comman_uesed.has(x.id)){
 		var index = comman_uesed.indexOf(x.id);
 		if (index > -1) {
 			comman_uesed.splice(index, 1);
@@ -222,10 +222,10 @@ function change_setbutton_color(x){
 }
 function change_devbutton_color(x){
 	var but = document.getElementById(x.id)
-	if( x.style.background == 'rgb(255, 255, 255)' || x.style.background == '' ){
+	if(!selected_dev.has(x.id)){
 		selected_dev.set(x.id, x.id)
 		x.style.background = 'rgb(205, 239, 244)';
-	}else if(x.style.background == 'rgb(205, 239, 244)'){
+	}else if(selected_dev.has(x.id)){
 		selected_dev.delete(x.id)
 		x.style.background = 'rgb(255, 255, 255)';
 		
@@ -253,7 +253,7 @@ function app_info(x){
 function change_connted_color(block){
 
 	if(block.type != "eca" && block.type != "ea"){
-		if(colour)
+		if(colour)//colour
 			if(block.colour_ == Block_colour_event_disconnted)
 				block.setColour(Block_colour_event)
 			else if(block.colour_ == Block_colour_condition_disconnted)
@@ -270,7 +270,7 @@ function change_connted_color(block){
 function change_disconnted_color(block){
 
 	if(block.type != "eca" && block.type != "ea"){
-		if(colour)
+		if(colour)//colour
 			if(block.colour_ == Block_colour_event)
 				block.setColour(Block_colour_event_disconnted)
 			else if(block.colour_ == Block_colour_condition)

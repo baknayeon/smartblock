@@ -171,9 +171,9 @@ function add_timer_xml(xmlList){
 }
 
 function add_eventHander_xml(xmlList){
-	 if (Blockly.Blocks["event_handler"]) {
+	 if (Blockly.Blocks["specific_event"]) {
 		  var blockText = '<xml>' +
-			  '<block type="event_handler">' +
+			  '<block type="specific_event">' +
 			  '</block>' +
 			  '</xml>';
 		  var block = Blockly.Xml.textToDom(blockText).firstChild;
@@ -294,7 +294,7 @@ function addXml(b){
 			  var blockText = '<xml>' +
 				  '<block type="any">' +
 					  '<value name="p">'+
-						  '<block type="event_handler">'+
+						  '<block type="specific_event">'+
 						  '</block>'+
 					  '</value>' +
 					  '<statement name="group">'+
