@@ -208,10 +208,10 @@ function toolbox_pre(){
 }
 
 function change_setbutton_color(x){
-	if(!comman_uesed.has(x.id)){
+	if(!comman_uesed.includes(x.id)){
 		comman_uesed.push(x.id)
 		x.style.background = 'rgb(238, 238, 238)';
-	}else if(comman_uesed.has(x.id)){
+	}else if(comman_uesed.includes(x.id)){
 		var index = comman_uesed.indexOf(x.id);
 		if (index > -1) {
 			comman_uesed.splice(index, 1);
