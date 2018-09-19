@@ -15,6 +15,14 @@ Blockly.devicesFlyoutCallback_event = function(workspace) {
 		  var block = Blockly.Xml.textToDom(blockText).firstChild;
 		 xmlList.push(block)
 	} 
+	if (Blockly.Blocks["e_app"]) {
+		  var blockText = '<xml>' +
+			  '<block type="e_app">' +
+			  '</block>' +
+			  '</xml>';
+		  var block = Blockly.Xml.textToDom(blockText).firstChild;
+		 xmlList.push(block)
+	} 
 	add_eventHander_xml(xmlList);
 	add_groupingBlock_xml("any", Block_colour_event, xmlList);
 	add_schedule_xml(xmlList)

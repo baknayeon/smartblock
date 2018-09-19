@@ -4,7 +4,7 @@ Blockly.SmartThings['eca'] = function(block) {
 	var value_action = Blockly.SmartThings.valueToCode(block, 'Action', Blockly.SmartThings.ORDER_ATOMIC);
   // TODO: Assemble SmartThings into ECA node.
 		
-	var rule = new ECA(value_event, value_condition, value_action);
+	var rule = new ECA(value_event, value_condition, value_action.reverse());
 	
 	return rule;
 };
@@ -17,8 +17,7 @@ Blockly.SmartThings['ea'] = function(block) {
 	var condition = new Condition()
 	condition.result = 'true'
 
-	var rule = new ECA(value_event, condition, value_action);
-	
+	var rule = new ECA(value_event, condition, value_action.reverse());
 	return rule;
 };
 
@@ -51,7 +50,7 @@ function Device_attr(){
 function ECA(statements_event, value_condition, statements_action) {
 	this.event = statements_event;
     this.condition = value_condition;
-    this.actionList = statements_action.reverse();
+    this.actionList = statements_action;
 
 	eca_num++;
 
@@ -143,8 +142,12 @@ function Inpute(e) {
 			this.input = 'input \"'+this.name+'\", \"capability.'+this.device +'\", title:\"'+this.name+'\"' ;
 			var attr_obj = attrMap.getNUMBER(this.device)
 			this.subscribe = "subscribe("+this.name+', \"'+ attr_obj.id+'\", '+ handler_name+")";
-		}else if(this.device == "location"){
+		}else if(this.device == "location" && this.attr != "."){
 			this.subscribe = "subscribe("+this.device+', \"'+ this.attr+'\", '+ handler_name+")";
+		}else if(this.device == "location" && this.attr == "."){
+			this.subscribe = "subscribe("+this.device+', '+ handler_name+")";
+		}else if(this.device == "app"){
+			this.subscribe = "subscribe("+this.device+', '+ handler_name+")";
 		}
 	}else{
 		var handler_name = "rule"+eca_num+"_handler";
@@ -191,6 +194,7 @@ function Event() {
 function Action() {
 	this.devname;
     this.command;
+    this.command_part;
 	this.device;
 	this.option;
 

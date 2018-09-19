@@ -16,6 +16,7 @@
   <script src="help.js"></script>
   <script src="codegenerate.js"></script>
   <script src="toolbox.js"></script>
+  <script src="verification.js"></script>
 
   <script src="block/rule_definer.js"></script>
   <script src="block/rule_generator.js"></script>
@@ -39,6 +40,7 @@
 	var selected_dev = new Map();
 	var attrMap = new AttributeMap(); 	
 	var commMap = new CommandMap();
+	var verificationMap = new VerificationMap();
 	var comman_uesed = new Array;
 
 	mapInit(); 	
@@ -179,7 +181,11 @@
 		_("click2").style.background = "#fff"
 		_("click3").style.background = "#f4f4f4"
 
-		var code = smartApp();
+		var ecaList = Blockly.SmartThings.workspaceToCode(workspace);
+
+		verification(ecaList);
+		var code = smartApp(ecaList);
+
 		_("smartApp_code").textContent = code;
 		hljs.highlightBlock(_("smartApp_code"));
 	}

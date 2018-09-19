@@ -210,7 +210,18 @@ Blockly.Blocks['e_location'] = {
   init: function() {
     this.appendDummyInput()
         .appendField("location")
-        .appendField(new Blockly.FieldDropdown([["mode","mode"], ["position","position"], ["sunset","sunset"], ["sunrise","sunrise"], ["sunriseTime","sunriseTime"], ["sunsetTime","sunsetTime"]]), "attr");
+        .appendField(new Blockly.FieldDropdown([[".","."], ["mode","mode"], ["position","position"], ["sunset","sunset"], ["sunrise","sunrise"], ["sunriseTime","sunriseTime"], ["sunsetTime","sunsetTime"]]), "attr");
+    this.setOutput(true, "Event");
+    this.setColour(Block_colour_event);
+ this.setTooltip("");
+ this.setHelpUrl("");
+  }
+};
+
+Blockly.Blocks['e_app'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("app")
     this.setOutput(true, "Event");
     this.setColour(Block_colour_event);
  this.setTooltip("");
@@ -225,6 +236,16 @@ Blockly.SmartThings['e_location'] = function(block) {
 	var smartevent = new Event();
 	smartevent.device = "location";
 	smartevent.attr = dropdown_attr	
+
+	// TODO: Change ORDER_NONE to the correct strength.
+	return smartevent;
+};
+
+Blockly.SmartThings['e_app'] = function(block) {
+	// TODO: Assemble SmartThings into code variable.
+
+	var smartevent = new Event();
+	smartevent.device = "app";	
 
 	// TODO: Change ORDER_NONE to the correct strength.
 	return smartevent;

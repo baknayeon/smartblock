@@ -1,9 +1,8 @@
-function smartApp(){
+function smartApp(ecaList){
 	var code;
 	var name = document.getElementById("name").value;
 
 	if(name){
-		var ecaList = Blockly.SmartThings.workspaceToCode(workspace);
 	
 		//definition
 		var definition = generating_definition()
@@ -430,3 +429,32 @@ function generating_subscribe(ecaList){
 	return subscribe;
 }
 
+function condition_input(condition, array){
+	
+	if(condition.result){ //true, false, !p
+		if(condition.result != 'true' && condition.result != 'false')
+			condition_input(condition, array)
+			
+	}else{ // p&&p, p||p, f <= fn, m <= n, fϵd  
+		var operator = condition.operator
+		var right = condition.right;
+		var left = condition.left;
+
+		if(operator == '&&' || operator == '||'){
+			condition_input(right, array)
+			condition_input(left, array)
+		}
+		else if(operator == '==' || operator == '<'|| operator == '>' || operator == 'ϵ'){
+			//smartDevice
+			
+			var field_right = right
+			array.push(new Condition(field_right.devname, field_right.device));
+			
+			if(left.constructor == Inputc){ // field =< field
+				var field_left = left
+				array.push(new Condition(field_right.devname, field_right.device));
+			}f
+
+		}
+	}
+}

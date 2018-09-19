@@ -1,3 +1,14 @@
+VerificationMap = function(){   
+    this.set1 = new Object();
+	this.set1["on"] = "off"; 
+	this.set1["off"] = "on"; 
+};   
+VerificationMap.prototype = {  
+    conflict : function(attribute1, attribute2){ 
+		if(this.set1[attribute1] == attribute2)
+			return true;
+	}
+};  
 AttributeMap = function(){   
     this.set1 = new Array();  //only one
     this.set2 = new Array();  //

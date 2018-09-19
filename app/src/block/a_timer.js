@@ -99,10 +99,10 @@ Blockly.SmartThings['a_minutes'] = function(block) {
   var cron = ""
 
   if(value_ != ""){
-	cron = value_.replace("minutes", "*/"+text_time)
+	cron = value_.replace("minutes", text_time)
   }else{
 	if(text_time)
-		cron = "0 "+"*/"+text_time+" hours day month week"
+		cron = "0 "+text_time+" hours day month week"
   }
 
   return cron;
@@ -116,10 +116,10 @@ Blockly.SmartThings['a_hours'] = function(block) {
   var cron = ""
 
   if(value_ != ""){
-	cron = value_.replace("hours", "*/"+text_time)
+	cron = value_.replace("hours", text_time)
   }else{
 	if(text_time)
-		cron = "0 minutes "+"*/"+text_time+" day month week"
+		cron = "0 minutes "+text_time+" day month week"
   }
 
   return cron;
@@ -284,10 +284,16 @@ Blockly.SmartThings['timer'] = function(block) {
 	time = time.replace("day", "*")
 	time = time.replace("month", "*")
 	time = time.replace("week", "?")
+	
+	var time_string = time.split(' ');
+	if(time_string[1] != "*")
+		time_string[1] = "*/"+time_string[1]
+	if(time_string[2] != "*")
+		time_string[2] = "*/"+time_string[2]
   	for(var action of statements_groupingActions){
 		if(!action.timer)	
 			if(!action.timerhandler){
-				action.timer = time
+				action.timer = time_string[0] +" "+ time_string[1] +" "+ time_string[2] +" "+ time_string[3] +" "+ time_string[4] +" "+ time_string[5]
 				action.timerhandler = variable_name
 			}
 	}

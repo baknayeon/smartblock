@@ -5,17 +5,18 @@ function action_block(device){
 		var actionList = Blockly.SmartThings.valueToCode(block, device, Blockly.SmartThings.ORDER_ATOMIC);
 		// TODO: Assemble SmartThings into code variable.
 		var result
-		
 		var smartAction = new Action();
 		if(dropdown_commands){
 			if(commMap.isSingleCommad(device)){
 				smartAction.devname = device+variable_name;
 				smartAction.command= smartAction.devname+'.'+dropdown_commands+'()';
+				smartAction.command_part= dropdown_commands;
 				smartAction.device = device;	
 			}else if(commMap.isSingleMethod(device)){
 				var command = commMap.getMethod(device)
 				smartAction.devname = device+variable_name;
 				smartAction.command= smartAction.devname+'.'+command.id+'('+dropdown_commands+')';
+				smartAction.command_part= dropdown_commands;
 				smartAction.device = device;	
 			}
 
@@ -33,7 +34,6 @@ function action_block(device){
 			else
 				result = smartAction;
 		}
-
 		return result;
 
 	};
