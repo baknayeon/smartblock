@@ -1,35 +1,46 @@
 function verification(ecaLists){
-	var result = [false, false, false]
-	var fac = generatingFac(ecaLists)
+	var result = [false, false, false, false, false]
+
+	var flatecaLists = makeFlat(ecaLists)
+	var fac = generatingFac(flatecaLists)
 	var ruleflow = generatingRuleFlows(fac)
-	
-	for(var index = 0; index < ecaLists.length; index++){
-		var ecaList = ecaLists[index]
+
+	var inconsistencyList = new Array()
+	var redundancyPair = new Array()
+	for(var index = 0; index < flatecaLists.length; index++){
+		var flatecaList = flatecaLists[index]
 		
-		for(var sub = index+1; sub < ecaLists.length; sub++){
-			var ecaList_sub = ecaLists[sub]
+		for(var sub = index+1; sub < flatecaLists.length; sub++){
+			var flatecaList_sub = flatecaLists[sub]
 
-			result[0] = inconsistency(ecaList, ecaList_sub)
-			result[1] = redundancy(ecaList, ecaList_sub)
-
+			if(inconsistency_1(flatecaList, flatecaList_sub))
+				result[0] = true//inconsistencyList.push([index, sub])
+			if(redundancy_1(flatecaList, flatecaList_sub))
+				result[2] = true//redundancyPair.push([index, sub])
 		}
 	}
 
-	result[2] =circularity(fac, ruleflow)
+	if(inconsistency_2(ruleflow, flatecaLists))
+		result[1] = true
+	if(redundancy_2(ruleflow, flatecaLists))
+		result[3] = true
+
+
+	
+
+	result[4] = circularity(fac, ruleflow)
 	
 	return result
 }
 
-function generatingFac(ecaLists){
-
-	var FlatecaLists = makeFlat(ecaLists)
+function generatingFac(flatecaLists){
 
 	var fac = new Array;
-	for(var index = 0; index < FlatecaLists.length; index++){
-		var action =  FlatecaLists[index].actionList	
+	for(var index = 0; index < flatecaLists.length; index++){
+		var action =  flatecaLists[index].actionList	
 
-		for(var sub = 0; sub < FlatecaLists.length; sub++){
-			var event_sub = FlatecaLists[sub].event	
+		for(var sub = 0; sub < flatecaLists.length; sub++){
+			var event_sub = flatecaLists[sub].event	
 			if(action.devname == event_sub.devname){
 				if(action.command_part == event_sub.attr){
 					/*fac[action.command] = {"event" : event_sub,
@@ -74,11 +85,12 @@ function generatingRuleFlows(fac){
 			}
 		}
 	}
+	ruleflow = ruleflow.concat(fac)
 
 	if(init.length > 0){
-		ruleflow = extendingFlow(fac, init)
+		ruleflow = ruleflow.concat(extendingFlow(fac, init))
 	}
-	
+
 	return ruleflow
 }
 
@@ -124,7 +136,7 @@ function circularity(fac, ruleflows){
 	return false
 }
 
-function inconsistency(ecaList, ecaList_sub){
+function inconsistency_1(ecaList, ecaList_sub){
 	var action = ecaList.actionList	
 	var action_sub = ecaList_sub.actionList	
 	
@@ -140,11 +152,11 @@ function inconsistency(ecaList, ecaList_sub){
 	return false
 }
 
-function redundancy(ecaList, ecaList_sub){
+function redundancy_1(ecaList, ecaList_sub){
 	var action = ecaList.actionList	
 	var action_sub = ecaList_sub.actionList	
 	
-	if(intersection(action, action_sub)){//Check the Actions has redundancy
+	if(action.command == action_sub.command){//Check the Actions has redundancy
 		var event = ecaList.event	
 		var event_sub = ecaList_sub.event	
 		var condition = ecaList.condition	
@@ -158,6 +170,81 @@ function redundancy(ecaList, ecaList_sub){
 	return false
 }
 
+
+function inconsistency_2(flowsList, flatecaLists){
+
+	for(ecaList of flatecaLists){ // eca vs flow
+
+		var action = ecaList.actionList	
+		for(flow of flowsList){
+			var action_sub = flatecaLists[flow[flow.length-1]].actionList
+	
+			if(conflict(action, action_sub)){//Check the Actions has Conflict
+				var event = ecaList.event	
+				var event_sub = flatecaLists[flow[0]].event	
+				if(same_event(event, event_sub)){
+					//if(same_condition(condition, condition_sub) || opposite_condition(condition, condition_sub))
+						return true
+				}
+			}
+		}
+
+	}
+
+	for(flow of flowsList){  // flow vs flow
+		var action = flatecaLists[flow[flow.length-1]].actionList
+		for(flow_sub of flowsList){
+			var action_sub = flatecaLists[flow_sub[flow_sub.length-1]].actionList
+			if(conflict(action, action_sub)){//Check the Actions has Conflict
+				var event = flatecaLists[flow[0]].event		
+				var event_sub = flatecaLists[flow_sub[0]].event	
+				if(same_event(event, event_sub)){
+					//if(same_condition(condition, condition_sub) || opposite_condition(condition, condition_sub))
+						return true
+				}
+			}
+		}
+	}
+
+	return false
+
+}
+function redundancy_2(flowsList, flatecaLists){
+
+	for(ecaList of flatecaLists){ // eca vs flow
+
+		var action = ecaList.actionList	
+		for(flow of flowsList){
+			var action_sub = flatecaLists[flow[flow.length-1]].actionList
+			if(action.command == action_sub.command){//Check the Actions has redundancy
+				var event = ecaList.event	
+				var event_sub = flatecaLists[flow[0]].event	
+				if(same_event(event, event_sub)){
+					//if(same_condition(condition, condition_sub) || opposite_condition(condition, condition_sub))
+						return true
+				}
+			}
+		}
+
+	}
+
+	for(flow of flowsList){  // flow vs flow
+		var action = flatecaLists[flow[flow.length-1]].actionList
+		for(flow_sub of flowsList){
+			var action_sub = flatecaLists[flow_sub[flow_sub.length-1]].actionList
+			if(action.command == action_sub.command){//Check the Actions has redundancy
+				var event = flatecaLists[flow[0]].event		
+				var event_sub = flatecaLists[flow_sub[0]].event	
+				if(same_event(event, event_sub)){
+					//if(same_condition(condition, condition_sub) || opposite_condition(condition, condition_sub))
+						return true
+				}
+			}
+		}
+	}
+
+	return false
+}
 
 function same_event(event, event_sub){
 	if(event.devname == event_sub.devname){
@@ -199,25 +286,13 @@ function opposite_condition(condition, condition_sub){
 
 function conflict(action, action_sub){
 	//check same name
-	for(a of action){
-		for(a2 of action_sub){
-			if(a.devname == a2.devname){
-				if(verificationMap.conflict(a.command_part, a2.command_part))
+	//for(a of action){
+	//	for(a2 of action_sub){
+			if(action.devname == action_sub.devname){
+				if(verificationMap.conflict(action.command_part, action_sub.command_part))
 					return true
 			}
-		}
-	}
-	return false
-}
-
-function intersection(action, action_sub){
-	//check same name
-	for(a of action){
-		for(a2 of action_sub){
-			if(a.command == a2.command){
-				return true
-			}
-		}
-	}
+	///	}
+	//}
 	return false
 }
