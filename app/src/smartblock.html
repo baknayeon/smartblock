@@ -171,7 +171,16 @@
 	var demoWorkspace2; 
      
 	function click3(){
-		
+
+		var ecaList = Blockly.SmartThings.workspaceToCode(workspace);
+		if(ecaList != null){
+			verification(ecaList);
+			var code = smartApp(ecaList);
+
+			_("smartApp_code").textContent = code;
+			hljs.highlightBlock(_("smartApp_code"));
+		}
+			
 		_("in_box1").style.display = "none"
 		_("in_box2").style.display = "none"
 		_("in_box3").style.display = ""
@@ -180,14 +189,6 @@
 		_("click1").style.background = "#fff"
 		_("click2").style.background = "#fff"
 		_("click3").style.background = "#f4f4f4"
-
-		var ecaList = Blockly.SmartThings.workspaceToCode(workspace);
-
-		verification(ecaList);
-		var code = smartApp(ecaList);
-
-		_("smartApp_code").textContent = code;
-		hljs.highlightBlock(_("smartApp_code"));
 	}
 
 	function saveCode() {

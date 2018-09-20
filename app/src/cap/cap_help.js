@@ -1,12 +1,35 @@
 VerificationMap = function(){   
-    this.set1 = new Object();
-	this.set1["on"] = "off"; 
-	this.set1["off"] = "on"; 
+    this.conflictObject = new Object();
+	this.conflictObject["on"] = "off"; 
+	this.conflictObject["off"] = "on"; 
+	this.conflictObject["lock"] = "unlock"; 
+	this.conflictObject["unlock"] = "lock"; 
+	this.conflictObject["stop"] = "play"; 
+	this.conflictObject["play"] = "stop"; 
+
+    this.influenceObject = new Object();
+	this.influenceObject["lock"] = "locked"; 
+	this.influenceObject["unlock"] = "unlocked"; 
+	this.influenceObject["mute"] = "muted"; 
+	this.influenceObject["unmute"] = "unmuted"; 
+	this.influenceObject["close"] = "closed"; 
+	this.influenceObject["play"] = "unmuted"; 
+	this.influenceObject["stop"] = "muted"; 
 };   
 VerificationMap.prototype = {  
     conflict : function(attribute1, attribute2){ 
-		if(this.set1[attribute1] == attribute2)
+		if(this.conflictObject[attribute1] == attribute2)
 			return true;
+	},
+    influence: function(action, event){
+		if(action.devname == event.devname){
+			if(action.command_part == event.attr){
+				return true
+			}
+			else if(this.influenceObject[action.command_part] == event.attr)
+				return true;
+
+		}
 	}
 };  
 AttributeMap = function(){   

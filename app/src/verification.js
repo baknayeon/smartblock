@@ -1,37 +1,25 @@
 function verification(ecaLists){
-	var result = [false, false, false, false, false]
+	var result = true
 
 	var flatecaLists = makeFlat(ecaLists)
 	var fac = generatingFac(flatecaLists)
 	var ruleflow = generatingRuleFlows(fac)
 
-	var inconsistencyList = new Array()
-	var redundancyPair = new Array()
-	for(var index = 0; index < flatecaLists.length; index++){
-		var flatecaList = flatecaLists[index]
-		
-		for(var sub = index+1; sub < flatecaLists.length; sub++){
-			var flatecaList_sub = flatecaLists[sub]
-
-			if(inconsistency_1(flatecaList, flatecaList_sub))
-				result[0] = true//inconsistencyList.push([index, sub])
-			if(redundancy_1(flatecaList, flatecaList_sub))
-				result[2] = true//redundancyPair.push([index, sub])
-		}
+	var message =""
+	
+	if(ruleflow != "circularity"){
+		message = inconsistency_redundancy(flatecaLists, ruleflow)
+	}
+	else if(ruleflow == "circularity"){
+		message = "There is circularity between rules!"
 	}
 
-	if(inconsistency_2(ruleflow, flatecaLists))
-		result[1] = true
-	if(redundancy_2(ruleflow, flatecaLists))
-		result[3] = true
-
-
-	
-
-	result[4] = circularity(fac, ruleflow)
-	
+	if(message.length > 0){
+		alert(message);
+	}
 	return result
 }
+
 
 function generatingFac(flatecaLists){
 
@@ -41,16 +29,14 @@ function generatingFac(flatecaLists){
 
 		for(var sub = 0; sub < flatecaLists.length; sub++){
 			var event_sub = flatecaLists[sub].event	
-			if(action.devname == event_sub.devname){
-				if(action.command_part == event_sub.attr){
-					/*fac[action.command] = {"event" : event_sub,
-											"action" : action,
-											"pair" : [index, sub]
-											}*/
-					fac.push([index, sub])
-				}
+			if(verificationMap.influence(action, event_sub)){
+				/*fac[action.command] = {"event" : event_sub,
+										"action" : action,
+										"pair" : [index, sub]
+										}*/
+				fac.push([index, sub])
+				
 			}
-
 		}
 	}
 	return fac
@@ -88,14 +74,18 @@ function generatingRuleFlows(fac){
 	ruleflow = ruleflow.concat(fac)
 
 	if(init.length > 0){
-		ruleflow = ruleflow.concat(extendingFlow(fac, init))
+		var flowResult = extendingFlow(fac, init)
+		if(extendingFlow != "circularity")
+			ruleflow = ruleflow.concat(flowResult)
+		else
+			ruleflow = flowResult
 	}
 
 	return ruleflow
 }
 
 function extendingFlow(fac, flows){
-	var result = []
+	var result = new Array()
 	result = result.concat(flows)
 	var loop = true
 	while(loop){
@@ -108,6 +98,9 @@ function extendingFlow(fac, flows){
 					if(flow[0] != pair[1]){
 						newflow.push(flow.concat(pair[1]))
 						loop = true
+					}else if(flow[0] == pair[1]){
+						return "circularity"
+					
 					}
 				}
 			}
@@ -119,132 +112,89 @@ function extendingFlow(fac, flows){
 
 }
 
-function circularity(fac, ruleflows){
-	ruleflows = ruleflows.reverse()
 
-	for(flow of ruleflows){
-		for(pair of fac){
-			var last_index = flow.length-1
-			if(flow[last_index] == pair[0]){
-				if(flow[0] == pair[1]){
-					return true
-					
+function inconsistency_redundancy(flatecaLists, flowsList){
+	
+	var alert = ""
+
+	for(var index = 0; index < flatecaLists.length; index++){ //eca vs eca
+		var flatecaList = flatecaLists[index]
+		
+		for(var sub = index+1; sub < flatecaLists.length; sub++){
+			var action = flatecaLists[index].actionList	
+			var action_sub = flatecaLists[sub].actionList	
+			
+			if(conflict(action, action_sub)){//Check the Actions has Conflict
+				var event = flatecaLists[index].event	
+				var event_sub = flatecaLists[sub].event	
+				var condition = flatecaLists[index].condition	
+				var condition_sub = flatecaLists[sub].condition	
+				if(same_event(event, event_sub) && same_condition(condition, condition_sub))
+					alert = alert+ "case 1 inconsistency\n"
+			}
+			else if(action.command == action_sub.command){//Check the Actions has redundancy
+				var event = flatecaLists[index].event	
+				var event_sub = flatecaLists[sub].event	
+				var condition = flatecaLists[index].condition	
+				var condition_sub = flatecaLists[sub].condition	
+				if(same_event(event, event_sub)){
+					if(same_condition(condition, condition_sub) || opposite_condition(condition, condition_sub))
+						alert = alert+ "case 1 redundancy\n"
 				}
 			}
 		}
 	}
-	return false
-}
-
-function inconsistency_1(ecaList, ecaList_sub){
-	var action = ecaList.actionList	
-	var action_sub = ecaList_sub.actionList	
 	
-	if(conflict(action, action_sub)){//Check the Actions has Conflict
-		var event = ecaList.event	
-		var event_sub = ecaList_sub.event	
-		var condition = ecaList.condition	
-		var condition_sub = ecaList_sub.condition	
-		if(same_event(event, event_sub) && same_condition(condition, condition_sub))
-			return true
-	}
+	for(var index = 0; index < flowsList.length; index++){
+		var flow = flowsList[index]
+		var action = flatecaLists[flow[flow.length-1]].actionList
 
-	return false
-}
-
-function redundancy_1(ecaList, ecaList_sub){
-	var action = ecaList.actionList	
-	var action_sub = ecaList_sub.actionList	
-	
-	if(action.command == action_sub.command){//Check the Actions has redundancy
-		var event = ecaList.event	
-		var event_sub = ecaList_sub.event	
-		var condition = ecaList.condition	
-		var condition_sub = ecaList_sub.condition	
-		if(same_event(event, event_sub)){
-			if(same_condition(condition, condition_sub) || opposite_condition(condition, condition_sub))
-				return true
-		}
-	}
-
-	return false
-}
-
-
-function inconsistency_2(flowsList, flatecaLists){
-
-	for(ecaList of flatecaLists){ // eca vs flow
-
-		var action = ecaList.actionList	
-		for(flow of flowsList){
-			var action_sub = flatecaLists[flow[flow.length-1]].actionList
-	
+		for(ecaList_sub of flatecaLists){  // eca vs flow
+			var action_sub = ecaList_sub.actionList	
 			if(conflict(action, action_sub)){//Check the Actions has Conflict
-				var event = ecaList.event	
-				var event_sub = flatecaLists[flow[0]].event	
+				var event = flatecaLists[flow[0]].event	
+				var event_sub = ecaList_sub.event	
+				if(same_event(event, event_sub)){
+					//if(same_condition(condition, condition_sub) || opposite_condition(condition, condition_sub))\
+					alert = alert+ "case 2 inconsistency\n"
+				}
+			}
+			else if(action.command == action_sub.command){//Check the Actions has redundancy
+				var event = flatecaLists[flow[0]].event	
+				var event_sub = ecaList_sub.event	
 				if(same_event(event, event_sub)){
 					//if(same_condition(condition, condition_sub) || opposite_condition(condition, condition_sub))
-						return true
+						alert = alert+ "case 2 redundancy\n"
 				}
 			}
 		}
-
-	}
-
-	for(flow of flowsList){  // flow vs flow
-		var action = flatecaLists[flow[flow.length-1]].actionList
-		for(flow_sub of flowsList){
-			var action_sub = flatecaLists[flow_sub[flow_sub.length-1]].actionList
+		for(var sub = index+1; sub < flowsList.length; sub++){// flow vs flow
+			var flow_sub = flowsList[sub]
+			var action_sub = flatecaLists[flow_sub[flow_sub.length-1]].actionList	
 			if(conflict(action, action_sub)){//Check the Actions has Conflict
+				var event = flatecaLists[flow[0]].event		
+				var event_sub = flatecaLists[flow_sub[0]].event		
+				if(same_event(event, event_sub)){
+					//if(same_condition(condition, condition_sub) || opposite_condition(condition, condition_sub))
+						alert = alert+ "case 3 inconsistency\n"
+				}
+			}
+			else if(action.command == action_sub.command){//Check the Actions has redundancy
 				var event = flatecaLists[flow[0]].event		
 				var event_sub = flatecaLists[flow_sub[0]].event	
 				if(same_event(event, event_sub)){
 					//if(same_condition(condition, condition_sub) || opposite_condition(condition, condition_sub))
-						return true
+						alert = alert+ "case 3 redundancy\n"
 				}
 			}
 		}
 	}
 
-	return false
+	return alert
 
 }
-function redundancy_2(flowsList, flatecaLists){
 
-	for(ecaList of flatecaLists){ // eca vs flow
 
-		var action = ecaList.actionList	
-		for(flow of flowsList){
-			var action_sub = flatecaLists[flow[flow.length-1]].actionList
-			if(action.command == action_sub.command){//Check the Actions has redundancy
-				var event = ecaList.event	
-				var event_sub = flatecaLists[flow[0]].event	
-				if(same_event(event, event_sub)){
-					//if(same_condition(condition, condition_sub) || opposite_condition(condition, condition_sub))
-						return true
-				}
-			}
-		}
-
-	}
-
-	for(flow of flowsList){  // flow vs flow
-		var action = flatecaLists[flow[flow.length-1]].actionList
-		for(flow_sub of flowsList){
-			var action_sub = flatecaLists[flow_sub[flow_sub.length-1]].actionList
-			if(action.command == action_sub.command){//Check the Actions has redundancy
-				var event = flatecaLists[flow[0]].event		
-				var event_sub = flatecaLists[flow_sub[0]].event	
-				if(same_event(event, event_sub)){
-					//if(same_condition(condition, condition_sub) || opposite_condition(condition, condition_sub))
-						return true
-				}
-			}
-		}
-	}
-
-	return false
-}
 
 function same_event(event, event_sub){
 	if(event.devname == event_sub.devname){
