@@ -321,7 +321,7 @@ function generating_condition(condition, devList){
 				var pre_left = generating_condition(left, devList)
 				if_condition = " ("+pre_left+") "+operator+" ("+pre_right+") "
 			}
-			else if(operator == '==' || operator == '<'|| operator == '>'){
+			else if(operator == '==' || operator == '<'|| operator == '>' || operator == '!='){
 				//smartDevice
 				if(right.constructor == Inputc){
 					if(left.constructor == Inputc){ // field =< field
@@ -453,7 +453,17 @@ function condition_input(condition, array){
 			if(left.constructor == Inputc){ // field =< field
 				var field_left = left
 				array.push(new Condition(field_right.devname, field_right.device));
-			}f
+			}else if(left.constructor == Device_attr){ // field =< field
+				var attr = left.attr
+				var attr_id = left.attr_id
+				if(attr =="")
+					if(attr_id == "number" ){ // 숫자 입력받고 싶을때.
+						var num = deviceCount.get("number")
+						array.push(new Condition("numbr"+num, "number"));
+						deviceCount.up("number")
+					}
+			}
+
 
 		}
 	}

@@ -78,11 +78,13 @@ Blockly.Blocks['compare'] = {
  init: function() {
     var OPERATORS = this.RTL ? [
           ['=', 'EQ'],
+          ['≠', 'NEQ'],
           ['>', 'LT'],
           ['<', 'GT'],
           ['ϵ', 'EO'],
         ] : [
           ['=', 'EQ'],
+          ['≠', 'NEQ'],
           ['<', 'LT'],
           ['>', 'GT'],
           ['ϵ', 'EO'],
@@ -114,11 +116,13 @@ Blockly.Blocks['compare'] = {
   forgrouping_: function(device, attr) {
     var OPERATORS = this.RTL ? [
           ['=', 'EQ'],
+          ['≠', 'NEQ'],
           ['>', 'LT'],
           ['<', 'GT'],
           ['ϵ', 'EO'],
         ] : [
           ['=', 'EQ'],
+          ['≠', 'NEQ'],
           ['<', 'LT'],
           ['>', 'GT'],
           ['ϵ', 'EO'],
@@ -156,9 +160,9 @@ Blockly.Blocks['compare'] = {
     var blockB = this.getInputTargetBlock('B');
 
 	if(this.id == event.newParentId && event.newInputName == "B"){
-		if(dropdown.value_ =='EO'){
+		if(dropdown.value_ == 'EQ' || dropdown.value_ == 'NEQ' ){
 			blockB.setCheck(["Device"]);
-		}else if(dropdown =='EQ'|| dropdown =='LT' || dropdown =='GT'){
+		}else if(dropdown =='EQ'|| dropdown =='LT' || dropdown =='GT' || dropdown == 'NEQ'){
 			if(this.getInput('B'))
 				this.getInput('B').setCheck(["c_dev","attribute", "number"]);
 			if(typeof event.element == "string"){
@@ -428,13 +432,13 @@ Blockly.SmartThings['compare'] = function(block) {
   // Comparison operator.
   var OPERATORS = {
     'EQ': '==',
+    'NEQ': '!=',
     'LT': '<',
     'GT': '>',
 	'EO': 'ϵ'
   };
   var operator = OPERATORS[block.getFieldValue('OP')];
-  var order = (operator == '==' || operator == '!=') ?
-      Blockly.SmartThings.ORDER_EQUALITY : Blockly.SmartThings.ORDER_RELATIONAL;
+  var order = (operator == '==' || operator == '!=') ?Blockly.SmartThings.ORDER_EQUALITY : Blockly.SmartThings.ORDER_RELATIONAL;
   var argument0 = Blockly.SmartThings.valueToCode(block, 'A', order) || "%grouping";
   var argument1 = Blockly.SmartThings.valueToCode(block, 'B', order) || 0;
   var argument12 = block.getFieldValue('attribute');

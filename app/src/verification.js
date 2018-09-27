@@ -2,8 +2,8 @@ function verification(ecaLists){
 	var result = true
 
 	var flatecaLists = makeFlat(ecaLists)
-	var fac = generatingFac(flatecaLists)
-	var ruleflow = generatingRuleFlows(fac)
+	var face = generatingFace(flatecaLists)
+	var ruleflow = generatingRuleFlows(face)
 
 	var message =""
 	
@@ -11,36 +11,20 @@ function verification(ecaLists){
 		message = inconsistency_redundancy(flatecaLists, ruleflow)
 	}
 	else if(ruleflow == "circularity"){
-		message = "There is circularity between rules!"
+		message = "There is a circularity between rules!"
 	}
 
 	if(message.length > 0){
-		alert(message);
+		alert_verification(message);
+		result = false
 	}
 	return result
 }
 
-
-function generatingFac(flatecaLists){
-
-	var fac = new Array;
-	for(var index = 0; index < flatecaLists.length; index++){
-		var action =  flatecaLists[index].actionList	
-
-		for(var sub = 0; sub < flatecaLists.length; sub++){
-			var event_sub = flatecaLists[sub].event	
-			if(verificationMap.influence(action, event_sub)){
-				/*fac[action.command] = {"event" : event_sub,
-										"action" : action,
-										"pair" : [index, sub]
-										}*/
-				fac.push([index, sub])
-				
-			}
-		}
-	}
-	return fac
+function alert_verification(message){
+	var openWin = window.open("support/app_info.html", 'myWindow', 'scrollbars=no,toolbar=no,resizable=no,width=430px,height=450px,left=400,top=100');
 }
+
 function makeFlat(ecaLists){
 	var result = new Array()
 
@@ -58,41 +42,38 @@ function makeFlat(ecaLists){
 
 }
 
-function generatingRuleFlows(fac){
-	var ruleflow = new Array()
-	var init = new Array()
+function generatingFace(flatecaLists){
 
-	for(pair1 of fac){
-		for(pair2 of fac){
-			if(pair1[1] == pair2[0]){
-				var flow3 = [pair1[0], pair1[1], pair2[1]]	
-				init.push(flow3)
+	var face = new Array;
+	for(var index = 0; index < flatecaLists.length; index++){
+		var action =  flatecaLists[index].actionList	
 
+		for(var sub = 0; sub < flatecaLists.length; sub++){
+			var event_sub = flatecaLists[sub].event	
+			if(verificationMap.influence(action, event_sub)){
+				/*fac[action.command] = {"event" : event_sub,
+										"action" : action,
+										"pair" : [index, sub]
+										}*/
+				face.push([index, sub])
+				
 			}
 		}
 	}
-	ruleflow = ruleflow.concat(fac)
-
-	if(init.length > 0){
-		var flowResult = extendingFlow(fac, init)
-		if(extendingFlow != "circularity")
-			ruleflow = ruleflow.concat(flowResult)
-		else
-			ruleflow = flowResult
-	}
-
-	return ruleflow
+	return face
 }
 
-function extendingFlow(fac, flows){
-	var result = new Array()
-	result = result.concat(flows)
+
+function generatingRuleFlows(face){
+	var ruleflow = new Array()
+	var flows = face
 	var loop = true
+
 	while(loop){
 		loop = false
 		var newflow = new Array()
 		for(flow of flows){
-			for(pair of fac){
+			for(pair of face){
 				var last_index = flow.length-1
 				if(flow[last_index] == pair[0]){
 					if(flow[0] != pair[1]){
@@ -100,18 +81,16 @@ function extendingFlow(fac, flows){
 						loop = true
 					}else if(flow[0] == pair[1]){
 						return "circularity"
-					
 					}
 				}
 			}
 		}
 		flows = newflow
-		result = result.concat(newflow)
+		ruleflow = ruleflow.concat(newflow)
 	}
-	return result
 
+	return ruleflow
 }
-
 
 function inconsistency_redundancy(flatecaLists, flowsList){
 	

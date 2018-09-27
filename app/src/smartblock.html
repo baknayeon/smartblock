@@ -174,21 +174,29 @@
 
 		var ecaList = Blockly.SmartThings.workspaceToCode(workspace);
 		if(ecaList != null){
-			verification(ecaList);
-			var code = smartApp(ecaList);
+			var result_verification = verification(ecaList);
+			if(result_verification){
+				
+				_("in_box1").style.display = "none"
+				_("in_box2").style.display = "none"
+				_("in_box3").style.display = ""
+				_("save_but").style.visibility  = "visible"
+			
+				_("click1").style.background = "#fff"
+				_("click2").style.background = "#fff"
+				_("click3").style.background = "#f4f4f4"
 
-			_("smartApp_code").textContent = code;
-			hljs.highlightBlock(_("smartApp_code"));
+				var code = smartApp(ecaList);
+
+				_("smartApp_code").textContent = code;
+				hljs.highlightBlock(_("smartApp_code"));
+
+			}
+		}else{
+
+			alert("plz build SmartBlock");
 		}
 			
-		_("in_box1").style.display = "none"
-		_("in_box2").style.display = "none"
-		_("in_box3").style.display = ""
-		_("save_but").style.visibility  = "visible"
-	
-		_("click1").style.background = "#fff"
-		_("click2").style.background = "#fff"
-		_("click3").style.background = "#f4f4f4"
 	}
 
 	function saveCode() {

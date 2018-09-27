@@ -167,7 +167,7 @@ function Inputa(a) {
 	}else if(a.name && a.function){
 		this.name = a.name;
 		this.device = a.function;
-		this.input = 'input \"'+this.name+'\", \"'+this.device +'\", title:\"'+this.name+'\"' ;
+		this.input = 'input \"'+this.name+'\", \"'+this.device +'\", title:\"'+this.name+'\", required: false' ;
 	}
 
 }
