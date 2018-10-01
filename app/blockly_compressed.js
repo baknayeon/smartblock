@@ -3293,9 +3293,7 @@ Blockly.FieldVariable.prototype.onItemSelected=function(a,b){
 Blockly.make_newBlock=function(a){
 	var b=Blockly.clipboardXml_,c=Blockly.clipboardSource_;
 	Blockly.copy_(a);
-	//colour=true;
 	a.workspace.paste(Blockly.clipboardXml_);
-	//colour=false;
 	Blockly.clipboardXml_=b;
 	Blockly.clipboardSource_=c
 };
@@ -3623,12 +3621,22 @@ Blockly.Toolbox.TreeControl.prototype.setSelectedItem=function(a){
 Blockly.Toolbox.TreeNode=function(a,b,c,d){goog.ui.tree.TreeNode.call(this,b,c,d);a&&(b=function(){Blockly.svgResize(a.workspace_)},goog.events.listen(a.tree_,goog.ui.tree.BaseNode.EventType.EXPAND,b),goog.events.listen(a.tree_,goog.ui.tree.BaseNode.EventType.COLLAPSE,b))};goog.inherits(Blockly.Toolbox.TreeNode,goog.ui.tree.TreeNode);
 Blockly.Toolbox.TreeNode.prototype.getExpandIconSafeHtml=function(){return goog.html.SafeHtml.create("span")};
 
-var colour=true; //ny
-Blockly.Toolbox.TreeNode.prototype.onClick_=function(a){
-	colour=false;
-	this.hasChildren()&&this.isUserCollapsible_?(this.toggle(),this.select()):this.isSelected()?this.getTree().setSelectedItem(null):this.select();this.updateRow()
-	colour=true;
+var colourBlock=true; //ny
+Blockly.Toolbox.TreeNode.prototype.onClick_ = function(_e) {
+  // Expand icon.
+  colourBlock=false;
+  if (this.hasChildren() && this.isUserCollapsible_) {
+    this.toggle();
+    this.select();
+  } else if (this.isSelected()) {
+    this.getTree().setSelectedItem(null);
+  } else {
+    this.select();
+  }
+  this.updateRow();
+  colourBlock=true;
 };
+
 
 Blockly.Toolbox.TreeNode.prototype.onMouseDown=function(a){};Blockly.Toolbox.TreeNode.prototype.onDoubleClick_=function(a){};
 Blockly.Toolbox.TreeNode.prototype.onKeyDown=function(a){if(this.tree.toolbox_.horizontalLayout_){var b={},c=goog.events.KeyCodes.DOWN,d=goog.events.KeyCodes.UP;b[goog.events.KeyCodes.RIGHT]=this.rightToLeft_?d:c;b[goog.events.KeyCodes.LEFT]=this.rightToLeft_?c:d;b[goog.events.KeyCodes.UP]=goog.events.KeyCodes.LEFT;b[goog.events.KeyCodes.DOWN]=goog.events.KeyCodes.RIGHT;a.keyCode=b[a.keyCode]||a.keyCode}return Blockly.Toolbox.TreeNode.superClass_.onKeyDown.call(this,a)};
@@ -4443,9 +4451,7 @@ Blockly.copy_=function(a){
 Blockly.duplicate_=function(a){
 	var b=Blockly.clipboardXml_,c=Blockly.clipboardSource_;
 	Blockly.copy_(a);
-	colour = true
 	a.workspace.paste(Blockly.clipboardXml_);
-	colour = false
 	Blockly.clipboardXml_=b;
 	Blockly.clipboardSource_=c
 };

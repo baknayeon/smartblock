@@ -224,7 +224,7 @@ function app_info(x){
 function change_connted_color(block){
 
 	if(block.type != "eca" && block.type != "ea"){
-		if(colour)//colour
+		if(colourBlock)//colour
 			if(block.colour_ == Block_colour_event_disconnted)
 				block.setColour(Block_colour_event)
 			else if(block.colour_ == Block_colour_condition_disconnted)
@@ -241,7 +241,7 @@ function change_connted_color(block){
 function change_disconnted_color(block){
 
 	if(block.type != "eca" && block.type != "ea"){
-		if(colour)//colour
+		if(colourBlock)//colour
 			if(block.colour_ == Block_colour_event)
 				block.setColour(Block_colour_event_disconnted)
 			else if(block.colour_ == Block_colour_condition)

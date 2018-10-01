@@ -22,7 +22,8 @@ function verification(ecaLists){
 }
 
 function alert_verification(message){
-	var openWin = window.open("support/app_info.html", 'myWindow', 'scrollbars=no,toolbar=no,resizable=no,width=430px,height=450px,left=400,top=100');
+	var windowObj = window.open("support/verification.html?val=test", 'myWindow', 'scrollbars=no,toolbar=no,resizable=no,width=430px,height=450px,left=400,top=100');
+	alert(message)	
 }
 
 function makeFlat(ecaLists){
@@ -95,15 +96,15 @@ function generatingRuleFlows(face){
 function inconsistency_redundancy(flatecaLists, flowsList){
 	
 	var alert = ""
-
-	for(var index = 0; index < flatecaLists.length; index++){ //eca vs eca
+	//eca vs eca
+	for(var index = 0; index < flatecaLists.length; index++){ 
 		var flatecaList = flatecaLists[index]
 		
 		for(var sub = index+1; sub < flatecaLists.length; sub++){
 			var action = flatecaLists[index].actionList	
 			var action_sub = flatecaLists[sub].actionList	
 			
-			if(conflict(action, action_sub)){//Check the Actions has Conflict
+			if(conflict(action, action_sub)){//Check Conflict
 				var event = flatecaLists[index].event	
 				var event_sub = flatecaLists[sub].event	
 				var condition = flatecaLists[index].condition	
@@ -111,7 +112,7 @@ function inconsistency_redundancy(flatecaLists, flowsList){
 				if(same_event(event, event_sub) && same_condition(condition, condition_sub))
 					alert = alert+ "case 1 inconsistency\n"
 			}
-			else if(action.command == action_sub.command){//Check the Actions has redundancy
+			else if(action.command == action_sub.command){//Check Redundancy
 				var event = flatecaLists[index].event	
 				var event_sub = flatecaLists[sub].event	
 				var condition = flatecaLists[index].condition	
@@ -128,7 +129,8 @@ function inconsistency_redundancy(flatecaLists, flowsList){
 		var flow = flowsList[index]
 		var action = flatecaLists[flow[flow.length-1]].actionList
 
-		for(ecaList_sub of flatecaLists){  // eca vs flow
+		// eca vs flow
+		for(ecaList_sub of flatecaLists){  
 			var action_sub = ecaList_sub.actionList	
 			if(conflict(action, action_sub)){//Check the Actions has Conflict
 				var event = flatecaLists[flow[0]].event	
@@ -147,7 +149,9 @@ function inconsistency_redundancy(flatecaLists, flowsList){
 				}
 			}
 		}
-		for(var sub = index+1; sub < flowsList.length; sub++){// flow vs flow
+
+		// flow vs flow
+		for(var sub = index+1; sub < flowsList.length; sub++){
 			var flow_sub = flowsList[sub]
 			var action_sub = flatecaLists[flow_sub[flow_sub.length-1]].actionList	
 			if(conflict(action, action_sub)){//Check the Actions has Conflict
@@ -204,13 +208,65 @@ function same_event(event, event_sub){
 }
 
 function same_condition(condition, condition_sub){
-	condition
-	return true
+	var result = 0
+
+
+	if(condition.constructor == Grouping && condition_sub.constructor == Grouping){
+
+		
+	}else if(condition.constructor != Grouping && condition_sub.constructor != Grouping){
+
+		if(condition.result && condition_sub.result){ //true, false
+			if(condition.result == condition_sub.result){
+				if(condition.result == 'true' || condition.result == 'false'){
+					result = 1
+				}
+			}
+		}else if( !condition.result && !condition_sub.result){  // p&&p, p||p, !p, f <= fn, m <= n, fϵd  
+			var operator = condition.operator;
+			var right = condition.right;
+			var left = condition.left;
+			
+			var operator_sub = condition_sub.operator;
+			var right_sub = condition_sub.right;
+			var left_sub = condition_sub.left;
+
+			if(operator == operator_sub){
+				if(operator == '&&' || operator == '||'){
+					var right = same_condition(condition.right, condition_sub.right)
+					var left = same_condition(condition.left, condition_sub.left)
+					if(right == 1 && left == 1){
+						result = 1	
+					}else{ // swap
+						right = same_condition(condition.right, condition_sub.left)
+						left = same_condition(condition.left, condition_sub.right)
+						if(right == 1 && left == 1)
+							result = 1
+					}
+				
+				}else if(operator == '!'){
+					result = same_condition(condition.right, condition_sub.right)
+					
+				}else if(operator == '==' || operator == '!='){
+					if(right.devname == right_sub.devname && left.attr == left_sub.attr)
+						result = 1
+
+				}else if(operator == '<'|| operator == '>' ){
+					result = 1
+
+				}
+			}
+		}
+	}
+	return result
 }
 
+
 function opposite_condition(condition, condition_sub){
+	var result = false
 	condition
-	return true
+	condition_sub
+	return result
 }
 
 function conflict(action, action_sub){
