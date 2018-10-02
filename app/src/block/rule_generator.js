@@ -30,21 +30,29 @@ function Page(){
 function Condition(){
 	this.right;
 	this.left;
-	this.operator;
+	this.operator;	
 	this.result;
 }
 
 
-function Inputc(){
+function Inputc(name, device){
 	this.device;
 	this.devname;
 	this.input;
+	
+	if(name && device){
+		this.devname = name;
+		this.device = device;
+	}
 }
 
-function Device_attr(){
+function Attribute(){
 	this.dev;
 	this.attr_id;
 	this.attr;
+}
+function number(){
+	this.value;
 }
 
 function ECA(statements_event, value_condition, statements_action) {
@@ -205,11 +213,6 @@ function Action() {
 	this.args = new Array();
 }
 
-
-function Condition(name, device) {
-	this.devname = name;
- 	this.device = device;
-}
 
 
 function Args() {

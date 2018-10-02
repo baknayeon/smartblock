@@ -321,7 +321,7 @@ function generating_condition(condition, devList){
 				var pre_left = generating_condition(left, devList)
 				if_condition = " ("+pre_left+") "+operator+" ("+pre_right+") "
 			}
-			else if(operator == '==' || operator == '<'|| operator == '>' || operator == '!='){
+			else if(operator == '==' || operator == '<'|| operator == '>' || operator == '!=' || operator == '≤'|| operator == '≥'){
 				//smartDevice
 				if(right.constructor == Inputc){
 					if(left.constructor == Inputc){ // field =< field
@@ -338,7 +338,7 @@ function generating_condition(condition, devList){
 							if_condition = right.devname+'.currentValue("'+left_attr.id+'")' + operator +field_left.devname+'.currentValue("'+right_attr.id+'")'
 						}
 
-					}else if (left.constructor == Device_attr){// field =< n(attr)
+					}else if (left.constructor == Attribute){// field =< n(attr)
 						var field = right
 						var dev_attr = left
 
@@ -386,6 +386,10 @@ function generating_condition(condition, devList){
 			}else if(operator == 'ϵ'){//field ϵ device
 				var field = right
 				if_condition = field.devname+'.hasCapability("'+left+'")'
+
+			}else if(operator == '∉'){//field ∉ device
+				var field = right
+				if_condition = "!("+field.devname+'.hasCapability("'+left+'"))'
 
 			}
 		}
@@ -444,26 +448,26 @@ function condition_input(condition, array){
 			condition_input(right, array)
 			condition_input(left, array)
 		}
-		else if(operator == '==' || operator == '<'|| operator == '>' || operator == 'ϵ'){
+		else if(operator == '==' || operator == '<'|| operator == '>' || operator == '!=' || operator == '≤'|| operator == '≥'){
 			//smartDevice
 			
 			var field_right = right
-			array.push(new Condition(field_right.devname, field_right.device));
+			array.push(new Inputc(field_right.devname, field_right.device));
 			
-			if(left.constructor == Inputc){ // field =< field
+			if(left.constructor == Inputc){ // f =< f
 				var field_left = left
-				array.push(new Condition(field_right.devname, field_right.device));
-			}else if(left.constructor == Device_attr){ // field =< field
+				array.push(new Inputc(field_right.devname, field_right.device));
+			}else if(left.constructor == Attribute){ // f =< n(attribute)
 				var attr = left.attr
 				var attr_id = left.attr_id
-				if(attr =="")
-					if(attr_id == "number" ){ // 숫자 입력받고 싶을때.
-						var num = deviceCount.get("number")
-						array.push(new Condition("numbr"+num, "number"));
-						deviceCount.up("number")
-					}
+				
+			}else if(left.constructor == number){ //  f =< n(number)
+				if(left.value =="")// 숫자 입력받고 싶을때.
+					var num = deviceCount.get("number")
+					array.push(new Inputc("numbr"+num, "number"));
+					deviceCount.up("number")
+				
 			}
-
 
 		}
 	}

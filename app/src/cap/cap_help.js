@@ -2,10 +2,12 @@ VerificationMap = function(){
     this.conflictObject = new Object();
 	this.conflictObject["on"] = "off"; 
 	this.conflictObject["off"] = "on"; 
-	this.conflictObject["lock"] = "unlock"; 
-	this.conflictObject["unlock"] = "lock"; 
+	this.conflictObject["locked"] = "unlocked"; 
+	this.conflictObject["unlocked"] = "locked"; 
 	this.conflictObject["stop"] = "play"; 
 	this.conflictObject["play"] = "stop"; 
+	this.conflictObject["present"] = "not present"; 
+	this.conflictObject["not present"] = "present"; 
 
     this.influenceObject = new Object();
 	this.influenceObject["lock"] = "locked"; 
@@ -63,7 +65,7 @@ AttributeMap.prototype = {
 	putENUM : function(key, attr){  
 		setDevice(key);
 		if(attr.value != null){
-			if(attr.constructor == Attribute){
+			if(attr.constructor == Attributes){
 				this.ENUM[key] = attr; 
 			}else if(goog.isArray(attr)){
 				this.ENUM[key] = attr; 
@@ -74,7 +76,7 @@ AttributeMap.prototype = {
 	putNUMBER : function(key, attr){   
 		setDevice(key);
 		if(attr.value == null){
-			if(attr.constructor == Attribute){
+			if(attr.constructor == Attributes){
 				this.NUMBER[key] = attr; 
 			}else if(goog.isArray(attr)){
 				this.NUMBER[key] = attr; 
@@ -133,7 +135,7 @@ AttributeMap.prototype = {
 				}
 			}
 		}
-    	 return new Attribute(id, newAttr)
+    	 return new Attributes(id, newAttr)
     },
     getENUM_vaulesById : function(key, id){
 		var newAttr = [];
@@ -245,9 +247,10 @@ CommandMap.prototype = {
     }
 }; 
 
-function Attribute(i, v){
+function Attributes(i, v){
 	this.id = i;
 	this.value = v;
+	
 }
 
 function Command_method(i, t, v){

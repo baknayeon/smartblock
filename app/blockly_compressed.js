@@ -3365,11 +3365,13 @@ Blockly.Generator.prototype.blockToCode=function(a){
 
 function isit(b){
 	// ny
-	if(b.constructor == Condition || b.constructor == Inputc ||b.constructor == Device_attr ||b.constructor == Args )
+	if(b.constructor == Condition || b.constructor == Inputc ||b.constructor == Attribute ||b.constructor == Args )
 		return true
 	else if (b.constructor == Event)
 		return true
 	else if (b.constructor == Grouping)
+		return true
+	else if (b.constructor == Number)
 		return true
 	else if(goog.isArray(b)){
 		var action = b[0]

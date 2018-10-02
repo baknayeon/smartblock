@@ -1,109 +1,109 @@
 function mapInit(){ 
     try{ 
-        attrMap.putENUM("accelerationSensor", new Attribute("acceleration", ["active", "inactive"])); 
+        attrMap.putENUM("accelerationSensor", new Attributes("acceleration", ["active", "inactive"])); 
 		//actuator
-        attrMap.putENUM("airConditionerMode", new Attribute("airConditionerMode", ["auto", "cool", "dry", "coolClean", "dryClean", "fanOnly", "heat", "heatClean", "notSupported"])); 
-		attrMap.putNUMBER("airQualitySensor", new Attribute("airQuality", null)); 
-        attrMap.putENUM("alarm", new Attribute("alarm", ["both", "off", "siren", "strobe"])); 
-        attrMap.putENUM("audioMute", new Attribute("mute", ["muted", "unmuted"])); 
+        attrMap.putENUM("airConditionerMode", new Attributes("airConditionerMode", ["auto", "cool", "dry", "coolClean", "dryClean", "fanOnly", "heat", "heatClean", "notSupported"])); 
+		attrMap.putNUMBER("airQualitySensor", new Attributes("airQuality", null)); 
+        attrMap.putENUM("alarm", new Attributes("alarm", ["both", "off", "siren", "strobe"])); 
+        attrMap.putENUM("audioMute", new Attributes("mute", ["muted", "unmuted"])); 
 		//audioNotification
 		//audioTrackData
-		attrMap.putNUMBER("audioVolume", new Attribute("volume", null)); 
+		attrMap.putNUMBER("audioVolume", new Attributes("volume", null)); 
 
-		attrMap.putNUMBER("battery", new Attribute("battery", null)); 
-		attrMap.putENUM("beacon", new Attribute("battery",["not present", "present"])); 
+		attrMap.putNUMBER("battery", new Attributes("battery", null)); 
+		attrMap.putENUM("beacon", new Attributes("battery",["not present", "present"])); 
 		//bridge
-		attrMap.putENUM("bulb", new Attribute("switch", ["off", "on"])); 
-		attrMap.putENUM("button", new Attribute("button", ["held", "pushed"])); 
-		attrMap.putNUMBER("button", new Attribute("numberOfButtons", null)); 
+		attrMap.putENUM("bulb", new Attributes("switch", ["off", "on"])); 
+		attrMap.putENUM("button", new Attributes("button", ["held", "pushed"])); 
+		attrMap.putNUMBER("button", new Attributes("numberOfButtons", null)); 
 
-        attrMap.putNUMBER("carbonDioxideMeasurement",  new Attribute("carbonDioxide", null));
-        attrMap.putENUM("carbonMonoxideDetector", new Attribute("carbonMonoxide", ["clear", "detected", "tested"])); 
-		attrMap.putNUMBER("button", new Attribute("numberOfButtons", null)); 
-		attrMap.putNUMBER("colorTemperature", new Attribute("colorTemperature", null));
+        attrMap.putNUMBER("carbonDioxideMeasurement",  new Attributes("carbonDioxide", null));
+        attrMap.putENUM("carbonMonoxideDetector", new Attributes("carbonMonoxide", ["clear", "detected", "tested"])); 
+		attrMap.putNUMBER("button", new Attributes("numberOfButtons", null)); 
+		attrMap.putNUMBER("colorTemperature", new Attributes("colorTemperature", null));
 		//color
-        attrMap.putENUM("colorMode", new Attribute("colorMode", ["color", "colorTemperature", "other"])); 
+        attrMap.putENUM("colorMode", new Attributes("colorMode", ["color", "colorTemperature", "other"])); 
 		//configuration
-        attrMap.putENUM("consumable", new Attribute("consumableStatus", ["good", "maintenance_required", "missing", "order", "replace"])); 
-		attrMap.putENUM("contactSensor", new Attribute("contact", ["closed", "open"])); 
+        attrMap.putENUM("consumable", new Attributes("consumableStatus", ["good", "maintenance_required", "missing", "order", "replace"])); 
+		attrMap.putENUM("contactSensor", new Attributes("contact", ["closed", "open"])); 
 
 		//demandResponseLoadControl
-        attrMap.putENUM("dishwasherMode", new Attribute("dishwasherMode", ["auto", "quick", "rinse", "dry"]));
+        attrMap.putENUM("dishwasherMode", new Attributes("dishwasherMode", ["auto", "quick", "rinse", "dry"]));
 		//dishwasherOperatingState
-		attrMap.putENUM("doorControl", new Attribute("door", ["closed", "closing", "open", "opening", "unknown"]));
-        attrMap.putENUM("dryerMode", new Attribute("dryerMode", ["regular", "lowHeat", "highHeat"]));
+		attrMap.putENUM("doorControl", new Attributes("door", ["closed", "closing", "open", "opening", "unknown"]));
+        attrMap.putENUM("dryerMode", new Attributes("dryerMode", ["regular", "lowHeat", "highHeat"]));
 		//dryerOperatingState
         //dustSensor
 
-		attrMap.putNUMBER("energyMeter", new Attribute("energy", null));
+		attrMap.putNUMBER("energyMeter", new Attributes("energy", null));
 		//estimatedTimeOfArrival
 		//execute
 
-		attrMap.putNUMBER("fanSpeed", new Attribute("fanSpeed", null));
-        attrMap.putENUM("filterStatus", new Attribute("filterStatus", ["normal", "replace"]));
-        attrMap.putENUM("garageDoorControl", new Attribute("door", ["closed", "closing", "open", "opening", "unknown"]));
+		attrMap.putNUMBER("fanSpeed", new Attributes("fanSpeed", null));
+        attrMap.putENUM("filterStatus", new Attributes("filterStatus", ["normal", "replace"]));
+        attrMap.putENUM("garageDoorControl", new Attributes("door", ["closed", "closing", "open", "opening", "unknown"]));
 		//geolocation
 		//holdableButton
-		attrMap.putNUMBER("illuminanceMeasurement", new Attribute("illuminance", null));
+		attrMap.putNUMBER("illuminanceMeasurement", new Attributes("illuminance", null));
 		//imageCapture
 		//indicator
 		//infraredLevel
-        attrMap.putENUM("light", new Attribute("switch", ["off", "on"])); 
+        attrMap.putENUM("light", new Attributes("switch", ["off", "on"])); 
 		//lockOnly
-        attrMap.putENUM("lock", new Attribute("lock", ["locked", "unknown", "unlocked", "unlocked with timeout"])); 
+        attrMap.putENUM("lock", new Attributes("lock", ["locked", "unknown", "unlocked", "unlocked with timeout"])); 
 		//mediaController
 		//mediaInputSource
 		//mediaPlaybackRepeat
 		//mediaPlaybackShuffle
-        attrMap.putENUM("mediaPlayback", new Attribute("playbackStatus", ["pause", "play", "stop"])); 
+        attrMap.putENUM("mediaPlayback", new Attributes("playbackStatus", ["pause", "play", "stop"])); 
 		//mediaPresets
 		//mediaTrackControl
 		//momentary
-        attrMap.putENUM("motionSensor", new Attribute("motion", ["active", "inactive"])); 
-        attrMap.putENUM("musicPlayer", new Attribute("mute", ["muted", "unmuted"])); 
+        attrMap.putENUM("motionSensor", new Attributes("motion", ["active", "inactive"])); 
+        attrMap.putENUM("musicPlayer", new Attributes("mute", ["muted", "unmuted"])); 
 		//notification
-		attrMap.putNUMBER("odorSensor", new Attribute("odorLevel", null));
-        attrMap.putENUM("outlet", new Attribute("switch", ["off", "on"])); 
-        attrMap.putENUM("ovenMode", new Attribute("ovenMode", ["heating", "grill", "warming", "defrosting"])); 
+		attrMap.putNUMBER("odorSensor", new Attributes("odorLevel", null));
+        attrMap.putENUM("outlet", new Attributes("switch", ["off", "on"])); 
+        attrMap.putENUM("ovenMode", new Attributes("ovenMode", ["heating", "grill", "warming", "defrosting"])); 
 		//ovenOperatingState
-		attrMap.putNUMBER("ovenSetpoint", new Attribute("ovenSetpoint", null));
+		attrMap.putNUMBER("ovenSetpoint", new Attributes("ovenSetpoint", null));
 		//pHMeasurement
 		//polling
 		//powerConsumptionReport
-		attrMap.putNUMBER("powerMeter", new Attribute("power", null));
-        attrMap.putENUM("powerSource", new Attribute("powerSource", ["battery", "dc", "mains", "unknown"]));
-        attrMap.putENUM("presenceSensor", new Attribute("presence", ["present", "not present"]));
-        attrMap.putENUM("rapidCooling", new Attribute("rapidCooling", ["off", "on"]));
+		attrMap.putNUMBER("powerMeter", new Attributes("power", null));
+        attrMap.putENUM("powerSource", new Attributes("powerSource", ["battery", "dc", "mains", "unknown"]));
+        attrMap.putENUM("presenceSensor", new Attributes("presence", ["present", "not present"]));
+        attrMap.putENUM("rapidCooling", new Attributes("rapidCooling", ["off", "on"]));
 		//refresh
-		attrMap.putNUMBER("refrigerationSetpoint", new Attribute("refrigerationSetpoint", null));
-		attrMap.putNUMBER("relativeHumidityMeasurement", new Attribute("humidity", null));
+		attrMap.putNUMBER("refrigerationSetpoint", new Attributes("refrigerationSetpoint", null));
+		attrMap.putNUMBER("relativeHumidityMeasurement", new Attributes("humidity", null));
 		//relaySwitch
-        attrMap.putENUM("robotCleanerCleaningMode", new Attribute("robotCleanerCleaningMode", ["auto", "part", "repeat", "manual", "stop", "map"]));
-        attrMap.putENUM("robotCleanerMovement", new Attribute("robotCleanerMovement", ["homing", "idle", "charging", "alarm", "powerOff", "reserve", "point", "after", "cleaning"]));
+        attrMap.putENUM("robotCleanerCleaningMode", new Attributes("robotCleanerCleaningMode", ["auto", "part", "repeat", "manual", "stop", "map"]));
+        attrMap.putENUM("robotCleanerMovement", new Attributes("robotCleanerMovement", ["homing", "idle", "charging", "alarm", "powerOff", "reserve", "point", "after", "cleaning"]));
         //robotCleanerTurboMode
 		//sensor
 		//shockSensor
 		//signalStrength
 		//sleepSensor
-		attrMap.putENUM("smokeDetector", new Attribute("smoke",  ["clear", "detected", "tested"])); 
+		attrMap.putENUM("smokeDetector", new Attributes("smoke",  ["clear", "detected", "tested"])); 
 		//soundPressureLevel
-		attrMap.putENUM("soundSensor", new Attribute("smoke",  ["detected", "notdetected", ])); 
+		attrMap.putENUM("soundSensor", new Attributes("smoke",  ["detected", "notdetected", ])); 
 		//speechRecognition
 		//speechSynthesis
 		//here
-		attrMap.putNUMBER("switchLevel", new Attribute("level"), null);
-        attrMap.putENUM("switch", new Attribute("switch",["off", "on"])); 
-		attrMap.putNUMBER("temperatureMeasurement", new Attribute("temperature"), null);
+		attrMap.putNUMBER("switchLevel", new Attributes("level"), null);
+        attrMap.putENUM("switch", new Attributes("switch",["off", "on"])); 
+		attrMap.putNUMBER("temperatureMeasurement", new Attributes("temperature"), null);
 		//thermostatCoolingSetpoint
 		//thermostatHeatingSetpoint
-        attrMap.putENUM("thermostatFanMode", new Attribute("thermostatFanMode",["auto", "circulate", "followschedule", "on"])); 
-        attrMap.putENUM("thermostatMode", new Attribute("thermostatMode", ["auto", "eco", "rushhour", "cool", "emergencyheat", "heat", "off"])); 
-        attrMap.putENUM("thermostatOperatingState", new Attribute("thermostatOperatingState", ["cooling", "fan only", "heating", "idle", "pending cool", "pending heat", "vent economizer"])); 
-		attrMap.putNUMBER("thermostatSetpoint", new Attribute("thermostatSetpoint"), null);
-		attrMap.putENUM("valve", new Attribute("valve", ["closed", "open"])); 
-		attrMap.putENUM("washerMode", new Attribute("washerMode", ["regular", "heavy", "rinse", "spinDry"])); 
-		attrMap.putENUM("washerOperatingState", new Attribute("machineState", ["pause", "run", "stop"])); 
-		attrMap.putENUM("waterSensor", new Attribute("water", ["dry", "wet"])); 
+        attrMap.putENUM("thermostatFanMode", new Attributes("thermostatFanMode",["auto", "circulate", "followschedule", "on"])); 
+        attrMap.putENUM("thermostatMode", new Attributes("thermostatMode", ["auto", "eco", "rushhour", "cool", "emergencyheat", "heat", "off"])); 
+        attrMap.putENUM("thermostatOperatingState", new Attributes("thermostatOperatingState", ["cooling", "fan only", "heating", "idle", "pending cool", "pending heat", "vent economizer"])); 
+		attrMap.putNUMBER("thermostatSetpoint", new Attributes("thermostatSetpoint"), null);
+		attrMap.putENUM("valve", new Attributes("valve", ["closed", "open"])); 
+		attrMap.putENUM("washerMode", new Attributes("washerMode", ["regular", "heavy", "rinse", "spinDry"])); 
+		attrMap.putENUM("washerOperatingState", new Attributes("machineState", ["pause", "run", "stop"])); 
+		attrMap.putENUM("waterSensor", new Attributes("water", ["dry", "wet"])); 
 		//44
 		attrMap.generateGroup();
 

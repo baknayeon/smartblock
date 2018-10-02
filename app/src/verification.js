@@ -22,8 +22,7 @@ function verification(ecaLists){
 }
 
 function alert_verification(message){
-	var windowObj = window.open("support/verification.html?val=test", 'myWindow', 'scrollbars=no,toolbar=no,resizable=no,width=430px,height=450px,left=400,top=100');
-	alert(message)	
+	var windowObj = window.open("support/alert_verification.html?a="+message+"&b="+message.length, 'myWindow', 'scrollbars=no,toolbar=no,resizable=no,width=430px,height=450px,left=400,top=100');
 }
 
 function makeFlat(ecaLists){
@@ -232,28 +231,61 @@ function same_condition(condition, condition_sub){
 			var left_sub = condition_sub.left;
 
 			if(operator == operator_sub){
-				if(operator == '&&' || operator == '||'){
+				if(operator == '&&'){
 					var right = same_condition(condition.right, condition_sub.right)
 					var left = same_condition(condition.left, condition_sub.left)
-					if(right == 1 && left == 1){
-						result = 1	
+					if(right > 0 && left > 0){
+						result = right + left 	
 					}else{ // swap
 						right = same_condition(condition.right, condition_sub.left)
 						left = same_condition(condition.left, condition_sub.right)
-						if(right == 1 && left == 1)
-							result = 1
+						if(right > 0 && left > 0)
+							result = right + left 	
+					}
+				
+				}else if(operator == '||'){
+					var right2right = same_condition(condition.right, condition_sub.right)
+					if(right2right > 0){
+						result = right2right 		
+					}else{
+						var left2left = same_condition(condition.left, condition_sub.left)
+						if(left2left > 0){
+							result = left2left 		
+						}else{
+							var right2left = same_condition(condition.right, condition_sub.left)
+							if(right2left > 0){
+								result = right2left 		
+							}else{
+								var left2right = same_condition(condition.left, condition_sub.right)
+								if(left2right > 0)
+									result = left2right 		
+							}
+						}
 					}
 				
 				}else if(operator == '!'){
 					result = same_condition(condition.right, condition_sub.right)
 					
-				}else if(operator == '==' || operator == '!='){
-					if(right.devname == right_sub.devname && left.attr == left_sub.attr)
-						result = 1
-
-				}else if(operator == '<'|| operator == '>' ){
-					result = 1
-
+				}else if(right.devname == right_sub.devname && right.constructor == Inputc){// alway be f(inputc) in right ;f < f, f <= n, m <= n, fϵd   
+					if(left.constructor == Inputc && left_sub.constructor == Inputc){ // f ? f
+						if(left.devname == left_sub.devname){
+							result = 1
+						}
+					}else if(left.constructor == Attribute && left_sub.constructor == Attribute){ // f ? n(attribute)
+						if(left.attr == left_sub.attr && left.dev == left_sub.dev)
+							result = 1
+							
+					}else if(left.constructor == Number && left_sub.constructor == Number){  // f ? n(number)
+						if(left.value == left_sub.value)
+							result = 1
+						else if(Math.abs(left.value - left_sub.value) <= 5)
+							result = 0.5 //warning
+					}else{ //f ? d 
+						if(left == left_sub)
+							result = 1
+							
+						
+					}
 				}
 			}
 		}
@@ -263,12 +295,137 @@ function same_condition(condition, condition_sub){
 
 
 function opposite_condition(condition, condition_sub){
-	var result = false
-	condition
-	condition_sub
+	var result = 0
+
+
+	if(condition.constructor == Grouping && condition_sub.constructor == Grouping){
+
+		
+	}else if(condition.constructor != Grouping && condition_sub.constructor != Grouping){
+
+		if(condition.result && condition_sub.result){ //true, false
+			if( (condition.result == 'true' && condition_sub.result== 'false') || 
+				(condition.result == 'false' && condition_sub.result== 'true')		){
+					result = 1
+			}
+		}else if( !condition.result && !condition_sub.result){  // p&&p, p||p, !p, f <= fn, m <= n, fϵd  
+			var operator = condition.operator;
+			var right = condition.right;
+			var left = condition.left;
+			
+			var operator_sub = condition_sub.operator;
+			var right_sub = condition_sub.right;
+			var left_sub = condition_sub.left;
+
+			if(operator == "!" || operator_sub == "!"){//not and the other
+				if(operator == "!" && operator_sub != "!"){ //not and the other fϵd  
+					result = same_condition(right, condition_sub)
+				}else if(operator != "!" && operator_sub == "!"){//the other and not
+					result = same_condition(condition, right_sub)
+				}else{//not and not 
+					result = opposite_condition(right, right_sub)
+				}
+			}else if(operator == "||" && operator_sub == "||"){
+				var right2right = opposite_condition(condition.right, condition_sub.right)
+				if(right2right > 0){
+					result = right2right 		
+				}else{
+					var left2left = opposite_condition(condition.left, condition_sub.left)
+					if(left2left > 0){
+						result = left2left 		
+					}else{
+						var right2left = opposite_condition(condition.right, condition_sub.left)
+						if(right2left > 0){
+							result = right2left 		
+						}else{
+							var left2right = opposite_condition(condition.left, condition_sub.right)
+							if(left2right > 0)
+								result = left2right 		
+						}
+					}
+				}
+					
+				//??
+
+			}else{// p&&p, p||p, f <= fn, m <= n, fϵd 
+				if(opposite_Logicaloperator(operator, operator_sub)){// p&&p, p||p
+					//if(operator == '&&' || operator == '||'){
+						var right = opposite_condition(condition.right, condition_sub.right)
+						var left = opposite_condition(condition.left, condition_sub.left)
+						if(right == 1 && left == 1){
+							result = 1	
+						}else{ // swap
+							right = opposite_condition(condition.right, condition_sub.left)
+							left = opposite_condition(condition.left, condition_sub.right)
+							if(right == 1 && left == 1)
+								result = 1
+						}
+					//}
+				}else if(right.devname == right_sub.devname && right.constructor == Inputc){// alway be f(inputc) in right ;f < f, f <= n, m <= n, fϵd  
+					if(left.constructor == Inputc && left_sub.constructor == Inputc){ // f ? f
+						if(left.devname == left_sub.devname){
+							if(opposite_operator(operator, operator_sub)){ 
+								result = 1
+							}
+						}
+					}else if(left.constructor == Attribute && left_sub.constructor == Attribute){ // f ? n(attribute)
+						if(left.attr == left_sub.attr && left.dev == left_sub.dev){ 
+							if(opposite_operator(operator, operator_sub))
+									result = 1
+							
+					  	}else if(verificationMap.conflict(left.attr, left_sub.attr)){ //semantic
+					  		if(operator == operator_sub)
+					  			result = 1
+					  	}
+					}else if(left.constructor == Number && left_sub.constructor == Number){  // f ? n(number)
+						if(left.value == left_sub.value)
+							if(opposite_operator(operator, operator_sub)){ 
+									result = 1
+							}
+					}else{ //f ? d 
+						if(left == left_sub)
+							if(opposite_operator(operator, operator_sub)){ 
+									result = 1
+							}
+						
+					}
+					
+				}
+
+			}
+		}
+	}
 	return result
 }
 
+function opposite_Logicaloperator(operator, operator_sub){
+
+	if(operator == "&&" && operator_sub == "||")
+		return true
+	else if(operator == "||" && operator_sub == "&&")
+		return true
+	return false
+}
+
+function opposite_operator(operator, operator_sub){
+
+	if(operator == "<" && operator_sub == "≥")
+		return true
+	else if(operator == "≥" && operator_sub == "<")
+		return true
+	else if(operator == ">" && operator_sub == "≤")
+		return true
+	else if(operator == "≤" && operator_sub == ">")
+		return true
+	else if(operator == "==" && operator_sub == "!=")
+		return true
+	else if(operator == "!=" && operator_sub == "==")
+		return true
+	else if(operator == "ϵ" && operator_sub == "∉")
+		return true
+	else if(operator == "∉" && operator_sub == "ϵ")
+	return false
+}
 function conflict(action, action_sub){
 	//check same name
 	//for(a of action){

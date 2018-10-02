@@ -80,19 +80,25 @@ Blockly.Blocks['compare'] = {
           ['=', 'EQ'],
           ['≠', 'NEQ'],
           ['>', 'LT'],
+          ['≥', 'LTQ'],
           ['<', 'GT'],
+          ['≤', 'GTQ'],
           ['ϵ', 'EO'],
+		  ['∉','NEO'],
         ] : [
           ['=', 'EQ'],
           ['≠', 'NEQ'],
-          ['<', 'LT'],
-          ['>', 'GT'],
+          ['>', 'LT'],
+          ['≥', 'LTQ'],
+          ['<', 'GT'],
+          ['≤', 'GTQ'],
           ['ϵ', 'EO'],
+		  ['∉','NEO'],
         ];
     this.appendValueInput('A')
-		.setCheck(["c_dev"]);
+		.setCheck(["Inputc"]);
     this.appendValueInput('B')
-		.setCheck(["c_dev", "attribute", "number"])
+		.setCheck(["Inputc", "Attribute", "number"])
 		.appendField(new Blockly.FieldDropdown(OPERATORS), 'OP');
     this.setInputsInline(true);
     // Assign 'this' to a variable for use in the tooltip closure below.
@@ -102,30 +108,27 @@ Blockly.Blocks['compare'] = {
 	this.setTooltip("");
 	this.setHelpUrl("");
     this.setColour(Block_colour_condition);
-    this.setTooltip(function() {
-      var op = thisBlock.getFieldValue('OP');
-      var TOOLTIPS = {
-        'EQ': Blockly.Msg.LOGIC_COMPARE_TOOLTIP_EQ,
-        'LT': Blockly.Msg.LOGIC_COMPARE_TOOLTIP_LT,
-        //'GT': Blockly.Msg.LOGIC_COMPARE_TOOLTIP_GT,
-        'EO': Blockly.Msg.LOGIC_COMPARE_TOOLTIP_GT,
-      };
-      return TOOLTIPS[op];
-    });
+    this.setTooltip(null);
   }, 
   forgrouping_: function(device, attr) {
     var OPERATORS = this.RTL ? [
           ['=', 'EQ'],
           ['≠', 'NEQ'],
           ['>', 'LT'],
+          ['≥', 'LTQ'],
           ['<', 'GT'],
+          ['≤', 'GTQ'],
           ['ϵ', 'EO'],
+		  ['∉','NEO'],
         ] : [
           ['=', 'EQ'],
           ['≠', 'NEQ'],
-          ['<', 'LT'],
-          ['>', 'GT'],
+          ['>', 'LT'],
+          ['≥', 'LTQ'],
+          ['<', 'GT'],
+          ['≤', 'GTQ'],
           ['ϵ', 'EO'],
+		  ['∉','NEO'],
         ];
      this.removeInput('A');
      this.removeInput('B');
@@ -142,16 +145,7 @@ Blockly.Blocks['compare'] = {
 	this.setTooltip("");
 	this.setHelpUrl("");
     this.setColour(Block_colour_condition);
-    this.setTooltip(function() {
-      var op = thisBlock.getFieldValue('OP');
-      var TOOLTIPS = {
-        'EQ': Blockly.Msg.LOGIC_COMPARE_TOOLTIP_EQ,
-        'LT': Blockly.Msg.LOGIC_COMPARE_TOOLTIP_LT,
-        //'GT': Blockly.Msg.LOGIC_COMPARE_TOOLTIP_GT,
-        'EO': Blockly.Msg.LOGIC_COMPARE_TOOLTIP_GT,
-      };
-      return TOOLTIPS[op];
-    });
+    this.setTooltip(null);
   },
  onchange: function(event) {
 	var dropdown = this.getFieldValue('OP');
@@ -159,17 +153,19 @@ Blockly.Blocks['compare'] = {
     var blockA = this.getInputTargetBlock('A');
     var blockB = this.getInputTargetBlock('B');
 
-	if(this.id == event.newParentId && event.newInputName == "B"){
-		if(dropdown.value_ == 'EQ' || dropdown.value_ == 'NEQ' ){
-			blockB.setCheck(["Device"]);
-		}else if(dropdown =='EQ'|| dropdown =='LT' || dropdown =='GT' || dropdown == 'NEQ'){
-			if(this.getInput('B'))
-				this.getInput('B').setCheck(["c_dev","attribute", "number"]);
-			if(typeof event.element == "string"){
+	if(this.id == event.blockId && event.element == "field"){
+		if(dropdown == 'EO' || dropdown == 'NEO'){
+			this.getInput('B').setCheck(["Device"]);
+		}else if(dropdown =='EQ'|| dropdown =='LT' || dropdown =='GT' || dropdown =='LTQ'|| dropdown =='GTQ'){
+			this.getInput('B').setCheck(["Inputc", "Attribute", "number"]);
+		}
+	}else if(this.id == event.newParentId ){
+		if(event.newInputName == "B" || event.newInputName == "A" )
+		if(typeof event.element == "string"){
 			}else{
 				if(blockA && blockB){
-					var device = blockB.getFieldValue("device")
-					if(device === "device."){
+					//var device = blockB.getFieldValue("device")
+					//if(device === "device."){
 						if(blockA.type.includes("c_")&& blockB.type == "dev_attr"){
 
 							var device = blockA.getFieldValue("type")
@@ -206,14 +202,12 @@ Blockly.Blocks['compare'] = {
 
 							}
 						}
-					}
+					//}
 				}
 			}
-		}else{
-			
 
-		}
-	}if(event.type=="create"){
+	}
+	if(event.type=="create"){
 		if(blockA && blockB){
 			var device = blockB.getFieldValue("device")
 			if(device === "device."){
@@ -345,7 +339,7 @@ function condition_block(device){
 				block.appendField(new Blockly.FieldDropdown(attrMap.getMultiType(device)), "attribute_id");
 			}
 
-			this.setOutput(true, "c_dev");
+			this.setOutput(true, "Inputc");
 			this.setColour(Block_colour_condition);
 			this.setTooltip("");
 			this.setHelpUrl("");
@@ -375,7 +369,7 @@ Blockly.Blocks['dev_attr'] = {
 		.appendField(new Blockly.FieldDropdown([[ "field", "field" ]]), 'attribute');
 		this.setInputsInline(true);
 		this.setColour(Block_colour_condition);
-        this.setOutput(true, 'attribute');
+        this.setOutput(true, 'Attribute');
         var thisBlock = this;
     },
 	onchange: function(event) {
@@ -434,8 +428,12 @@ Blockly.SmartThings['compare'] = function(block) {
     'EQ': '==',
     'NEQ': '!=',
     'LT': '<',
+    'LTQ': '≤',
     'GT': '>',
-	'EO': 'ϵ'
+    'GTQ': '≥',
+	'EO': 'ϵ',
+	'NEO': '∉'
+	
   };
   var operator = OPERATORS[block.getFieldValue('OP')];
   var order = (operator == '==' || operator == '!=') ?Blockly.SmartThings.ORDER_EQUALITY : Blockly.SmartThings.ORDER_RELATIONAL;
@@ -443,7 +441,7 @@ Blockly.SmartThings['compare'] = function(block) {
   var argument1 = Blockly.SmartThings.valueToCode(block, 'B', order) || 0;
   var argument12 = block.getFieldValue('attribute');
  
-  if(argument0 != "%grouping"  && argument1 != 0 && argument12 == null){
+  if(argument0 != "%grouping"  && argument1 != null && argument12 == null){
 	  //not grouping
 	  var c = new Condition();
 	  c.right = argument0;
@@ -482,7 +480,7 @@ Blockly.SmartThings['negate'] = function(block) {
 		else if(value_not.result == 'false')
 			c.result = 'true';
 	}else{
-		c.rigt = value_not;
+		c.right = value_not;
 		c.operator = "!";
 	}
 	
@@ -494,7 +492,7 @@ Blockly.SmartThings['device_list'] = function(block) {
   // TODO: Assemble SmartThings into code variable.
   var code = dropdown_name;
   // TODO: Change ORDER_NONE to the correct strength.
-  return [code, Blockly.SmartThings.ORDER_NONE];
+  return code
 };
 
 Blockly.SmartThings['dev_attr'] = function(block) {
@@ -503,7 +501,7 @@ Blockly.SmartThings['dev_attr'] = function(block) {
   var dropdown_attribute = block.getFieldValue('attribute');
   // TODO: Assemble SmartThings into code variable.
 
-  var dev_attr = new Device_attr();
+  var dev_attr = new Attribute();
   dev_attr.dev = dropdown_name
   dev_attr.attr_id = dropdown_attribute_id
   dev_attr.attr = returnName(dropdown_attribute)
@@ -529,11 +527,10 @@ Blockly.SmartThings['number'] = function(block) {
   // TODO: Assemble SmartThings into code variable.
   // TODO: Change ORDER_NONE to the correct strength.
 
-  var dev_attr = new Device_attr();
-  dev_attr.attr_id = "number"
-  dev_attr.attr = text_number
+  var number = new Number();
+  number.value = text_number
   
-  return dev_attr
+  return number
 };
 
 

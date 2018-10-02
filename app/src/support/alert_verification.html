@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Verificiation</title>
+	<meta charset="UTF-8">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="./alert_info.css">
+<!--===============================================================================================-->
+</head>
+<body>
+
+
+	<div id="error">
+		
+		<h2 class="error">
+		error
+		</h2>
+		<b>
+		</b>
+	</div>
+	
+	<div id="warning">
+		
+		<h2 class="warning">
+		warning
+		</h2>	
+		<b>
+		</b>
+	</div>
+
+
+<script type="text/javascript">
+ 
+    function _GET(search) {
+        var obj = {};
+        var uri = decodeURI(search);
+            uri = uri.slice(1,uri.length);
+ 
+        var param = uri.split('&');
+        
+        for (var i = 0; i < param.length; i++) {
+            var devide = param[i].split('=');
+            obj[devide[0]] = devide[1];
+        }
+ 
+        return obj;
+    }
+ 
+    window.onload = function () {
+        var search = window.location.search;
+        var getData =  _GET(search);
+        var sender = document.querySelector('#sender');
+ 
+        sender.value = getData.val;
+    }
+</script>
+</body>
+</html>
