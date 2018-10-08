@@ -3310,7 +3310,7 @@ Blockly.Generator.prototype.workspaceToCode=function(a){
 	eca_num = 0;
 	scru_rule= new Array();
 	scru_page= new Array();
-	deviceCount.set("timer", parseInt("1"))
+
 	deviceCount.set("time", parseInt("1"))
 	deviceCount.set("message", parseInt("1"))
 	deviceCount.set("phone", parseInt("1"))

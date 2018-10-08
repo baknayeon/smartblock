@@ -55,6 +55,12 @@ function number(){
 	this.value;
 }
 
+function simpleECA(statements_event, value_condition, statements_action) {
+	this.event = statements_event;
+    this.condition = value_condition;
+    this.actionList = statements_action;
+}
+
 function ECA(statements_event, value_condition, statements_action) {
 	this.event = statements_event;
     this.condition = value_condition;
@@ -84,6 +90,9 @@ function ECA(statements_event, value_condition, statements_action) {
 
 	for(i in statements_action){ // input for action generate
 		if(statements_action[i].devname){
+			var a = new Inputa(statements_action[i]);
+			this.input_a_make.push(a);
+		}else if(statements_action[i].name){
 			var a = new Inputa(statements_action[i]);
 			this.input_a_make.push(a);
 		}
@@ -160,21 +169,25 @@ function Inpute(e) {
 	}else{
 		var handler_name = "rule"+eca_num+"_handler";
 		this.handler = handler_name + "(evt)";
-		this.subscribe = 'schedule(\"'+e.time+'\", '+ handler_name+")";
 
-		if(e.devname)
+		if(e.devname){
 			this.input = 'input \"'+e.devname+'\", \"'+e.device +'\", title:\"'+e.devname+'\"' ;
+			this.subscribe = 'schedule('+e.time+', '+ handler_name+")";
+		}else{
+			this.subscribe = 'schedule(\"'+e.time+'\", '+ handler_name+")";
+			
+		}
 	}
 }
 
 function Inputa(a) {
-	if(a.devname && a.device){
+	if(a.devname){
 		this.name = a.devname;
 		this.device = a.device;
 		this.input = 'input \"'+this.name+'\", \"capability.'+this.device +'\", title:\"'+this.name+'\"' ;
-	}else if(a.name && a.function){
+	}else if(a.name){
 		this.name = a.name;
-		this.device = a.function;
+		this.device = a.device;
 		this.input = 'input \"'+this.name+'\", \"'+this.device +'\", title:\"'+this.name+'\", required: false' ;
 	}
 

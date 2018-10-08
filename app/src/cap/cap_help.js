@@ -24,6 +24,7 @@ VerificationMap.prototype = {
 			return true;
 	},
     influence: function(action, event){
+    	if(action.devname && event.devname)
 		if(action.devname == event.devname){
 			if(action.command_part == event.attr){
 				return true

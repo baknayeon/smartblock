@@ -213,10 +213,10 @@ Blockly.Blocks['timer'] = {
 		.appendField("start")
 		.appendField(new Blockly.FieldVariable("timer"+time_num, null, null, "timer"), "NAME")
 		.setCheck("Action");
-	  this.appendValueInput("kind_value")
+	  this.appendValueInput("time")
 		.appendField(new Blockly.FieldDropdown([["after","after"], ["every","every"]]), "kind")
 		 .setAlign(Blockly.ALIGN_RIGHT)
-		.setCheck("after");
+		.setCheck(["after", "option"]);
 	this.appendStatementInput("groupingActions")
 		.setCheck("groupingActions");
 	this.setInputsInline(false);
@@ -228,9 +228,9 @@ Blockly.Blocks['timer'] = {
   onchange: function(event) {
 	if(event.element == "field" && event.blockId == this.id){
 		if(event.newValue == "after"){
-			this.getInput("kind_value").setCheck("after");
+			this.getInput("time").setCheck("after");
 		}else if(event.newValue == "every"){
-			this.getInput("kind_value").setCheck("every");
+			this.getInput("time").setCheck("every");
 		}
 	}
   
@@ -240,20 +240,31 @@ Blockly.Blocks['timer'] = {
 Blockly.SmartThings['timer'] = function(block) {
   
   var variable_name = Blockly.SmartThings.variableDB_.getName(block.getFieldText('NAME'), Blockly.Variables.NAME_TYPE); //timer name
-  var value_kind_value = Blockly.SmartThings.valueToCode(block, 'kind_value', Blockly.SmartThings.ORDER_ATOMIC);
+  var value_kind_value = Blockly.SmartThings.valueToCode(block, 'time', Blockly.SmartThings.ORDER_ATOMIC);
   var dropdown_timer = block.getFieldValue('kind'); //after of every
   var statements_groupingActions = Blockly.SmartThings.statementToCode(block, 'groupingActions');
   // TODO: Assemble SmartThings into code variable.
   
   if(dropdown_timer == "after"){
-  	
-	var time = value_kind_value
-	time = time.replace("minutes", "0")
-	time = time.replace("hours", "0")
-	var time_string = time.split(' ');
-  	var minute = parseInt(time_string[1]);
-  	var hour = parseInt(time_string[2]);
-  	var time = minute*60 + hour*60*60
+  	var time 
+
+	if(value_kind_value.constructor == Args){ //after time input time
+		var smartAction = new Action
+		smartAction.name = value_kind_value.name
+		smartAction.device = "number";
+		statements_groupingActions.push(smartAction)
+		time = (value_kind_value.name+"*60");
+	}else{
+	
+		time = value_kind_value
+		time = time.replace("minutes", "0")
+		time = time.replace("hours", "0")
+		var time_string = time.split(' ');
+		var minute = parseInt(time_string[1]);
+		var hour = parseInt(time_string[2]);
+		time = minute*60 + hour*60*60
+	}
+
 	for(var action of statements_groupingActions){
 		if(!action.timer)	
 			if(!action.timerhandler){

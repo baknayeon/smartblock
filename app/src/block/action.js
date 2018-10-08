@@ -199,6 +199,7 @@ Blockly.Blocks['sendsms'] = {
  this.setTooltip("");
  this.setHelpUrl("");
   }, onchange: function(event){
+  	if(event.type == Blockly.Events.BLOCK_MOVE){
   	if(event.newParentId == this.id)
   		if(event.newInputName == "message")
   			this.getInput("message").removeField("text");
@@ -210,6 +211,10 @@ Blockly.Blocks['sendsms'] = {
   			this.getInput("message").appendField(new Blockly.FieldTextInput(""), "text");
   		else if(event.oldInputName == "phone")
   			this.getInput("phone").appendField(new Blockly.FieldTextInput("+8210"), "phone");
+  }else if ( event.type == Blockly.Events.BLOCK_CREATE ){
+	this.getInput("message")
+  	
+  }
   }
 };
 
@@ -338,7 +343,7 @@ Blockly.SmartThings['option'] = function(block) {
   // TODO: Assemble SmartThings into code variable.
 
   var args = new Args();
-  args.function = dropdown_type;
+  args.device = dropdown_type;
   args.name = dropdown_type+deviceCount.get(dropdown_type)
 deviceCount.up(dropdown_type)
   // TODO: Change ORDER_NONE to the correct strength.

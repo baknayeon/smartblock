@@ -10,22 +10,18 @@
 <body>
 
 
-	<div id="error">
+	<div>
 		
-		<h2 class="error">
-		error
-		</h2>
-		<b>
-		</b>
-	</div>
-	
-	<div id="warning">
-		
-		<h2 class="warning">
-		warning
-		</h2>	
-		<b>
-		</b>
+		<h2 class="error" id ="error_title"></h2>
+		<p class="subtitle" id="error_subtitle"></p>
+		<p id="errorText"></p>
+	<div>
+		<hr>
+		</div>
+		<h2 class="warning" id="warning_title"></h2>
+		<p class="subtitle" id="warning_subtitle"></p>
+		<p id="warningTex"></p>
+
 	</div>
 
 
@@ -49,10 +45,60 @@
     window.onload = function () {
         var search = window.location.search;
         var getData =  _GET(search);
-        var sender = document.querySelector('#sender');
- 
-        sender.value = getData.val;
+		_("error_title").innerHTML = getData.error+" Error"
+		_("warning_title").innerHTML = getData.warning+" Warning"
+
+		var inconsistency1 = getData.inconsistency1
+		var redundancy1 = getData.redundancy1
+		var errors = generate_inconsistency1(inconsistency1)
+		var warnings = generate_redundancy1(redundancy1)
+		
+		if(errors[0] > 1)
+			_("error_subtitle").innerHTML = "There are "+errors[0]+" inconsistencys" 
+		else if(errors[0] == 1)
+			_("error_subtitle").innerHTML = "There is "+errors[0]+" inconsistency" 
+
+		if(warnings[0] > 1)
+			_("warning_subtitle").innerHTML = "There are "+warnings[0]+" redundancys" 
+		else if(warnings[0] == 1)
+			_("warning_subtitle").innerHTML = "There is "+warnings[0]+" redundancy" 
+
+		_("errorText").innerHTML = errors[1]
+		_("warningTex").innerHTML = warnings[1]
     }
+
+function generate_inconsistency1(inconsistency1){
+	var error_message = ""
+	var param = inconsistency1.split('/');
+	for (var i = 0; i < param.length-1; i++) {
+		var error = param[i].split('*');
+		var event = error[0]
+		var action1 = error[1]
+		var action2 = error[2]
+
+		error_message += "&nbsp;&nbsp;&nbsp;&nbsp;<b>WHEN</b> "+event + "<br>" + "&nbsp;&nbsp;&nbsp;&nbsp;<b>ACTION</b> " + action1+" and "+ action2+"<br><br>"
+	}
+
+	return [param.length-1, error_message]
+
+}
+function generate_redundancy1(redundancy1){
+	var warnings_message = ""
+	var param = redundancy1.split('/');
+	for (var i = 0; i < param.length-1; i++) {
+		var error = param[i].split('*');
+		var event = error[0]
+		var action1 = error[1]
+		var action2 = error[2]
+
+		warnings_message += "&nbsp;&nbsp;&nbsp;&nbsp;<b>WHEN</b> "+event + "<br>" + "&nbsp;&nbsp;&nbsp;&nbsp;<b>ACTION</b> " + action1+"<br><br>"
+	}
+
+	return [param.length-1, warnings_message]
+
+}
+
+	function _(x){ return document.getElementById(x); }
 </script>
 </body>
 </html>

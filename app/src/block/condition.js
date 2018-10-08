@@ -427,14 +427,16 @@ Blockly.SmartThings['compare'] = function(block) {
   var OPERATORS = {
     'EQ': '==',
     'NEQ': '!=',
-    'LT': '<',
-    'LTQ': '≤',
-    'GT': '>',
-    'GTQ': '≥',
+    'LT': '>',
+    'LTQ': '≥',
+    'GT': '<',
+    'GTQ': '≤',
 	'EO': 'ϵ',
 	'NEO': '∉'
 	
   };
+
+  
   var operator = OPERATORS[block.getFieldValue('OP')];
   var order = (operator == '==' || operator == '!=') ?Blockly.SmartThings.ORDER_EQUALITY : Blockly.SmartThings.ORDER_RELATIONAL;
   var argument0 = Blockly.SmartThings.valueToCode(block, 'A', order) || "%grouping";
