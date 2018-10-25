@@ -125,7 +125,7 @@ function generating_pref(ecaList){
 		for(i in ecaList){
 			var input_e = ecaList[i].input_e_make;
 			var input_a = ecaList[i].input_a_make;
-			var input_c 
+			var input_c = ecaList[i].input_c_make;
 
 			//eliminate dutulicate
 			for(e in input_e){
@@ -148,29 +148,16 @@ function generating_pref(ecaList){
 
 			}
 
-			if(ecaList[i].condition.constructor == Grouping){
-				input_c = ecaList[i].condition.list
-				for(c in input_c){
-					var cSt_c = codition_input.indexOf(input_c[c].input);
-					var eSt_c = event_input.indexOf(input_c[c].input);
-					var aSt_c = action_input.indexOf(input_c[c].input);
-					if(cSt_c == -1 && eSt_c == -1 && aSt_c == -1)
-						if(input_c[c])
-							codition_input += "\n\t\t\t"+input_c[c];
+			for(c in input_c){
+				var cSt_c = codition_input.indexOf(input_c[c]);
+				var eSt_c = event_input.indexOf(input_c[c]);
+				var aSt_c = action_input.indexOf(input_c[c]);
+				if(cSt_c == -1 && eSt_c == -1 && aSt_c == -1)
+					if(input_c[c])
+						codition_input += "\n\t\t\t"+input_c[c].input;
 
-				}
-			}else{
-				input_c = generat_codition_input(ecaList[i].condition)
-				for(c in input_c){
-					var cSt_c = codition_input.indexOf(input_c[c]);
-					var eSt_c = event_input.indexOf(input_c[c]);
-					var aSt_c = action_input.indexOf(input_c[c]);
-					if(cSt_c == -1 && eSt_c == -1 && aSt_c == -1)
-						if(input_c[c])
-							codition_input += "\n\t\t\t"+input_c[c];
-
-				}
 			}
+
 		}
 
 		prferences = 'preferences{ \n'+
@@ -246,10 +233,17 @@ function generating_eventHandler(ecaList){
 							handlerMethod += "\t\trunIn("+time+", "+timerhandler+")\n"	
 					}
 						
-				}else if(action.method)
-					handlerMethod += "\t\t"+action.method+"\n"			
-				else if(action.command)
-					handlerMethod += "\t\t"+action.command+"\n"			
+				}else if(action.method && typeof action.method == "string" ){ //send method
+					handlerMethod += "\t\t"+action.method+"\n"		
+				}	
+				else if(action.command && typeof action.command == "string") //device command
+					handlerMethod += "\t\t"+action.command+"\n"		
+				else if(action.method && action.method.constructor && action.method.constructor == Method){ //device method
+					var action_method = action.devname + "."+action.method.id+"("+ action.method.args +")"
+					handlerMethod += "\t\t"+action_method+"\n"		
+				}else if(action.state){ //state
+					handlerMethod += "\t\t"+action.state_command+"\n"		
+				}
 			}
 
 			handlerMethod += "\t}\n";
@@ -311,6 +305,10 @@ function generating_condition(condition, devList){
 				var predicate = generating_condition(condition, devList)
 				if_condition = '!'+predicate;
 			}
+		}else if(condition.already){
+			var already = condition.already
+			if_condition = already.condition
+				
 		}else{ // p&&p, p||p, f <= fn, m <= n, fϵd  
 			var operator = condition.operator
 			var right = condition.right;
@@ -324,30 +322,42 @@ function generating_condition(condition, devList){
 			else if(operator == '==' || operator == '<'|| operator == '>' || operator == '!=' || operator == '≤'|| operator == '≥'){
 				//smartDevice
 				if(right.constructor == Inputc){
-					if(left.constructor == Inputc){ // field =< field
+					if(left.constructor == Inputc){ // device field =< Inputc field
 						var field_right = right
-						var field_left = left
 
-						if(attrMap.isOnlyENUM(field_right.device)){
+						if(attrMap.onlyInENUM(field_right.device)){//device 
 							var right_attr = attrMap.getENUM(field_right.device)
-							var left_attr = attrMap.getENUM(field_left.device)
-							if_condition = field_right.devname+'.currentState("'+left_attr.id+'").value ' + operator +" "+field_left.devname+'.currentState("'+right_attr.id+'").value'
-						}else if(attrMap.isOnlyNUMBER(field_right.device)){
+							if_condition = field_right.devname+'.currentState("'+right_attr.id+'").value ' //+ operator +" "+field_left.devname+'.currentState("'+left_attr.id+'").value'
+						}else if(attrMap.onlyInNUMBER(field_right.device)){ //device 
 							var right_attr = attrMap.getNUMBER(field_right.device)
-							var left_attr = attrMap.getNUMBER(field_left.device)
-							if_condition = right.devname+'.currentValue("'+left_attr.id+'")' + operator +field_left.devname+'.currentValue("'+right_attr.id+'")'
+							if_condition = right.devname+'.currentValue("'+right_attr.id+'")' //+ operator +field_left.devname+'.currentValue("'+left_attr.id+'")'
+						}else if(field_left.name){
+							if_condition = if_condition +field_right.name
 						}
 
-					}else if (left.constructor == Attribute){// field =< n(attr)
+						if_condition = if_condition + operator
+
+						var field_left = left
+						if(attrMap.onlyInENUM(field_left.device)){//device =< device
+							var left_attr = attrMap.getENUM(field_left.device)
+							if_condition =  if_condition+" "+field_left.devname+'.currentState("'+left_attr.id+'").value'
+						}else if(attrMap.onlyInNUMBER(field_left.device)){ //device 
+							var left_attr = attrMap.getNUMBER(field_left.device)
+							if_condition = if_condition+" "+field_left.devname+'.currentValue("'+left_attr.id+'")'
+						}else if(field_left.name){
+							if_condition = if_condition +field_left.name
+						}
+
+					}else if (left.constructor == Attribute){// device field =< n(attr)
 						var field = right
 						var dev_attr = left
 
 
-						if(attrMap.isOnlyENUM(field.device)){
+						if(attrMap.onlyInENUM(field.device)){
 							var field_attr = attrMap.getENUM(field.device)
 							if_condition = field.devname+'.currentState("'+field_attr.id+'").value '+ operator+' "'+dev_attr.attr+'"';
 
-						}else if(attrMap.isOnlyNUMBER(field.device)){
+						}else if(attrMap.onlyInNUMBER(field.device)){
 							var field_attr = attrMap.getNUMBER(field.device)
 							if_condition = field.devname+'.currentValue("'+field_attr.id+'") '+ operator+' '+dev_attr.attr;
 						}else if(attrMap.hasMultiTypeNUMBER(field.device)){
@@ -356,9 +366,39 @@ function generating_condition(condition, devList){
 						}
 
 
-					}else if (!isNaN(left)){// field =< n(num)
-						var field_attr = attrMap.getNUMBER(right.device)
-						if_condition = right.devname+'.currentValue("'+field_attr.id+'") '+ operator+" "+left;
+					}else if (!isNaN(left.value)){// device field =< n(num)
+						var field = right
+						
+						if(field.constructor == Inputc){
+							if(attrMap.onlyInNUMBER(field.device)){
+								var field_attr = attrMap.getNUMBER(field.device)
+								if_condition = field.devname+'.currentValue("'+field_attr.id+'") '
+							}else if(field.name){ //input data
+								if_condition = field.name
+							}
+						}else if(field.constructor == Number){
+							if(field.value){ //hard coding data
+								if_condition =  '\"'+field.value+ '\"'
+							}
+						}
+
+						if_condition = if_condition + " "+ operator +" "
+
+
+						field = left
+						if(field.constructor == Inputc){
+							if(attrMap.onlyInNUMBER(field.device)){
+								var field_attr = attrMap.getNUMBER(field.device)
+								if_condition = if_condition + field.devname+'.currentValue("'+field_attr.id+'") '
+							}else if(field.name){//input data
+								if_condition = if_condition + field.name
+							}
+						}else if(field.constructor == Number){
+							if(field.value){  //hard coding data
+								if_condition = if_condition + field.value 
+							}
+						}
+
 					}
 					// currentState와 currentValue 구분 필요
 				}else if(right == "%grouping"){ // grouping
@@ -369,11 +409,11 @@ function generating_condition(condition, devList){
 						var dev_attr = left
 
 
-						if(attrMap.isOnlyENUM(device)){
+						if(attrMap.onlyInENUM(device)){
 							var field_attr = attrMap.getENUM(device)
-							i = i + '(' + devname+'.currentState("'+field_attr.id+'").value '+ operator+' "'+dev_attr+'") % ';
+							i = i + '(' + devname+'.currentState("'+field_attr.id+'").value '+ operator+' "'+dev_attr.attr+'") % ';
 
-						}else if(attrMap.isOnlyNUMBER(device)){
+						}else if(attrMap.onlyInNUMBER(device)){
 							var field_attr = attrMap.getNUMBER(device)
 							i = i + '(' + devname+'.currentValue("'+field_attr.id+'") '+ operator+' "'+dev_attr+'")  %';
 						}
@@ -381,8 +421,42 @@ function generating_condition(condition, devList){
 					i = i+"%"
 					if_condition = i.replace(" % %","")
 					
-				}
+				}else if(right.constructor == String || left.constructor == String ){ //inputc data
+					if(right.constructor == String){
+						if_condition = right 
+					}else if(right.constructor == Inputc){ // inputc data
+							if(attrMap.onlyInNUMBER(right.device)){
+								var field_attr = attrMap.getNUMBER(right.device)
+								if_condition = right.devname+'.currentValue("'+field_attr.id+'") '
+							}else if(right.name){ //input data
+								if_condition = right.name
+							}
+					}else if(right.constructor == Number){
+						if(isNaN(right.value)){ //hard coding 
+							if_condition = '\"'+right.value+ '\"'
+						}else
+							if_condition = right.value
+					}
 
+					if_condition = if_condition +" "+ operator+" "
+
+					if(left.constructor == String){
+						if_condition = if_condition + left 
+					}else if(left.constructor == Inputc){ //inputc data
+							if(attrMap.onlyInNUMBER(left.device)){
+								var field_attr = attrMap.getNUMBER(left.device)
+								if_condition = if_condition + left.devname+'.currentValue("'+field_attr.id+'") '
+							}else if(left.name){ //input data
+								if_condition = if_condition + left.name
+							}
+					}else if(left.constructor == Number){
+						if(isNaN(left.value)){ //hard coding data
+							if_condition = if_condition +'\"'+left.value+ '\"'//string
+						}else
+							if_condition = if_condition + left.value
+					}
+				}
+			
 			}else if(operator == 'ϵ'){//field ϵ device
 				var field = right
 				if_condition = field.devname+'.hasCapability("'+left+'")'
@@ -433,42 +507,3 @@ function generating_subscribe(ecaList){
 	return subscribe;
 }
 
-function condition_input(condition, array){
-	
-	if(condition.result){ //true, false, !p
-		if(condition.result != 'true' && condition.result != 'false')
-			condition_input(condition, array)
-			
-	}else{ // p&&p, p||p, f <= fn, m <= n, fϵd  
-		var operator = condition.operator
-		var right = condition.right;
-		var left = condition.left;
-
-		if(operator == '&&' || operator == '||'){
-			condition_input(right, array)
-			condition_input(left, array)
-		}
-		else if(operator == '==' || operator == '<'|| operator == '>' || operator == '!=' || operator == '≤'|| operator == '≥'){
-			//smartDevice
-			
-			var field_right = right
-			array.push(new Inputc(field_right.devname, field_right.device));
-			
-			if(left.constructor == Inputc){ // f =< f
-				var field_left = left
-				array.push(new Inputc(field_right.devname, field_right.device));
-			}else if(left.constructor == Attribute){ // f =< n(attribute)
-				var attr = left.attr
-				var attr_id = left.attr_id
-				
-			}else if(left.constructor == number){ //  f =< n(number)
-				if(left.value =="")// 숫자 입력받고 싶을때.
-					var num = deviceCount.get("number")
-					array.push(new Inputc("numbr"+num, "number"));
-					deviceCount.up("number")
-				
-			}
-
-		}
-	}
-}

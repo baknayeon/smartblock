@@ -4,7 +4,7 @@ Blockly.SmartThings['eca'] = function(block) {
 	var value_action = Blockly.SmartThings.valueToCode(block, 'Action', Blockly.SmartThings.ORDER_ATOMIC);
   // TODO: Assemble SmartThings into ECA node.
 		
-	var rule = new ECA(value_event, value_condition, value_action.reverse());
+	var rule = new ECA(value_event, value_condition, value_action);
 	
 	return rule;
 };
@@ -17,7 +17,7 @@ Blockly.SmartThings['ea'] = function(block) {
 	var condition = new Condition()
 	condition.result = 'true'
 
-	var rule = new ECA(value_event, condition, value_action.reverse());
+	var rule = new ECA(value_event, condition, value_action);
 	return rule;
 };
 
@@ -32,19 +32,27 @@ function Condition(){
 	this.left;
 	this.operator;	
 	this.result;
+
+	this.already;
+}
+
+function Already(){
+	this.input;
+	this.condition;
+	
 }
 
 
-function Inputc(name, device){
+
+function Inputc(){
 	this.device;
 	this.devname;
 	this.input;
 	
-	if(name && device){
-		this.devname = name;
-		this.device = device;
-	}
+	this.type;
+	this.name;
 }
+
 
 function Attribute(){
 	this.dev;
@@ -72,66 +80,98 @@ function ECA(statements_event, value_condition, statements_action) {
     this.input_a_make = new Array();
     this.input_c_make = new Array();
 
-	if(this.event.constructor != Grouping){
-		this.input_e_make.push(new Inpute(this.event))
-	}
-	else{
+
+
+
+	if(this.event.constructor == Grouping){
 		var device_list = this.event.list
 		for(i in device_list){
 			var event_dev = device_list[i]
 			this.input_e_make.push(new Inpute(event_dev))
 		}
+	}else{
+		this.input_e_make.push(new Inpute(this.event))
 	}
 
-	if(statements_action.constructor == Grouping){
-		statements_action = statements_action.list
+
+
+	if(this.condition.constructor == Grouping){
+		this.input_c_make = this.condition.list
+	}else{
+		condition_input(this.condition, this.input_c_make);
 	}
 
 
-	for(i in statements_action){ // input for action generate
-		if(statements_action[i].devname){
-			var a = new Inputa(statements_action[i]);
-			this.input_a_make.push(a);
-		}else if(statements_action[i].name){
-			var a = new Inputa(statements_action[i]);
-			this.input_a_make.push(a);
-		}
-		else if(statements_action[i].method){
-			var argument = statements_action[i].args
-			if(argument){
-				for(index in argument){
-					var a = new Inputa(argument[index]);
-					this.input_a_make.push(a);
-				}
-			}
-		}else if(statements_action[i].constructor == Grouping){
-			var device_list = statements_action[i].list
+
+
+	for(var action of this.actionList){ // input for action generate
+		
+		if(action.constructor == Grouping){
+			var device_list = action.list
 			if(device_list){
 				for(index in device_list){
 					var a = new Inputa(device_list[index]);
 					this.input_a_make.push(a);
 				}
 			}
-		}
-	}
-
-	var coditionList = new Array();
-
-	
-	if(value_condition.constructor == Grouping){
-		this.input_c_make = value_condition.list
-	}else{
-		condition_input(value_condition, coditionList);
-
-		for(i in coditionList){ // input for action generate
-			if(coditionList[i].devname){
-				var c = new Inputa(coditionList[i]);
-				this.input_c_make.push(c);
+		}else{
+			if(action.devname){
+				var a = new Inputa(action);
+				this.input_a_make.push(a);
 			}
+
+			if(action.arginput){
+				var a = new Inputa(action.arginput);
+				this.input_a_make.push(a);
+			}
+			if(action.state){
+				var a = new Inputa(action.valueinput);
+				this.input_a_make.push(a);
+			}
+
 		}
+
+
 	}
+
 }  
 
+function condition_input(condition, array){
+	
+	if(condition.result){ //true, false, !p
+		if(condition.result != 'true' && condition.result != 'false')
+			condition_input(condition, array)
+			
+	}else if(condition.already){
+		var a = condition.already
+		array.push(a.input);
+	
+	}else if(condition.constructor == Grouping){
+		for(var inputc of condition.list){
+			var input = inputc.input
+			array.push(input);
+		}
+	}else{ // p&&p, p||p, f <= fn, m <= n, fϵd  
+		var operator = condition.operator
+		var right = condition.right;
+		var left = condition.left;
+
+		if(operator == '&&' || operator == '||'){
+			condition_input(right, array)
+			condition_input(left, array)
+		}
+		else if(operator == '==' || operator == '<'|| operator == '>' || operator == '!=' || operator == '≤'|| operator == '≥'){
+			//smartDevice
+			
+			if(right.constructor == Inputc) // f =< f
+				array.push(right);
+			
+			if(left.constructor == Inputc) // f =< f
+				array.push(left);
+		
+		}
+	}
+}
 function Inpute(e) {
 
 	if(!e.time){
@@ -151,11 +191,11 @@ function Inpute(e) {
 
 		}
 
-		if(attrMap.isOnlyENUM(this.device)){
+		if(attrMap.onlyInENUM(this.device)){
 			this.input = 'input \"'+this.name+'\", \"capability.'+this.device +'\", title:\"'+this.name+'\"' ;
 			var attr_obj = attrMap.getENUM(this.device)
 			this.subscribe = "subscribe("+this.name+', \"'+ attr_obj.id +"."+this.attr+'\", '+ handler_name+")";
-		}else if(attrMap.isOnlyNUMBER(this.device)){
+		}else if(attrMap.onlyInNUMBER(this.device)){
 			this.input = 'input \"'+this.name+'\", \"capability.'+this.device +'\", title:\"'+this.name+'\"' ;
 			var attr_obj = attrMap.getNUMBER(this.device)
 			this.subscribe = "subscribe("+this.name+', \"'+ attr_obj.id+'\", '+ handler_name+")";
@@ -181,16 +221,9 @@ function Inpute(e) {
 }
 
 function Inputa(a) {
-	if(a.devname){
-		this.name = a.devname;
-		this.device = a.device;
-		this.input = 'input \"'+this.name+'\", \"capability.'+this.device +'\", title:\"'+this.name+'\"' ;
-	}else if(a.name){
-		this.name = a.name;
-		this.device = a.device;
-		this.input = 'input \"'+this.name+'\", \"'+this.device +'\", title:\"'+this.name+'\", required: false' ;
-	}
-
+	this.devname = a.devname;
+	this.device = a.device;
+	this.input = a.input;
 }
 
 function Grouping() {
@@ -214,21 +247,30 @@ function Event() {
 
 function Action() {
 	this.devname;
+	this.device;
+
     this.command;
     this.command_part;
-	this.device;
-	this.option;
 
 	this.timer;
 	this.timerhandler;
 
 	this.method;
-	this.args = new Array();
+	this.arginput;
+
+	this.state
+	this.state_command
+	this.valueinput
+
+}
+
+function Args() {
+	this.devname;
+	this.device;
 }
 
 
-
-function Args() {
-	this.name;
-	this.function;
+function state() {
+	this.devname;
+	this.device;
 }

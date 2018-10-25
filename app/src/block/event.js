@@ -15,9 +15,6 @@ Blockly.Blocks['specific_event'] = {
   }
 };
 
-
-
-
 Blockly.Blocks['specific_event'] = {
   init: function() {
     this.appendDummyInput('from')
@@ -36,34 +33,34 @@ Blockly.Blocks['specific_event'] = {
 			if(this.parentBlock_){ 
 				var parentBlock = this.parentBlock_
 			
-				if(event.type == Blockly.Events.BLOCK_MOVE ){
-					if((event.newParentId == parentBlock.id && parentBlock.type.includes("e_") )){
+				if((event.type == Blockly.Events.BLOCK_MOVE && event.newParentId == parentBlock.id) 
+				 ||(event.type ==Blockly.Events.BLOCK_CREATE &&  event.blockId == parentBlock.id )){
 						var fromBlock = this.getInput('from');
 						var toBlock = this.getInput('to');
 						var device = parentBlock.getFieldValue("device")
 						var parentBlock_attr = parentBlock.getFieldValue("attribute");
 						parentBlock.getInput(device).removeField("attribute");
 						var newAttr = [[".","."]]
-						if(attrMap.isOnlyENUM(device)){
+						if(attrMap.onlyInENUM(device)){
 							newAttr = newAttr.concat(attrMap.getENUM_vaules(device));
 							fromBlock.removeField('dropDownFrom');
 							fromBlock.appendField(new Blockly.FieldDropdown(newAttr), "dropDownFrom");
 							toBlock.removeField("dropDownTo");
 							toBlock.appendField(new Blockly.FieldDropdown(newAttr,parentBlock_attr), "dropDownTo");
-						}else if(attrMap.hasMultiTypeENUM(device)){
+						}else if(attrMap.onlyInNUMBER(device)){ //|| attrMap.hasMultiTypeNUMBER(device)
+							fromBlock.removeField('dropDownFrom');
+							fromBlock.appendField(new Blockly.FieldTextInput(""), "dropDownFrom");
+							toBlock.removeField("dropDownTo");
+							toBlock.appendField(new Blockly.FieldTextInput(parentBlock_attr), "dropDownTo");
+						}/*else if(attrMap.hasMultiTypeENUM(device)){
 							var attribute_id = parentBlock.getField("attribute_id").text_;
 							newAttr = newAttr.concat(attrMap.getENUM_vaulesById(device, attribute_id));
 							fromBlock.removeField('dropDownFrom');
 							fromBlock.appendField(new Blockly.FieldDropdown(newAttr), "dropDownFrom");
 							toBlock.removeField("dropDownTo");
 							toBlock.appendField(new Blockly.FieldDropdown(newAttr,parentBlock_attr), "dropDownTo");
-						}else if(attrMap.isOnlyNUMBER(device) || attrMap.hasMultiTypeNUMBER(device)){
-							fromBlock.removeField('dropDownFrom');
-							fromBlock.appendField(new Blockly.FieldTextInput(""), "dropDownFrom");
-							toBlock.removeField("dropDownTo");
-							toBlock.appendField(new Blockly.FieldTextInput(parentBlock_attr), "dropDownTo");
-						}
-					}
+						}*/
+					
 				}else if(event.element == "field" && event.name ==="attribute_id"){
 					var device = parentBlock.getField("device").text_
 					var attribute_id = event.newValue;
@@ -82,11 +79,9 @@ Blockly.Blocks['specific_event'] = {
 					}
 
 				}
-				
-				
-			
-		}
-  }
+			}
+	}
+  
 };
 
 
@@ -103,10 +98,11 @@ Blockly.SmartThings['specific_event'] = function(block) {
 };
 
 
-function event_block(device){
-	Blockly.SmartThings['e_'+device] = function(block) {
+function event_block(device, type){
+	Blockly.SmartThings['e_'+device+type] = function(block) {
 	  var variable_name = Blockly.SmartThings.variableDB_.getName(block.getFieldText('name'), Blockly.Variables.NAME_TYPE);
 	  var dropdown_attributes = block.getFieldValue('attribute');
+	  var dropdown_attributes_type = block.getFieldType('attribute');
 	  var value_switch = Blockly.SmartThings.valueToCode(block, device, Blockly.SmartThings.ORDER_ATOMIC);
 	  // TODO: Assemble SmartThings into code variable.
 
@@ -115,37 +111,31 @@ function event_block(device){
 	  smartevent.device = device;
 	  smartevent.event_handler = value_switch;
 	  smartevent.attr = dropdown_attributes
-
+	  smartevent.attrtype = dropdown_attributes_type
 	  
 	  return smartevent;
 	};
 
-	Blockly.Blocks['e_'+device] = {
+	Blockly.Blocks['e_'+device+type] = {
 		
 		init: function() {
 			var new_devName = shortName(device)
 			var count = deviceCount.get(device)
-			if(goog.isNumber(count)){
-				count = count.toString();
-			}
-			this.appendValueInput(device)
-					.setCheck("specific_event")
-					.appendField(new_devName, "device")
-					.appendField(new Blockly.FieldVariable(count, null, null, device), "name");
 
-			var block = this.getInput(device);
-			if(attrMap.isOnlyENUM(device)){
-				block.appendField(new Blockly.FieldDropdown(attrMap.getENUM_vaules(device)), "attribute");
-			}else if(attrMap.isOnlyNUMBER(device)){
-				block.appendField(new Blockly.FieldTextInput(""), "attribute");
-			}else if(attrMap.hasMultiTypeENUM(device)){
-				block.appendField(new Blockly.FieldDropdown(attrMap.getMultiType(device)), "attribute_id")
+			if(type == "ENUM"){
+				this.appendDummyInput(device)
+					.appendField(new_devName, "device")
+					.appendField(new Blockly.FieldVariable(count, null, null, device), "name")
 					.appendField(new Blockly.FieldDropdown(attrMap.getENUM_vaules(device)), "attribute");
-			}else if(attrMap.hasMultiTypeNUMBER(device)){
-				block.appendField(new Blockly.FieldDropdown(attrMap.getMultiType(device)), "attribute_id")
+			}else if(type == "NUMBER"){
+				this.appendDummyInput(device)
+					.appendField(new_devName, "device")
+					.appendField(new Blockly.FieldVariable(count, null, null, device), "name")
+					.appendField(new Blockly.FieldCheckbox("TRUE"), "attribute_checkbox")
 					.appendField(new Blockly.FieldTextInput(""), "attribute");
 			}
 			this.setOutput(true, "Event");
+			this.setInputsInline(true);
 			this.setColour(Block_colour_event);
 			this.setTooltip("");
 			this.setHelpUrl("");
@@ -172,39 +162,101 @@ function event_block(device){
 						appendAttr(device, block)
 					
 				}
-			}
-			else if(event.type == Blockly.Events.BLOCK_CREATE && this.id == event.blockId){
+			}else if(event.type == Blockly.Events.BLOCK_CREATE && this.id == event.blockId){ //copy with specific_event
 				if(this.childBlocks_.length == 1){
-					
 					var device = this.getField("device").text_;
 					var block = this.getInput(device);
 					block.removeField("attribute")
 				}
-			}else if(this.childBlocks_.length == 1){
-				var childBlocks_ = this.childBlocks_["0"]
-				if(childBlocks_.type == "specific_event"){
-					var device = this.getField("device").text_;
-					var block = this.getInput(device);
-					block.removeField("attribute")
+			}else if(event.type == Blockly.Events.BLOCK_CHANGE && event.element == "field" && event.name == "attribute_checkbox"){//change checkbox
+				var shortdevice = this.getField("device").text_;
+				var device = returnName(shortdevice)
+				var count = deviceCount.get(device)
+				this.removeInput(device)
+				if(event.newValue == false){
+					this.appendValueInput(device) //connect with Inpute
+					.appendField(shortdevice, "device")
+					.appendField(new Blockly.FieldVariable(count, null, null, device), "name")
+					.appendField(new Blockly.FieldCheckbox("FALSE"), "attribute_checkbox")
+					.setCheck("Inpute");
+
+				}else if(event.newValue == true){
+					this.appendDummyInput(device)
+					.appendField(shortdevice, "device")
+					.appendField(new Blockly.FieldVariable(count, null, null, device), "name")
+					.appendField(new Blockly.FieldCheckbox("TRUE"), "attribute_checkbox")
+					.appendField(new Blockly.FieldTextInput(""), "attribute");
+
+
 				}
 			}
-			
 		}
 	};
 }
 
 function appendAttr(device, block){
-	if(attrMap.isOnlyENUM(device)){
+	if(attrMap.onlyInENUM(device)){
 		block.appendField(new Blockly.FieldDropdown(attrMap.getENUM_vaules(device)), "attribute");
-	}else if(attrMap.hasMultiTypeENUM(device)){
-		var attribute_id = this.getField("attribute_id").text_;
-		block.appendField(new Blockly.FieldDropdown(attrMap.getENUM_vaulesById(device, attribute_id)),"attribute");
-
-	}else if(attrMap.isOnlyNUMBER(device) || attrMap.hasMultiTypeNUMBER(device)){
-		block.appendField(new Blockly.FieldTextInput(""), "attribute");
+	}else if(attrMap.onlyInNUMBER(device)){
+		block.appendField(new Blockly.FieldTextInput(""), "attribute")
+			.appendField(new Blockly.FieldCheckbox("TRUE"), "attribute_checkbox");
 	}
 
 }
+
+Blockly.Blocks['inpute_data'] = {
+  init: function() {
+	  var device = "text"
+	  var count = deviceCount.get(device);
+	  this.appendDummyInput("device")
+		  .appendField(new Blockly.FieldDropdown([["text","text"], ["bool","bool"], ["number","number"], ["phone","phone"], ["message","message"]]), "type")
+		  .appendField(new Blockly.FieldVariable(count, null, null, device), "name"); // , null, null, device)
+	  this.setColour(Block_colour_event);
+	  this.setInputsInline(false);
+	  this.setOutput(true, "Inpute");
+	  this.setTooltip("");
+	  this.setHelpUrl("");
+  },onchange: function(event) {
+  	if(this.id == event.blockId){
+			if(event.element == "field"){ //changing type 
+				var device = event.newValue
+				var count = deviceCount.get(device)
+				this.getInput("device").removeField("name")
+				this.getInput("device")
+					.appendField(new Blockly.FieldVariable(count, null, null, device), "name");
+
+			}else if(event.type == Blockly.Events.BLOCK_MOVE){ //block connect
+				if(event.newParentId && this.parentBlock_.id == event.newParentId ){
+					var device = event.newInputName
+					var attribute = attrMap.getNUMBER(device)
+					if(attribute && attrMap.onlyInNUMBER(device)){
+						var type = "number"
+						var count = deviceCount.get(type)
+						this.getInput("device").removeField("type")
+						this.getInput("device").removeField("name")
+
+						this.getInput("device").appendField(type,"type")
+						.appendField(new Blockly.FieldVariable(count, null, null, type), "name"); // , null, null, device)
+
+					}
+					
+					
+				}else if(event.oldParentId && this.parentBlock_ == null){ //block disconnect
+				
+					this.getInput("device").removeField("type")
+					this.getInput("device").removeField("name")
+					var count = deviceCount.get("text")
+					this.getInput("device")
+				 	.appendField(new Blockly.FieldDropdown([["text","text"], ["bool","bool"], ["number","number"], ["phone","phone"], ["message","message"]]), "type")
+					.appendField(new Blockly.FieldVariable(count, null, null, "text"), "name"); // , null, null, device)
+		
+				}
+			}
+
+		}
+  	}
+
+};
 
 Blockly.Blocks['e_location'] = {
   init: function() {

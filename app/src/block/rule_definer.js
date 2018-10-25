@@ -34,34 +34,3 @@ Blockly.Blocks['ea'] = {
  this.setHelpUrl("");
   }
 };
-
-Blockly.Blocks['lists_create_with_container'] = {
-  /**
-   * Mutator block for list container.
-   * @this Blockly.Block
-   */
-  init: function() {
-	this.setColour(color);
-	this.appendDummyInput()
-		.appendField("grouping");
-	this.appendStatementInput('STACK');
-	this.setTooltip("");
-	this.contextMenu = false;
-  }
-};
-
-Blockly.Blocks['lists_create_with_item'] = {
-  /**
-   * Mutator bolck for adding items.
-   * @this Blockly.Block
-   */
-  init: function() {
-	this.setColour(color);
-	this.appendDummyInput()
-		.appendField("deivce");
-	this.setPreviousStatement(true);
-	this.setNextStatement(true);
-	this.setTooltip("");
-	this.contextMenu = false;
-  }
-};

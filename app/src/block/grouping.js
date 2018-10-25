@@ -61,16 +61,15 @@ Blockly.SmartThings['exists'] = function(block) {
 Blockly.SmartThings['map'] = function(block) {
 	var p = Blockly.SmartThings.valueToCode(block, 'p', Blockly.SmartThings.ORDER_ATOMIC);
 	var device_list = Blockly.SmartThings.statementToCode(block, 'group');
- 	var actionList = Blockly.SmartThings.valueToCode(block, 'action', Blockly.SmartThings.ORDER_ATOMIC);
-	
+ 
 
 	var groupingDevice = new Array();
 
 	for(var action of device_list){
 		var device = action.device
-		if(commMap.isSingleCommad(device)){
-			action.command= action.devname+'.'+ p.function+'()';
-		}else if(commMap.isSingleMethod(device)){
+		if(commMap.has1Commad(device)){
+			action.command= action.devname+'.'+ p.device+'()';
+		}else if(commMap.has1Method(device)){
 			var command = commMap.getMethod(action)
 		}
 		groupingDevice.push(action)
@@ -98,7 +97,7 @@ function groupingBlock(color){
         .setCheck("Event");
 	  }else if(color == Block_colour_condition){	 
 		 this.appendValueInput("ADD0")
-        .setCheck("c_dev");
+        .setCheck("Inputc");
 	  }else if(color == Block_colour_action){	 
 		 this.appendValueInput("ADD0")
         .setCheck("Action");
@@ -111,177 +110,6 @@ function groupingBlock(color){
 		this.setTooltip("");
 		this.setHelpUrl("");
 	  },
-	  onchange: function(event) {
-		if(event.type == Blockly.Events.BLOCK_MOVE){
-			if(this.type=="group" ){ //connection group to deveice
-				if(event.newParentId == this.id || event.oldParentId == this.id){
-					var parentBlock = this.parentBlock_
-					var p_block = parentBlock.getInputTargetBlock("p")
-					var children_block = this.getChildren()
-					
-					if(p_block.type == "specific_event"){
-						//event
-						var length = children_block.length
-						var deviceList = new Set()
-						for(var i = 0; i< length; i++){
-							var block = this.childBlocks_[i]
-							if(block){
-								var device = block.getField("device").text_
-								deviceList.add(device)
-							}
-						}
-						
-						var fromBlock = p_block.getInput('from');
-						var toBlock = p_block.getInput('to');
-						var attrs = new Set();
-
-						for(let device of deviceList){
-							if(attrMap.isOnlyENUM(device)){
-								var newAttr = attrMap.getENUM(device);
-								for(let new_a of newAttr.value){
-									attrs.add(new_a)
-
-								}
-							}else if(attrMap.hasMultiTypeENUM(device)){
-								var attribute_id = parentBlock.getField("attribute_id").text_;
-								var newAttr = attrMap.getENUMById(device, attribute_id);
-								for(let new_a of newAttr.value){
-									attrs.add(new_a)
-
-								}
-
-							}else if(attrMap.isOnlyNUMBER(device) || attrMap.hasMultiTypeNUMBER(device)){
-
-							}
-
-						}
-						var newAttr = [[".","."]]
-						for(let attr of attrs){
-							newAttr.push([attr, attr])
-						}
-						fromBlock.removeField('dropDownFrom');
-						fromBlock.appendField(new Blockly.FieldDropdown(newAttr), "dropDownFrom");
-						toBlock.removeField("dropDownTo");
-						toBlock.appendField(new Blockly.FieldDropdown(newAttr), "dropDownTo");
-
-					}else if(p_block.type == "option"){
-						//action
-						var parentBlock = this.parentBlock_
-						var p_block = parentBlock.getInputTargetBlock("p")
-						var children_block = this.getChildren()
-
-						var length = children_block.length
-						var deviceList = new Set()
-
-						for(var i = 0; i< length; i++){
-							var block = this.childBlocks_[i]
-							if(block){
-								var device = block.getField("device").text_
-								deviceList.add(device)
-							}
-						}
-
-						if(p_block){
-							var newComm = new Set()
-
-							for(let device of deviceList){
-								if(commMap.isSingleCommad(device)){
-									for(let comm of commMap.getCommad(device))
-									{
-										newComm.add(comm)
-									}
-								}
-							}
-
-							var command = []
-							for(let c of newComm){
-								command.push([c, c])
-							}
-							p_block.getInput("type").removeField("type")
-							p_block.getInput("type").appendField(new Blockly.FieldDropdown(command), "type");
-						}
-					}else{
-						//condition
-						// operator with all and exists
-						
-						var parentBlock = this.parentBlock_
-						var p_block = parentBlock.getInputTargetBlock("p")
-						var children_block = this.getChildren()
-						
-						if(parentBlock.type =="all" || parentBlock.type=="exists" ){
-					
-							if("ADD".indexOf(event.newInputName) || "ADD".indexOf(event.oldInputName)){		
-								var length = children_block.length
-								var attrs = new Set()
-								var device
-								for(var i = 0; i< length; i++){
-									var block = this.childBlocks_[i]
-									if(block){
-										device = block.getField("type").text_
-										if(attrMap.isOnlyENUM(device)){
-											var newAttr = attrMap.getENUM(device);
-											for(let new_a of newAttr.value){
-												attrs.add(new_a)
-
-											}
-										}else if(attrMap.hasMultiTypeENUM(device)){
-											var attribute_id = parentBlock.getField("attribute_id").text_;
-											var newAttr = attrMap.getENUMById(device, attribute_id);
-											for(let new_a of newAttr.value){
-												attrs.add(new_a)
-
-											}
-
-										}
-									}
-									
-								}
-								var newAttr = []
-								for(let attr of attrs){
-									newAttr.push([attr, attr])
-								}
-								if(event.newInputName)
-									p_block.forgrouping_(device, newAttr);
-								else if(event.oldInputName && p_block  && length == 0){
-									p_block.removeInput('A');
-									p_block.removeInput('B');
-									p_block.init();
-								}
-								if(p_block){
-									var blockB = p_block.getInputTargetBlock("B")
-									if(blockB && blockB.type == 'dev_attr'){
-										blockB.getInput("dev_attr").removeField('attribute');
-										blockB.getInput("dev_attr").appendField(new Blockly.FieldDropdown(newAttr), "attribute");
-										
-									}
-								}
-							}
-
-						}
-					
-
-
-					}
-				}
-
-
-			}
-			if(event.newInputName == "p"){ //connection at p of group
-				
-			}
-		
-
-		if(this.type=="map" && event.oldParentId == this.id)  // action init
-  			if(this.childBlocks_.length == 1){
-				if(this.childBlocks_["0"].type == "option"){
-					var action = this.getInputTargetBlock("p")
-					action.getInput("type").removeField("type")
-				}
-			}
-
-		}
-			
-	},
 	  /**
 	   * Create XML to represent list inputs.
 	   * @return {!Element} XML storage element.
@@ -396,14 +224,14 @@ function groupingBlock(color){
 			else if(color == Block_colour_action)
 				 this.appendDummyInput('EMPTY');
 		}
-		// Add new inputs.
+		// Add new inputs.{
 		for (var i = 1; i < this.itemCount_; i++) {
 		  if (!this.getInput('ADD' + i)) {
 			var input = this.appendValueInput('ADD' + i);
 			if(color == Block_colour_event)
 				 input.setCheck("Event");
 			else if(color == Block_colour_condition)
-				input.setCheck("c_dev");
+				input.setCheck("Inputc");
 			else if(color == Block_colour_action)
 				input.setCheck("Action");
 
@@ -459,6 +287,59 @@ Blockly.Blocks['any'] = {
     this.setColour(Block_colour_event);
  this.setTooltip("");
  this.setHelpUrl("");
+  },onchange: function(event) {
+	if(event.type == Blockly.Events.BLOCK_MOVE){
+		
+		var p_block = this.getInputTargetBlock("p")
+		var block_group = this.getInputTargetBlock('group');
+		if((p_block && event.blockId == p_block.id) || (block_group && event.newParentId == block_group.id))
+			if(this.type=="any"  ){ //connection group to deveice
+					var children_blocks = block_group.childBlocks_
+					if(p_block.type == "specific_event"){
+						//event
+						var deviceList = new Set()
+						for(var childBlocks_ of children_blocks){
+							var device = childBlocks_.getField("device").text_
+							deviceList.add(device)
+						}
+
+						var fromBlock = p_block.getInput('from');
+						var toBlock = p_block.getInput('to');
+						var attrs = new Set();
+						for(var device of deviceList){
+							if(attrMap.onlyInENUM(device)){
+								var newAttr = attrMap.getENUM(device);
+								for(let new_a of newAttr.value){
+									attrs.add(new_a)
+
+								}
+							}else if(attrMap.hasMultiTypeENUM(device)){
+								var attribute_id = parentBlock.getField("attribute_id").text_;
+								var newAttr = attrMap.getENUMById(device, attribute_id);
+								for(let new_a of newAttr.value){
+									attrs.add(new_a)
+
+								}
+
+							}else if(attrMap.onlyInNUMBER(device) || attrMap.hasMultiTypeNUMBER(device)){
+
+							}
+
+						}
+
+						var newAttr = [[".","."]]
+						for(let attr of attrs){
+							newAttr.push([attr, attr])
+						}
+						fromBlock.removeField('dropDownFrom');
+						fromBlock.appendField(new Blockly.FieldDropdown(newAttr), "dropDownFrom");
+						toBlock.removeField("dropDownTo");
+						toBlock.appendField(new Blockly.FieldDropdown(newAttr), "dropDownTo");
+
+					}
+
+			}
+	}
   }
 };
 
@@ -473,6 +354,25 @@ Blockly.Blocks['all'] = {
     this.setColour(Block_colour_condition);
  this.setTooltip("");
  this.setHelpUrl("");
+  },onchange: function(event) {
+	if(event.type == Blockly.Events.BLOCK_MOVE){
+		var p_block = this.getInputTargetBlock("p")
+		var block_group = this.getInputTargetBlock('group');
+		if((p_block && event.blockId == p_block.id) || (block_group && event.newParentId == block_group.id))
+			if(this.type=="all" ){ //connection group to deveice
+
+				var block_group = this.getInputTargetBlock('group');
+				var block_group_childBlocks = block_group.childBlocks_
+				if(block_group_childBlocks.length > 0){
+					var childBlock1 = block_group_childBlocks[0]
+					var child_type = childBlock1.type.split("_")[1]
+
+					var blockP = this.getInputTargetBlock('p');
+					settingA(blockP, child_type)
+
+				}
+			}
+  	}
   }
 };
 Blockly.Blocks['exists'] = {
@@ -486,21 +386,111 @@ Blockly.Blocks['exists'] = {
     this.setColour(Block_colour_condition);
  this.setTooltip("");
  this.setHelpUrl("");
+  },onchange: function(event) {
+	if(event.type == Blockly.Events.BLOCK_MOVE){
+		var p_block = this.getInputTargetBlock("p")
+		var block_group = this.getInputTargetBlock('group');
+		if((p_block && event.blockId == p_block.id) || (block_group && event.newParentId == block_group.id))
+		if(this.type=="exists"){ //connection group to deveice
+			
+			var block_group = this.getInputTargetBlock('group');
+			var block_group_childBlocks = block_group.childBlocks_
+			if(block_group_childBlocks.length > 0){
+				var childBlock1 = block_group_childBlocks[0]
+				var child_type = childBlock1.type.split("_")[1]
+
+   				var blockP = this.getInputTargetBlock('p');
+				settingA(blockP, child_type)
+				
+			}
+		}
+  	}
   }
 };
 
+function settingA(blockP, child_type){
+	if(blockP){
+		if(blockP.type == "compare"){
+			blockP.removeInput("A")
+			blockP.appendDummyInputAtFrist('A')
+					  .appendField(new Blockly.FieldLabel(child_type), "type")
+		}else if(blockP.type == "operation"){
+			var child1 = blockP.childBlocks_[0]
+			var child2 = blockP.childBlocks_[1]
+			if(child1){
+				settingA(child1, child_type)
+			}
+			if(child2){
+				settingA(child2, child_type)
+			}
+		}
+	}
+
+
+}
+
 Blockly.Blocks['map'] = {
   init: function() {
-    this.appendValueInput("action")
-        .setCheck("Action");
-    this.appendValueInput("p")
+    this.appendDummyInput("p")
         .appendField("map")
-        .setCheck("option");
+        .appendField(new Blockly.FieldDropdown([[".","."]]), "type");
     this.appendStatementInput("group")
         .setCheck("group");
     this.setOutput(true, "Action");
+	this.setInputsInline(false);
     this.setColour(Block_colour_action);
  this.setTooltip("");
  this.setHelpUrl("");
+  },onchange: function(event) {
+	if(event.type == Blockly.Events.BLOCK_MOVE){
+		
+		var block_group = this.getInputTargetBlock('group');
+		var children_blocks = block_group.childBlocks_
+		if(block_group && event.newParentId == block_group.id){ //input
+			//action
+				
+			this.getInput("p").removeField("type")
+			this.getInput("p").appendField(new Blockly.FieldDropdown(getCommandInMap(children_blocks)), "type");
+
+		}else if(event.oldParentId == block_group.id){ //output
+			
+			if(children_blocks.length == 0){
+				this.getInput("p").removeField("type")
+				this.getInput("p").appendField(new Blockly.FieldDropdown([[".","."]]), "type");
+			}else{
+				this.getInput("p").removeField("type")
+				this.getInput("p").appendField(new Blockly.FieldDropdown(getCommandInMap(children_blocks)), "type");
+
+			}
+		}
+  	}
   }
 };
+
+function getCommandInMap(children_blocks){
+
+	var deviceList = new Set()
+	for(var childBlock of children_blocks){
+		var device = childBlock.getField("device").text_
+		deviceList.add(device)
+
+	}
+
+	var newComm = new Set()
+
+	for(let device of deviceList){
+		if(commMap.has1Commad(device)){
+			for(let comm of commMap.getCommad(device))
+			{
+				newComm.add(comm)
+			}
+		}
+	}
+
+	var command = []
+	for(let c of newComm){
+		command.push([c, c])
+	}
+
+	return command
+}

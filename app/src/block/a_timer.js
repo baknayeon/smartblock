@@ -209,14 +209,13 @@ Blockly.SmartThings['a_time'] = function(block) {
 Blockly.Blocks['timer'] = {
   init: function() {
 	var time_num = deviceCount.get("timer")
-    this.appendValueInput("actions")
+    this.appendDummyInput("actions")
 		.appendField("start")
-		.appendField(new Blockly.FieldVariable("timer"+time_num, null, null, "timer"), "NAME")
-		.setCheck("Action");
+		.appendField(new Blockly.FieldVariable("timer"+time_num, null, null, "timer"), "NAME");
 	  this.appendValueInput("time")
 		.appendField(new Blockly.FieldDropdown([["after","after"], ["every","every"]]), "kind")
 		 .setAlign(Blockly.ALIGN_RIGHT)
-		.setCheck(["after", "option"]);
+		.setCheck(["after", "option", "Inputa"]);
 	this.appendStatementInput("groupingActions")
 		.setCheck("groupingActions");
 	this.setInputsInline(false);
@@ -238,13 +237,13 @@ Blockly.Blocks['timer'] = {
 };
 
 Blockly.SmartThings['timer'] = function(block) {
-  
+  var actionList = Blockly.SmartThings.valueToCode(block, 'actions', Blockly.SmartThings.ORDER_ATOMIC);
   var variable_name = Blockly.SmartThings.variableDB_.getName(block.getFieldText('NAME'), Blockly.Variables.NAME_TYPE); //timer name
   var value_kind_value = Blockly.SmartThings.valueToCode(block, 'time', Blockly.SmartThings.ORDER_ATOMIC);
   var dropdown_timer = block.getFieldValue('kind'); //after of every
   var statements_groupingActions = Blockly.SmartThings.statementToCode(block, 'groupingActions');
   // TODO: Assemble SmartThings into code variable.
-  
+  var result
   if(dropdown_timer == "after"){
   	var time 
 
@@ -309,15 +308,17 @@ Blockly.SmartThings['timer'] = function(block) {
 			}
 	}
   }
-
-  return statements_groupingActions;
+	if(goog.isArray(actionList))
+		result = actionList.concat(statements_groupingActions);
+	else
+		result = statements_groupingActions;
+  return result;
 };
 
 Blockly.Blocks['stop'] = {
   init: function() {
 	var time_num = deviceCount.get("timer")
-    this.appendValueInput("stop ")
-        .setCheck("Action")
+    this.appendDummyInput("stop ")
         .appendField("stop")
 		.appendField(new Blockly.FieldVariable("timer"+time_num, null, null, "timer"), "NAME");
     this.setInputsInline(false);
@@ -375,7 +376,7 @@ Blockly.Blocks["timer_actions"] = {
 		this.setColour(Block_colour_action);
 		this.itemCount_ = 1;
 		this.updateShape_();
-		this.setMutator(new Blockly.Mutator(['lists_create_with_item']));
+		this.setMutator(new Blockly.Mutator(['lists_create_with_action']));
 		this.setTooltip("");
 		this.setHelpUrl("");
 	  },
@@ -410,7 +411,7 @@ Blockly.Blocks["timer_actions"] = {
 		containerBlock.initSvg();
 		var connection = containerBlock.getInput('STACK').connection;
 		for (var i = 0; i < this.itemCount_; i++) {
-		  var itemBlock = workspace.newBlock('lists_create_with_item');
+		  var itemBlock = workspace.newBlock('lists_create_with_action');
 		  itemBlock.initSvg();
 		  connection.connect(itemBlock.previousConnection);
 		  connection = itemBlock.nextConnection;
