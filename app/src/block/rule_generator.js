@@ -38,8 +38,11 @@ function Condition(){
 
 function Already(){
 	this.input;
-	this.condition;
-	
+	this.attr_value;
+	this.time;
+	this.type;
+	this.operator;
+
 }
 
 
@@ -121,12 +124,16 @@ function ECA(statements_event, value_condition, statements_action) {
 			}
 
 			if(action.arginput){
-				var a = new Inputa(action.arginput);
-				this.input_a_make.push(a);
+				for(var input of action.arginput){
+					var a = new Inputa(input);
+					this.input_a_make.push(a);
+				}
 			}
 			if(action.state){
-				var a = new Inputa(action.valueinput);
-				this.input_a_make.push(a);
+				for(var input of action.valueinput){
+					var a = new Inputa(input);
+					this.input_a_make.push(a);
+				}
 			}
 
 		}
@@ -256,11 +263,11 @@ function Action() {
 	this.timerhandler;
 
 	this.method;
-	this.arginput;
+	this.arginput = new Array;;
 
 	this.state
 	this.state_command
-	this.valueinput
+	this.valueinput = new Array;
 
 }
 

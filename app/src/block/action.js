@@ -397,7 +397,6 @@ Blockly.Blocks['sendnotification'] = {
 Blockly.SmartThings['sendpush'] = function(block) {
 	var text_text = block.getFieldValue('text');
 	var value_message = Blockly.SmartThings.valueToCode(block, 'message', Blockly.SmartThings.ORDER_ATOMIC);
-	var actionList = Blockly.SmartThings.valueToCode(block, 'action', Blockly.SmartThings.ORDER_ATOMIC);
 	// TODO: Assemble SmartThings into code variable.
 	
 	var smartAction = new Action();
@@ -406,19 +405,14 @@ Blockly.SmartThings['sendpush'] = function(block) {
 		text_text = '\"'+text_text+'\"'
 	}
 	else{
-		text_text = value_message.name
-		smartAction.args.push(value_message)
+		text_text = value_message.devname
+		smartAction.arginput.push(value_message)
 	}
 	
 	smartAction.method = 'sendPush('+text_text+')';
   
-	if(goog.isArray(actionList) || actionList.constructor == Grouping){
-		var result = actionList.concat(smartAction);
-	}else{
-		var result = [smartAction];
-
-	}
-  return result;
+	
+  return [smartAction];
 };
 
 Blockly.SmartThings['sendsms'] = function(block) {
@@ -426,7 +420,6 @@ Blockly.SmartThings['sendsms'] = function(block) {
 	var value_phone = Blockly.SmartThings.valueToCode(block, 'phone', Blockly.SmartThings.ORDER_ATOMIC);
 	var text_text = block.getFieldValue('text');
 	var value_message = Blockly.SmartThings.valueToCode(block, 'message', Blockly.SmartThings.ORDER_ATOMIC);
-	var actionList = Blockly.SmartThings.valueToCode(block, 'action', Blockly.SmartThings.ORDER_ATOMIC);
 	// TODO: Assemble SmartThings into code variable.
 
 	var smartAction = new Action();
@@ -434,29 +427,21 @@ Blockly.SmartThings['sendsms'] = function(block) {
 	if(value_phone == ""){
 		text_phone = '\"'+text_phone+'\"'
 	}else{	
-		text_phone = value_phone.name
-		smartAction.args.push(value_phone)
+		text_phone = value_phone.devname
+		smartAction.arginput.push(value_phone)
 	}
 
 	if(value_message == ""){
 		text_text = '\"'+text_text+'\"'
 	}
 	else{
-		text_text = value_message.name
-		smartAction.args.push(value_message)
+		text_text = value_message.devname
+		smartAction.arginput.push(value_message)
 	}
-	
 	
 	smartAction.method = 'sendSms('+ text_phone + ', '+text_text +')';
   
-	if(goog.isArray(actionList) || actionList.constructor == Grouping){
-		var result = actionList.concat(smartAction);
-	}else{
-		var result = [smartAction];
-
-	}
-	
-	return result;
+	return [smartAction];
 };
 
 Blockly.SmartThings['sendnotification'] = function(block) {
@@ -472,21 +457,13 @@ Blockly.SmartThings['sendnotification'] = function(block) {
 		text_text = '\"'+text_text+'\"'
 	}
 	else{
-		text_text = value_message.name
-		smartAction.args.push(value_message)
+		text_text = value_message.devname
+		smartAction.arginput.push(value_message)
 	}
-	
 	
 	smartAction.method = 'sendNotification('+text_text+')';
 
-	if(goog.isArray(actionList) || actionList.constructor == Grouping){
-		var result = actionList.concat(smartAction);
-	}else{
-		var result = [smartAction];
-
-	}
-	
-	return result;
+	return [smartAction];;
 };
 
 Blockly.SmartThings['inputa_data'] = function(block) {

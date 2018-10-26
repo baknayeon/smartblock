@@ -96,9 +96,9 @@ Blockly.Blocks['compare'] = {
 		  ['∉','NEO'],
         ];
     this.appendValueInput('A')
-		.setCheck(["Inputc", "state"]);
+		.setCheck(["Inputc", "state", "getAPI"]);
     this.appendValueInput('B')
-		.setCheck(["Inputc", "Attribute", "state", "data"])
+		.setCheck(["Inputc", "Attribute", "state", "data", "getAPI"])
 		.appendField(new Blockly.FieldDropdown(OPERATORS), 'OP');
     this.setInputsInline(true);
     // Assign 'this' to a variable for use in the tooltip closure below.
@@ -155,7 +155,7 @@ Blockly.Blocks['compare'] = {
 		if(dropdown == 'EO' || dropdown == 'NEO'){
 			this.getInput('B').setCheck(["Device"]);
 		}else if(dropdown =='EQ'|| dropdown =='LT' || dropdown =='GT' || dropdown =='LTQ'|| dropdown =='GTQ'){
-			this.getInput('B').setCheck(["Inputc", "Attribute", "state", "data"]);
+			this.getInput('B').setCheck(["Inputc", "Attribute", "state", "data","getAPI"]);
 		}
 	}else if(this.id == event.newParentId ){
 		if(event.newInputName == "B" || event.newInputName == "A" )
@@ -350,14 +350,12 @@ Blockly.SmartThings['already_enum'] = function(block) {
   var attr_value = block.getFieldValue('value');
   var time_min = block.getFieldValue('time_min');
   // TODO: Assemble SmartThings into code variable.
-   var type = value_device.device
-   var devname = value_device.devname
-   var attr_id = attrMap.getENUM_id(value_device.device)
-   var condition = "("+devname+'.eventsSince(new Date(now() - (1000 * '+time_min+')))?.findAll { it.name == \"'+attr_id+'\" }).count { it.value && it.value == \"'+attr_value+'\" } > 1' 
-
+ 
    var a = new Already();
-   a.condition = condition;
+   a.attr_value = attr_value
+   a.time = time_min
    a.input = value_device; 
+   a.type = "already_enum"; 
  
    var c = new Condition();
    c.already = a
@@ -377,9 +375,9 @@ Blockly.Blocks['already_num'] = {
 						] ;
     this.appendValueInput("device")
         .setCheck("Inputc");
-     this.appendDummyInput("attribute")
+     this.appendValueInput("attribute")
 		 .appendField(new Blockly.FieldDropdown(OPERATORS), 'operator')
-		.appendField(new Blockly.FieldTextInput(" "), 'value');
+        .setCheck(["data","Inputc"]);
     this.appendDummyInput()
         .appendField("since")
         .appendField(new Blockly.FieldTextInput(3), "time_min")
@@ -393,20 +391,41 @@ Blockly.Blocks['already_num'] = {
 };
 Blockly.SmartThings['already_num'] = function(block) {
   var value_device = Blockly.SmartThings.valueToCode(block, 'device', Blockly.SmartThings.ORDER_ATOMIC);
+  var value_attribute = Blockly.SmartThings.valueToCode(block, 'attribute', Blockly.SmartThings.ORDER_ATOMIC);
   var attr_value = block.getFieldValue('value');
   var time_min = block.getFieldValue('time_min');
+  var OPERATORS = {
+    'EQ': '==',
+    'NEQ': '!=',
+    'LT': '>',
+    'LTQ': '≥',
+    'GT': '<',
+    'GTQ': '≤',
+	'EO': 'ϵ',
+	'NEO': '∉'
+	
+  };
+
+  
+  var operator = OPERATORS[block.getFieldValue('operator')];
   // TODO: Assemble SmartThings into code variable.
+
+
+   var a = new Already();
+   if(value_attribute.constructor == Inputc)
+  	 a.attr_value = value_attribute.name
+   else if(value_attribute.constructor ==Number)
+  	 a.attr_value = value_attribute.value
+   a.time = time_min
+   a.input = value_device; 
+   a.type = "already_num"; 
+   a.operator = operator;
+ 
    var c = new Condition();
-   c.right = argument0;
-   c.left = "1"; // 
-   c.operator = ">";	
-   
-   var attr_id = attrMap.getENUM_id(value_device.device)
-  "("+value_device+".eventsSince(new Date(now() - (1000 * deltaSeconds)))?.findAll { it.name == "+attr_id+" }).count { it.value && it.value == "+attr_value+" } "
+   c.input = value_device; 
+   c.already = a
 
-
-  var code = '...;\n';
-  return code;
+  return c;
 };
 
 function condition_block(device){
@@ -730,7 +749,7 @@ Blockly.Blocks['getsunrise_c'] = {
 };
 Blockly.SmartThings['getsunrise_c'] = function(block) {
   // TODO: Assemble SmartThings into code variable.
-  return "getsunrise";
+  return "getSunriseAndSunset().sunrise";
 };
 
 Blockly.Blocks['getsunset_c'] = {
@@ -745,7 +764,7 @@ Blockly.Blocks['getsunset_c'] = {
 };
 Blockly.SmartThings['getsunset_c'] = function(block) {
   // TODO: Assemble SmartThings into code variable.
-  return "getsunset";
+  return "getSunriseAndSunset().sunset";
 };
 
 Blockly.Blocks['getweatherfeature_c'] = {
@@ -761,6 +780,20 @@ Blockly.Blocks['getweatherfeature_c'] = {
 Blockly.SmartThings['getweatherfeature_c'] = function(block) {
   // TODO: Assemble SmartThings into code variable.
   return "getWeatherFeature";
+};
+
+Blockly.Blocks['now'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("Current Local Time");
+    this.setOutput(true, "getAPI");
+    this.setColour(Block_colour_condition);
+ this.setTooltip("");
+ this.setHelpUrl("");
+  }
+};
+Blockly.SmartThings['now'] = function(block) {
+   return "new Date()";
 };
 
 

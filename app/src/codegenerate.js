@@ -149,9 +149,9 @@ function generating_pref(ecaList){
 			}
 
 			for(c in input_c){
-				var cSt_c = codition_input.indexOf(input_c[c]);
-				var eSt_c = event_input.indexOf(input_c[c]);
-				var aSt_c = action_input.indexOf(input_c[c]);
+				var cSt_c = codition_input.indexOf(input_c[c].input);
+				var eSt_c = event_input.indexOf(input_c[c].input);
+				var aSt_c = action_input.indexOf(input_c[c].input);
 				if(cSt_c == -1 && eSt_c == -1 && aSt_c == -1)
 					if(input_c[c])
 						codition_input += "\n\t\t\t"+input_c[c].input;
@@ -238,7 +238,7 @@ function generating_eventHandler(ecaList){
 				}	
 				else if(action.command && typeof action.command == "string") //device command
 					handlerMethod += "\t\t"+action.command+"\n"		
-				else if(action.method && action.method.constructor && action.method.constructor == Method){ //device method
+				else if(action.method && action.method.constructor && action.method.constructor == Command_method){ //device method
 					var action_method = action.devname + "."+action.method.id+"("+ action.method.args +")"
 					handlerMethod += "\t\t"+action_method+"\n"		
 				}else if(action.state){ //state
@@ -296,18 +296,30 @@ function generating_condition(condition, devList){
 			if_condition = i.replace(/%/gi, "||")
 		
 	}else{
-		if(condition.result){ //true, false, !p
+		if(condition.result){ //true, false
 			if(condition.result == 'true')
 				if_condition = 'true';
 			else if(condition.result == 'false')
 				if_condition = 'false';
-			else{
-				var predicate = generating_condition(condition, devList)
-				if_condition = '!'+predicate;
-			}
+		}else if(condition.operator == "!"){ //!p
+			var predicate = generating_condition(condition.right, devList)
+			if_condition = '!('+predicate+")";
 		}else if(condition.already){
 			var already = condition.already
-			if_condition = already.condition
+			var input = already.input
+			var time = already.time
+			var attr_value = already.attr_value
+			var operator = already.operator
+
+			var devname = input.devname
+			if(already.type == "already_enum"){
+				var attr_id = attrMap.getENUM_id(input.device)
+				if_condition = "("+devname+'.eventsSince(new Date(now() - (1000 * 60 * '+time+')))?.findAll { it.name == \"'+attr_id+'\" }).count { it.value && it.value == \"'+attr_value+'\" } > 1' 
+			}
+			else if(already.type == "already_num"){
+				var attr_id = attrMap.getNUM_id(input.device)
+				if_condition = "("+devname+'.eventsSince(new Date(now() - (1000 * 60 * '+time+')))?.findAll { it.name == \"'+attr_id+'\" }).count { it.doubleValue '+operator+' '+attr_value+' } > 1' 
+			}
 				
 		}else{ // p&&p, p||p, f <= fn, m <= n, fϵd  
 			var operator = condition.operator

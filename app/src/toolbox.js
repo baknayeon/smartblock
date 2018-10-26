@@ -120,6 +120,15 @@ Blockly.devicesFlyoutCallback_condition = function(workspace) {
 		 xmlList.push(block)
 	}
 
+	if (Blockly.Blocks["now"]) {
+		 var blockText = '<xml>' +
+			  '<block type="now">' +
+			  '</block>' +
+			  '</xml>';
+		 var block = Blockly.Xml.textToDom(blockText).firstChild;
+		 xmlList.push(block)
+	}
+
 	if (Blockly.Blocks["getlocation_c"]) {
 		 var blockText = '<xml>' +
 			  '<block type="getlocation_c">' +

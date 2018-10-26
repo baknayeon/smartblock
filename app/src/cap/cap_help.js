@@ -65,20 +65,6 @@ AttributeMap.prototype = {
     inENUMandNUMBER : function(key){   
         return this.ENUM[key] && this.NUMBER[key]; 
     },  
-    getENUM_vaulesById : function(key, id){
-		var newAttr = [];
-		if(this.set2[key]){
-			var attrlist = this.ENUM[key];
-			for(i in attrlist ){
-				if(attrlist[i].id == id){
-					var attr = attrlist[i];
-					for(a in attr.value)
-						newAttr.push([attr.value[a], attr.value[a]])
-				}
-			}
-		}
-    	 return newAttr
-    },
     getENUM_vaules : function(key){   
 		var newAttr = [];
 		var attr = this.ENUM[key];
@@ -91,29 +77,10 @@ AttributeMap.prototype = {
 		var attr = this.ENUM[key];
 		return attr.id
     },
-    hasMultiTypeENUM : function(key){ 
-	    return false; 
-    },   
-    hasMultiTypeNUMBER: function(key){ 
-	    return false; 
-    }, 
-    getMultiType : function(key){
-        return false; 
-    },  
-    getENUMById : function(key, id){
-		var newAttr = [];
-		if(this.set2[key]){
-			var attrlist = this.ENUM[key];
-			for(i in attrlist ){
-				if(attrlist[i].id == id){
-					var attr = attrlist[i];
-					for(a in attr.value)
-						newAttr.push(attr.value[a])
-				}
-			}
-		}
-    	 return new Attributes(id, newAttr)
-    },  
+    getNUM_id : function(key){
+		var attr = this.NUMBER[key];
+		return attr.id
+    },
     getENUM : function(key){   
         return this.ENUM[key]; 
     },    
@@ -122,7 +89,16 @@ AttributeMap.prototype = {
     },
 	makeBlock : function(key){   
         return this.ENUM[key] || this.NUMBER[key]; 
-    } 
+    } ,
+    hasMultiTypeENUM : function(key){ 
+	    return false; 
+    },   
+    hasMultiTypeNUMBER: function(key){ 
+	    return false; 
+    }, 
+    getMultiType : function(key){
+        return false; 
+    }
 }; 
 
 CommandMap = function(){   
