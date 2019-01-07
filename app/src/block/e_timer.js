@@ -48,18 +48,6 @@ Blockly.Blocks['e_week'] = {
  this.setHelpUrl("");
   }
 };
-Blockly.Blocks['e_year'] = {
-  init: function() {
-	var d = new Date();
-	var year = d.getFullYear()
-    this.appendDummyInput("day")
-        .appendField(new Blockly.FieldTextInput(year), "year")
-    this.setOutput(true, "year");
-    this.setColour(Block_colour_event);
- this.setTooltip("");
- this.setHelpUrl("");
-  }
-};
 
 
 Blockly.SmartThings['e_day'] = function(block) {
@@ -109,12 +97,6 @@ Blockly.SmartThings['e_week'] = function(block) {
 
   return cron;
 };
-Blockly.SmartThings['e_year'] = function(block) {
-  var text_year = block.getFieldValue('year');
-  // TODO: Assemble SmartThings into code variable.
-  var code = text_year;
-  return code;
-};
 
 Blockly.SmartThings['e_time'] = function(block) {
   var text_hour = block.getFieldValue('hour');
@@ -149,8 +131,8 @@ Blockly.Blocks['input_time'] = {
   init: function() {
 	var time_num = deviceCount.get("time")
     this.appendDummyInput("type")
-        .appendField("at")
-		.appendField(new Blockly.FieldVariable("time"+time_num, null, null, "time"), "name");
+        .appendField("at time")
+		.appendField(new Blockly.FieldVariable(time_num, null, null, "time"), "name");
 	this.setInputsInline(true);
 	this.setOutput(true, "Event");
     this.setColour(Block_colour_event);
@@ -164,9 +146,32 @@ Blockly.SmartThings['input_time'] = function(block) {
 	var variable_name = Blockly.SmartThings.variableDB_.getName(block.getFieldText('name'), Blockly.Variables.NAME_TYPE);
 
 	var smartevent = new Event();
-	smartevent.devname = variable_name
-	smartevent.device = "time"
-	smartevent.time = variable_name
+	smartevent.time = "time"+variable_name
+	smartevent.timevar = "time"+variable_name
+	
+  return smartevent;
+};
+
+Blockly.Blocks['e_timer'] = {
+  init: function() {
+	var time_num = deviceCount.get("timer")
+    this.appendDummyInput("type")
+        .appendField("timer");
+    this.appendDummyInput("type")
+		.appendField(new Blockly.FieldVariable(time_num, null, null, "timer"), "NAME");
+	this.setInputsInline(true);
+	this.setOutput(true, "Event");
+    this.setColour(Block_colour_event);
+	this.setTooltip("");
+	this.setHelpUrl("");
+  }
+};
+
+Blockly.SmartThings['e_timer'] = function(block) {
+	var variable_name = Blockly.SmartThings.variableDB_.getName(block.getFieldText('NAME'), Blockly.Variables.NAME_TYPE);
+
+	var smartevent = new Event();
+	smartevent.timerhandler = "timer"+variable_name
 	
   return smartevent;
 };

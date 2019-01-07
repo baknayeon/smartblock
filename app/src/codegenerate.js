@@ -12,12 +12,13 @@ function smartApp(ecaList){
 
 		//predefined_callback
 		var subscribe = generating_subscribe(ecaList)
-		var installed = "def installed() {\n" + subscribe +"}";
+		var method_atinstalled = generating_method_atinstalled(ecaList)
+		var installed = "def installed() {\n" + subscribe + method_atinstalled+"}";
 		var updated = "def updated() {\n\tunsubscribe()\n" +subscribe +"}";
 		var predefined_callback= installed+"\n"+updated;
 		
 		//eventHandler
-		var eventHandlers = generating_eventHandler(ecaList)
+		var eventHandlers = generating_Handler(ecaList)
 	
 		//combining 4 section 
 		code = definition +"\n\n"+ preferences +"\n\n"+ predefined_callback +"\n\n"+ eventHandlers;
@@ -58,31 +59,6 @@ function generating_definition(){
 	definition +=')';
 
 	return definition
-}
-
-function generat_codition_input(c){
-	var right = c.right;
-	var left = c. left;
-	var input = new Array
-	if(!right)
-		return ""
-	else if(right.constructor == Condition){
-		var i = generat_codition_input(right);
-		input = input.concat(i);
-	}else if (right.constructor == Inputc){
-		input.push(right.input);
-	}
-
-	if(!left)
-		return ""
-	else if(left.constructor == Condition){
-		var i = generat_codition_input(right);
-		input = input.concat(i);
-	}else if (left.constructor == Inputc){
-		input.push(left.input);
-	}
-
-	return input
 }
 
 function generating_pref(ecaList){
@@ -175,93 +151,160 @@ function generating_pref(ecaList){
 	return prferences;
 }
 
-function generating_eventHandler(ecaList){
-	var eventHandler = "";
+
+var condition_functionhandlerSet = new Set();
+var action_functionhandlerSet = new Set();
+
+function generating_Handler(ecaLists, devList){
+	var handler_methods = "";
 
 	var devList = new Array;
 
-	for(i in ecaList){
-		devList = devList.concat(ecaList[i].event, ecaList[i].actionList)
+	for(var ecaList of ecaLists){
+		devList = devList.concat(ecaList.event, ecaList.actionList)
 	}
 
-	for(i in ecaList){
-		var event = ecaList[i].event;
-		var condition = ecaList[i].condition;
-		var actionList = ecaList[i].actionList;
+	var timerHandlerMethod = new Map();
+	//handlerMethod
+	for(var ecaList of ecaLists){
+		if(ecaList.input_e_make[0].handler){  //event handler
 
-		var input_e_make = ecaList[i].input_e_make;
-
-		//for(var input_e of input_e_make){
-		
-			var event_condition_battery= generating_event_condition(ecaList[i].event)
-			var eh_condition= generating_eventHandler_condition(ecaList[i].event)
-			var predicate = generating_condition(condition, devList)
+			var event = ecaList.event;
+			var condition = ecaList.condition;
+			var actionList = ecaList.actionList;
 
 			//handlerMethod
-			var handlerMethod = "def "+input_e_make[0].handler+"{\n"
-
-			if(event_condition_battery)
-				handlerMethod +="\tif("+event_condition_battery+")\n"
-
-			//event handler
+			var eventHandler = "def "+ecaList.input_e_make[0].handler+"{\n" ;
+			
+			//event handler for specified
+			var eh_condition= generating_eventHandler_condition(ecaList.event)
 			if(eh_condition)
-				handlerMethod +="\tif("+eh_condition+")\n"
+				eventHandler +="\tif("+eh_condition+")\n"
+
 
 			//predicate
-			handlerMethod +="\tif("+predicate+"){\n"
-
+			var predicate = generating_condition(condition, devList)
+			eventHandler +="\tif("+predicate+"){\n"
+			
 			//action
-			var timer = new Map();
-			for(var action of actionList){
-				if(action.timerhandler){
-					
-					var time = action.timer
-					var timerhandler = action.timerhandler
-					if(timer.has(timerhandler)){
-						var timer_actions = timer.get(timerhandler)
-						timer_actions = timer_actions.concat(action)
-						timer.set(timerhandler,timer_actions)
+			eventHandler += generating_action(actionList)
 
-					}else{
-						timer.set(timerhandler,[action])
-						if(time[0] == "0"){
-							time[0] = 0
-							handlerMethod += '\t\tschedule(\"'+time+'\", '+timerhandler+")\n"	
+			eventHandler += "\t}\n";
+			eventHandler += "}\n";
 
-						}
-						else
-							handlerMethod += "\t\trunIn("+time+", "+timerhandler+")\n"	
-					}
-						
-				}else if(action.method && typeof action.method == "string" ){ //send method
-					handlerMethod += "\t\t"+action.method+"\n"		
-				}	
-				else if(action.command && typeof action.command == "string") //device command
-					handlerMethod += "\t\t"+action.command+"\n"		
-				else if(action.method && action.method.constructor && action.method.constructor == Command_method){ //device method
-					var action_method = action.devname + "."+action.method.id+"("+ action.method.args +")"
-					handlerMethod += "\t\t"+action_method+"\n"		
-				}else if(action.state){ //state
-					handlerMethod += "\t\t"+action.state_command+"\n"		
-				}
+			handler_methods += eventHandler
+
+		}else if(ecaList.event.timerhandler){ //timer handler
+			var key_handler = ecaList.event.timerhandler
+			if(timerHandlerMethod.has(key_handler)){
+				var ecaLists = timerHandlerMethod.get(key_handler)
+				ecaLists = ecaLists.concat(ecaList)
+				timerHandlerMethod.set(key_handler,ecaLists)
+
+			}else{
+				timerHandlerMethod.set(key_handler, [ecaList])
 			}
-
-			handlerMethod += "\t}\n";
-			handlerMethod += "}\n";
-
-			eventHandler += handlerMethod;
-			eventHandler += generating_timerhandler(timer)
-
-		//}
+		}
 	}
-	return eventHandler;	
+
+	handler_methods += generating_timerHandler(timerHandlerMethod, devList)
+	handler_methods += generating_condition_functionhandler(condition_functionhandlerSet)
+	handler_methods += generating_action_functionhandler(action_functionhandlerSet)
+
+	return handler_methods;	
 }
 
-function generating_timerhandler(timer){
+
+function generating_condition_functionhandler(functionhandlerSet){
+	
+	var functionhandler = ""
+	for (var handler of functionhandlerSet) {
+		functionhandler += "\ndef "+handler+"(){\n\tdef result = true \n\treturn result \n}";
+	}
+	return functionhandler
+
+}
+function generating_action_functionhandler(functionhandlerSet){
+	
+	var functionhandler = ""
+	for (var handler of functionhandlerSet) {
+		functionhandler += "\ndef "+handler+"(){\n\n}";
+	}
+	return functionhandler
+
+}
+function generating_timerHandler(timerHandlerMap, devList){
+	var timerHandler = ""
+	
+	timerHandlerMap.forEach(function (item, key, mapObj) {
+		var handler = key
+		var ecaLists = item
+
+		var timerHandlerMethod = "def "+handler+"(){\n";
+
+		for(var ecaList of ecaLists){
+			var event = ecaList.event;
+			var condition = ecaList.condition;
+			var actionList = ecaList.actionList;
+
+			//handlerMethod
+			//predicate
+			var predicate = generating_condition(condition, devList)
+			timerHandlerMethod +="\tif("+predicate+"){\n"
+
+			//action
+			timerHandlerMethod += generating_action(actionList)
+
+			timerHandlerMethod += "\t}\n";
+			
+		}
+		
+		timerHandlerMethod += "}\n";
+
+		timerHandler += timerHandlerMethod
+	});
+
+	return timerHandler
+}
+
+function generating_action(actionList){
+	var actions = ""
+	//action
+	for(var action of actionList){
+		if(action.timerhandler){
+			var time = action.time
+			var timerhandler = action.timerhandler
+			actions += "\t\trunIn("+time+", "+timerhandler+")\n"	
+				
+		}else if(action.command && typeof action.command == "string"){ //device command
+			actions += "\t\t"+action.command+"\n"		
+		}else if(action.method){ 
+			if(action.method.constructor == String){ //send method
+				actions += "\t\t"+action.method+"\n"		
+			}else{	//device method
+				var action_method = action.devname + "."+action.method.id+"("+ action.method.value +")"
+				actions += "\t\t"+action_method+"\n"		
+				
+			}	
+		}else if(action.state){ //state
+			actions += "\t\t"+action.state_command+"\n"		
+		}else if(action.functionhandler){ //function call
+			actions += "\t\t"+action.functionhandler+"\n"
+			action_functionhandlerSet.add(action.functionhandler)
+		}
+	}
+	return actions
+}
+
+function generating_timerhandler(eca){
 	var timerhandler = "" 
 
-	for (var [key, actionList] of timer) {	
-		timerhandler += "def "+key+"(){\n"	
+	var event = eca.event;
+	var condition = eca.condition;
+	var actionList = eca.actionList;
+
+	if(event.timerhandler){
+		timerhandler += "def "+event.timerhandler+"(){\n"	
 		for(var action of actionList){
 			if(action.method)
 				timerhandler += "\t"+action.method+"\n"			
@@ -270,19 +313,8 @@ function generating_timerhandler(timer){
 		}
 		timerhandler += "}\n"	
 	}
-	
-		
-	return timerhandler
-}
 
-function generating_event_condition(event){
-	var attr = attrMap.getNUMBER(event.device)
-	if(attr && event.attr){
-		var if_condition = event.devname+'.currentValue("'+attr.id+'") == '+event.attr;
-		return if_condition;
-	}
-	
-	return null
+	return timerhandler
 }
 
 function generating_condition(condition, devList){
@@ -296,16 +328,24 @@ function generating_condition(condition, devList){
 			if_condition = i.replace(/%/gi, "||")
 		
 	}else{
-		if(condition.result){ //true, false
-			if(condition.result == 'true')
-				if_condition = 'true';
-			else if(condition.result == 'false')
-				if_condition = 'false';
-		}else if(condition.operator == "!"){ //!p
+		if(condition.result == 'true')
+			if_condition = 'true';
+		else if(condition.result == 'false')
+			if_condition = 'false';
+		else if(condition.operator == "!" && condition.right){
 			var predicate = generating_condition(condition.right, devList)
 			if_condition = '!('+predicate+")";
-		}else if(condition.already){
-			var already = condition.already
+		}else if(condition.operator == "is_null"){ 
+			var value = condition.result
+
+		  if(value.constructor == Inputc){
+			if_condition = condition.result.devname
+		  }else if(value.constructor == API){
+			if_condition = condition.result.value
+		  }
+
+		}else if(condition.result && condition.result.constructor == Already){ //already
+			var already = condition.result
 			var input = already.input
 			var time = already.time
 			var attr_value = already.attr_value
@@ -320,7 +360,18 @@ function generating_condition(condition, devList){
 				var attr_id = attrMap.getNUM_id(input.device)
 				if_condition = "("+devname+'.eventsSince(new Date(now() - (1000 * 60 * '+time+')))?.findAll { it.name == \"'+attr_id+'\" }).count { it.doubleValue '+operator+' '+attr_value+' } > 1' 
 			}
+			else if(already.type == "happen_enum_dropdown"){ // it is happen?
+				var attr_id = attrMap.getENUM_id(input.device)
+				if_condition = devname+'.'+time+'.count { it.value && it.value == \"'+attr_value+'\" } > 0' 
+			}
+			else if(already.type == "already_num_dropdown"){
+				var attr_id = attrMap.getNUM_id(input.device)
+				if_condition = devname+'.'+time+'.count { it.value && it.value == \"'+attr_value+'\" } > 0' 
+			}
 				
+		}else if(condition.functionhandler){ //functionhandler
+			condition_functionhandlerSet.add(condition.functionhandler)
+			if_condition = condition.functionhandler+"()"
 		}else{ // p&&p, p||p, f <= fn, m <= n, fϵd  
 			var operator = condition.operator
 			var right = condition.right;
@@ -330,90 +381,9 @@ function generating_condition(condition, devList){
 				var pre_right = generating_condition(right, devList)
 				var pre_left = generating_condition(left, devList)
 				if_condition = " ("+pre_left+") "+operator+" ("+pre_right+") "
-			}
-			else if(operator == '==' || operator == '<'|| operator == '>' || operator == '!=' || operator == '≤'|| operator == '≥'){
+			}else if(operator == '==' || operator == '<'|| operator == '>' || operator == '!=' || operator == '>='|| operator == '=<'){
 				//smartDevice
-				if(right.constructor == Inputc){
-					if(left.constructor == Inputc){ // device field =< Inputc field
-						var field_right = right
-
-						if(attrMap.onlyInENUM(field_right.device)){//device 
-							var right_attr = attrMap.getENUM(field_right.device)
-							if_condition = field_right.devname+'.currentState("'+right_attr.id+'").value ' //+ operator +" "+field_left.devname+'.currentState("'+left_attr.id+'").value'
-						}else if(attrMap.onlyInNUMBER(field_right.device)){ //device 
-							var right_attr = attrMap.getNUMBER(field_right.device)
-							if_condition = right.devname+'.currentValue("'+right_attr.id+'")' //+ operator +field_left.devname+'.currentValue("'+left_attr.id+'")'
-						}else if(field_left.name){
-							if_condition = if_condition +field_right.name
-						}
-
-						if_condition = if_condition + operator
-
-						var field_left = left
-						if(attrMap.onlyInENUM(field_left.device)){//device =< device
-							var left_attr = attrMap.getENUM(field_left.device)
-							if_condition =  if_condition+" "+field_left.devname+'.currentState("'+left_attr.id+'").value'
-						}else if(attrMap.onlyInNUMBER(field_left.device)){ //device 
-							var left_attr = attrMap.getNUMBER(field_left.device)
-							if_condition = if_condition+" "+field_left.devname+'.currentValue("'+left_attr.id+'")'
-						}else if(field_left.name){
-							if_condition = if_condition +field_left.name
-						}
-
-					}else if (left.constructor == Attribute){// device field =< n(attr)
-						var field = right
-						var dev_attr = left
-
-
-						if(attrMap.onlyInENUM(field.device)){
-							var field_attr = attrMap.getENUM(field.device)
-							if_condition = field.devname+'.currentState("'+field_attr.id+'").value '+ operator+' "'+dev_attr.attr+'"';
-
-						}else if(attrMap.onlyInNUMBER(field.device)){
-							var field_attr = attrMap.getNUMBER(field.device)
-							if_condition = field.devname+'.currentValue("'+field_attr.id+'") '+ operator+' '+dev_attr.attr;
-						}else if(attrMap.hasMultiTypeNUMBER(field.device)){
-							var field_attr = attrMap.getNUMBER(field.device)
-							if_condition = field.devname+'.currentValue("'+field_attr.id+'") '+ operator+' "'+dev_attr.attr+'"';
-						}
-
-
-					}else if (!isNaN(left.value)){// device field =< n(num)
-						var field = right
-						
-						if(field.constructor == Inputc){
-							if(attrMap.onlyInNUMBER(field.device)){
-								var field_attr = attrMap.getNUMBER(field.device)
-								if_condition = field.devname+'.currentValue("'+field_attr.id+'") '
-							}else if(field.name){ //input data
-								if_condition = field.name
-							}
-						}else if(field.constructor == Number){
-							if(field.value){ //hard coding data
-								if_condition =  '\"'+field.value+ '\"'
-							}
-						}
-
-						if_condition = if_condition + " "+ operator +" "
-
-
-						field = left
-						if(field.constructor == Inputc){
-							if(attrMap.onlyInNUMBER(field.device)){
-								var field_attr = attrMap.getNUMBER(field.device)
-								if_condition = if_condition + field.devname+'.currentValue("'+field_attr.id+'") '
-							}else if(field.name){//input data
-								if_condition = if_condition + field.name
-							}
-						}else if(field.constructor == Number){
-							if(field.value){  //hard coding data
-								if_condition = if_condition + field.value 
-							}
-						}
-
-					}
-					// currentState와 currentValue 구분 필요
-				}else if(right == "%grouping"){ // grouping
+				if(right == "%grouping"){ // grouping
 					var i = ""
 					for(var inputc of devList){
 						var device = inputc.device
@@ -433,40 +403,11 @@ function generating_condition(condition, devList){
 					i = i+"%"
 					if_condition = i.replace(" % %","")
 					
-				}else if(right.constructor == String || left.constructor == String ){ //inputc data
-					if(right.constructor == String){
-						if_condition = right 
-					}else if(right.constructor == Inputc){ // inputc data
-							if(attrMap.onlyInNUMBER(right.device)){
-								var field_attr = attrMap.getNUMBER(right.device)
-								if_condition = right.devname+'.currentValue("'+field_attr.id+'") '
-							}else if(right.name){ //input data
-								if_condition = right.name
-							}
-					}else if(right.constructor == Number){
-						if(isNaN(right.value)){ //hard coding 
-							if_condition = '\"'+right.value+ '\"'
-						}else
-							if_condition = right.value
-					}
-
+				}else{ //node
+					
+					if_condition = generating_node(right)
 					if_condition = if_condition +" "+ operator+" "
-
-					if(left.constructor == String){
-						if_condition = if_condition + left 
-					}else if(left.constructor == Inputc){ //inputc data
-							if(attrMap.onlyInNUMBER(left.device)){
-								var field_attr = attrMap.getNUMBER(left.device)
-								if_condition = if_condition + left.devname+'.currentValue("'+field_attr.id+'") '
-							}else if(left.name){ //input data
-								if_condition = if_condition + left.name
-							}
-					}else if(left.constructor == Number){
-						if(isNaN(left.value)){ //hard coding data
-							if_condition = if_condition +'\"'+left.value+ '\"'//string
-						}else
-							if_condition = if_condition + left.value
-					}
+					if_condition = if_condition+ generating_node(left)
 				}
 			
 			}else if(operator == 'ϵ'){//field ϵ device
@@ -479,6 +420,49 @@ function generating_condition(condition, devList){
 
 			}
 		}
+	}
+
+	return if_condition
+}
+function generating_node(field){
+
+	var if_condition = "?"
+
+	if(field.constructor == Inputc){
+		if(attrMap.onlyInENUM(field.device)){//device 
+			var right_attr = attrMap.getENUM(field.device)
+			if_condition = field.devname+'.currentState("'+right_attr.id+'").value ' //+ operator +" "+field_left.devname+'.currentState("'+left_attr.id+'").value'
+		}else if(attrMap.onlyInNUMBER(field.device)){ //device 
+			var right_attr = attrMap.getNUMBER(field.device)
+			if_condition = field.devname+'.currentValue("'+right_attr.id+'")' 
+		}else if(field.name){
+			if_condition = field.name
+		}
+	}else if (field.constructor == Attribute){// device field =< n(attr)	
+		if(attrMap.onlyInENUM(field.device)){
+			var field_attr = attrMap.getENUM(field.device)
+			if_condition = ' "'+field.attr+'"';
+
+		}else if(attrMap.onlyInNUMBER(field.device)){
+			var field_attr = attrMap.getNUMBER(field.device)
+			if_condition =' '+field.attr;
+		}else if(attrMap.hasMultiTypeNUMBER(field.device)){
+			var field_attr = attrMap.getNUMBER(field.device)
+			if_condition = ' "'+field.attr+'"';
+		}
+	}else if (field.constructor == Calculation){// Calculation	
+
+		if_condition =  field.left+" "+field.operation+" "+field.right;
+
+	}else if(field.constructor == String){
+	  //hard coding data
+		if(isNaN(field) && field != 'null') //hard coding data
+			if_condition = '\"'+field+ '\"'//string
+		else
+			if_condition = field
+		
+	}else if(field.constructor == API && field.value){
+		if_condition = field.value
 	}
 
 	return if_condition
@@ -511,7 +495,7 @@ function generating_subscribe(ecaList){
 		for(e in input_list){
 			var input_e = input_list[e]
 			var subSt_e = subscribe.indexOf(input_e.subscribe);
-			if(subSt_e == -1)
+			if(subSt_e == -1 && input_e.subscribe)
 				subscribe += "\t"+input_e.subscribe+"\n";
 		}
 
@@ -519,3 +503,79 @@ function generating_subscribe(ecaList){
 	return subscribe;
 }
 
+function generating_method_atinstalled(ecaList){
+
+	var method_atinstalled = "";
+
+	for(i in ecaList){
+		var input_list = ecaList[i].input_e_make;
+		for(e in input_list){
+			var input_e = input_list[e]
+			var subSt_e = method_atinstalled.indexOf(input_e.handler);
+			if(subSt_e == -1 && input_e.handler)
+				method_atinstalled += "\t"+input_e.handler+"\n";
+		}
+
+	}
+	return method_atinstalled;
+}
+
+
+
+
+/*
+
+function generat_codition_input(c){
+	var right = c.right;
+	var left = c. left;
+	var input = new Array
+	if(!right)
+		return ""
+	else if(right.constructor == Condition){
+		var i = generat_codition_input(right);
+		input = input.concat(i);
+	}else if (right.constructor == Inputc){
+		input.push(right.input);
+	}
+
+	if(!left)
+		return ""
+	else if(left.constructor == Condition){
+		var i = generat_codition_input(right);
+		input = input.concat(i);
+	}else if (left.constructor == Inputc){
+		input.push(left.input);
+	}
+
+	return input
+}
+
+	
+function generating_eventHandler(ecaList, devList){
+
+	var event = ecaList.event;
+	var condition = ecaList.condition;
+	var actionList = ecaList.actionList;
+
+	//handlerMethod
+	var eventHandler = "def "+ecaList.input_e_make[0].handler+"(){\n" ;
+	
+	//event handler
+	var eh_condition= generating_eventHandler_condition(ecaList.event)
+	if(eh_condition)
+		eventHandler +="\tif("+eh_condition+")\n"
+
+
+	//predicate
+	var predicate = generating_condition(condition, devList)
+	eventHandler +="\tif("+predicate+"){\n"
+
+	//action
+	eventHandler += generating_action(actionList)
+
+	eventHandler += "\t}\n";
+	eventHandler += "}\n";
+	
+	return eventHandler;	
+}
+*/

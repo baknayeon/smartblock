@@ -1,19 +1,3 @@
-Blockly.Blocks['specific_event'] = {
-  init: function() {
-    this.appendDummyInput()
-        .appendField("from")
-        .appendField(new Blockly.FieldDropdown([[".","."]]), "from");
-    this.appendDummyInput()
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("to")
-        .appendField(new Blockly.FieldDropdown([[".","."]]), "to");
-    this.setInputsInline(true);
-    this.setOutput(true, "specific_event");
-    this.setColour(195);
- this.setTooltip("");
- this.setHelpUrl("");
-  }
-};
 
 Blockly.Blocks['specific_event'] = {
   init: function() {
@@ -102,7 +86,7 @@ function event_block(device, type){
 	Blockly.SmartThings['e_'+device+type] = function(block) {
 	  var variable_name = Blockly.SmartThings.variableDB_.getName(block.getFieldText('name'), Blockly.Variables.NAME_TYPE);
 	  var dropdown_attributes = block.getFieldValue('attribute');
-	  var dropdown_attributes_type = block.getFieldType('attribute');
+	  //var dropdown_attributes_type = block.getFieldType('attribute');
 	  var value_switch = Blockly.SmartThings.valueToCode(block, device, Blockly.SmartThings.ORDER_ATOMIC);
 	  // TODO: Assemble SmartThings into code variable.
 
@@ -111,7 +95,7 @@ function event_block(device, type){
 	  smartevent.device = device;
 	  smartevent.event_handler = value_switch;
 	  smartevent.attr = dropdown_attributes
-	  smartevent.attrtype = dropdown_attributes_type
+	//  smartevent.attrtype = dropdown_attributes_type
 	  
 	  return smartevent;
 	};
@@ -123,19 +107,20 @@ function event_block(device, type){
 			var count = deviceCount.get(device)
 
 			if(type == "ENUM"){
-				this.appendDummyInput(device)
+				this.appendValueInput(device)
 					.appendField(new_devName, "device")
 					.appendField(new Blockly.FieldVariable(count, null, null, device), "name")
-					.appendField(new Blockly.FieldDropdown(attrMap.getENUM_vaules(device)), "attribute");
+					.appendField(new Blockly.FieldDropdown(attrMap.getENUM_vaules(device)), "attribute")
+					.setCheck("specific_event");
 			}else if(type == "NUMBER"){
-				this.appendDummyInput(device)
+				this.appendValueInput(device)
 					.appendField(new_devName, "device")
 					.appendField(new Blockly.FieldVariable(count, null, null, device), "name")
 					.appendField(new Blockly.FieldCheckbox("TRUE"), "attribute_checkbox")
-					.appendField(new Blockly.FieldTextInput(""), "attribute");
+					.appendField(new Blockly.FieldTextInput(""), "attribute")
+					.setCheck("specific_event");
 			}
 			this.setOutput(true, "Event");
-			this.setInputsInline(true);
 			this.setColour(Block_colour_event);
 			this.setTooltip("");
 			this.setHelpUrl("");
@@ -281,12 +266,41 @@ Blockly.Blocks['e_app'] = {
   }
 };
 
+
+Blockly.Blocks['e_installed'] = {
+  init: function() {
+			var count = deviceCount.get("installed")
+
+  	this.appendDummyInput()
+  		.appendField("installed")
+  		.appendField(new Blockly.FieldVariable(count, null, null, "installed"), "name");
+  		this.setOutput(true, "Event");
+		this.setColour(Block_colour_event);
+		this.setTooltip("");
+		this.setHelpUrl("");
+  }
+};
+
+
+Blockly.SmartThings['e_installed'] = function(block) {
+	 var dropdown_attr = block.getFieldValue('attr');
+	  var variable_name = Blockly.SmartThings.variableDB_.getName(block.getFieldText('name'), Blockly.Variables.NAME_TYPE);
+	// TODO: Assemble SmartThings into code variable.
+
+	var smartevent = new Event();
+	smartevent.api = "installed";
+	smartevent.initmethod = "init_method"+variable_name;
+
+	// TODO: Change ORDER_NONE to the correct strength.
+	return smartevent;
+};
+
 Blockly.SmartThings['e_location'] = function(block) {
 	 var dropdown_attr = block.getFieldValue('attr');
 	// TODO: Assemble SmartThings into code variable.
 
 	var smartevent = new Event();
-	smartevent.device = "location";
+	smartevent.api = "location";
 	smartevent.attr = dropdown_attr	
 
 	// TODO: Change ORDER_NONE to the correct strength.
@@ -297,7 +311,7 @@ Blockly.SmartThings['e_app'] = function(block) {
 	// TODO: Assemble SmartThings into code variable.
 
 	var smartevent = new Event();
-	smartevent.device = "app";	
+	smartevent.api = "app";	
 
 	// TODO: Change ORDER_NONE to the correct strength.
 	return smartevent;

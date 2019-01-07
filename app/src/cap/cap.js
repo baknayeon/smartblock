@@ -118,8 +118,7 @@ function mapInit(){
 		attrMap.putNUMBER("washerOperatingState", new Attributes("completionTime"), null);
 		attrMap.putENUM("waterSensor", new Attributes("water", ["dry", "wet"])); 
 		attrMap.putENUM("windowShade", new Attributes("windowShade", ["closed", "closing", "open", "opening", "unknown"])); 
-		//44
-
+		//65
 
         //putCommand
 		//putMethod
@@ -154,7 +153,7 @@ function mapInit(){
 		commMap.putCommand("polling", ["poll"]);  
 		//2°³ ´Ù musicPlayer
 		commMap.putCommand("musicPlayer", ["mute", "nextTrack", "pause", "play", "stop", "unmute"]);  
-		commMap.putMethod("musicPlayer", new Command_method("setTrack", "string", null)); 
+		//commMap.putMethod("musicPlayer", new Command_method("setTrack", "string", null)); 
 
        commMap.putCommand("mediaPlayback", ["play", "pause", "stop"]);   
 
@@ -176,7 +175,6 @@ function mapInit(){
 		commMap.putCommand("thermostatFanMode", ["fanAuto", "fanCirculate", "fanOn"]);
 		commMap.putMethod("thermostatFanMode", new Command_method("setThermostatFanMode", "ENUM", ["auto", "circulate", "followschedule", "on"]));
         commMap.putCommand("thermostatMode", ["auto", "cool", "emergencyHeat", "heat", "off"]);
-        commMap.putMethod("thermostatMode", new Command_method("thermostatMode", "ENUM", ["auto", "eco", "rush hour", "cool", "emergency heat", "heat", "off"]));
 //thermostat
 
 
@@ -191,7 +189,7 @@ function mapInit(){
         commMap.putMethod("washerMode", new Command_method("setWasherMode", "ENUM", ["regular", "heavy", "rinse", "spinDry"]));
         commMap.putMethod("washerOperatingState", new Command_method("setMachineState", "ENUM", ["pause", "run", "stop"]));
 		commMap.putCommand("windowShade", ["close", "open", "presetPosition"]);  
-		//28
+		//46
 		
 
 		deviceCount.set("timer", parseInt("1"))
@@ -204,6 +202,12 @@ function mapInit(){
 		deviceCount.set("number", parseInt("1"))
 		deviceCount.set("message", parseInt("1"))
 		deviceCount.set("phone", parseInt("1"))
+		deviceCount.set("mode", parseInt("1"))
+
+
+			
+		deviceCount.set("function", parseInt("1"))
+		deviceCount.set("installed", parseInt("1"))
 
     }catch(e){alert(e);}
 } 

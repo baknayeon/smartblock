@@ -21,8 +21,13 @@
   <script src="block/rule_definer.js"></script>
   <script src="block/rule_generator.js"></script>
   <script src="block/event.js"></script>
-  <script src="block/condition.js"></script>
-  <script src="block/action.js"></script>
+  <script src="block/condition_generator.js"></script>
+  <script src="block/condition_device.js"></script>
+  <script src="block/condition_definer.js"></script>
+  <script src="block/action_list.js"></script>
+  <script src="block/action_device.js"></script>
+  <script src="block/action_API.js"></script>
+
   <script src="block/option.js"></script>
   <script src="block/preference.js"></script>
   <script src="block/a_timer.js"></script>
@@ -173,8 +178,8 @@
 
 		var ecaList = Blockly.SmartThings.workspaceToCode(workspace);
 		if(ecaList != null){
-			var result_verification = verification(ecaList);
-			if(result_verification){
+			///var result_verification = verification(ecaList);
+			//if(result_verification){
 				
 				_("in_box1").style.display = "none"
 				_("in_box2").style.display = "none"
@@ -190,7 +195,7 @@
 				_("smartApp_code").textContent = code;
 				hljs.highlightBlock(_("smartApp_code"));
 
-			}
+			//}
 		}else{
 
 			alert("plz build SmartBlock");

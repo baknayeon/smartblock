@@ -19,6 +19,17 @@ Blockly.devicesFlyoutCallback_event = function(workspace) {
 			}
 		}
 	});
+	
+	
+	if (Blockly.Blocks["e_installed"]) {
+		  var blockText = '<xml>' +
+			  '<block type="e_installed">' +
+			  '</block>' +
+			  '</xml>';
+		  var block = Blockly.Xml.textToDom(blockText).firstChild;
+		 xmlList.push(block)
+	} 
+		 
 
 	
 	if (Blockly.Blocks["inpute_data"]) {
@@ -102,7 +113,42 @@ Blockly.devicesFlyoutCallback_condition = function(workspace) {
 		 var block = Blockly.Xml.textToDom(blockText).firstChild;
 		 xmlList.push(block)
 	}
+	if (Blockly.Blocks["math_condition"]) {
+		 var blockText = '<xml>' +
+			  '<block type="math_condition">' +
+			  '</block>' +
+			  '</xml>';
+		 var block = Blockly.Xml.textToDom(blockText).firstChild;
+		 xmlList.push(block)
+	}
 
+	 if (Blockly.Blocks["is_null"]) {
+		 var blockText = '<xml>' +
+			  '<block type="is_null">' +
+			  '</block>' +
+			  '</xml>';
+		 var block = Blockly.Xml.textToDom(blockText).firstChild;
+		 xmlList.push(block)
+	}
+
+
+	if (Blockly.Blocks["last_event_data"]) {
+		 var blockText = '<xml>' +
+			  '<block type="last_event_data">' +
+			  '</block>' +
+			  '</xml>';
+		 var block = Blockly.Xml.textToDom(blockText).firstChild;
+		 xmlList.push(block)
+	}
+
+	if (Blockly.Blocks["happen_enum_dropdown"]) {
+		 var blockText = '<xml>' +
+			  '<block type="happen_enum_dropdown">' +
+			  '</block>' +
+			  '</xml>';
+		 var block = Blockly.Xml.textToDom(blockText).firstChild;
+		 xmlList.push(block)
+	}
 	if (Blockly.Blocks["already_enum"]) {
 		 var blockText = '<xml>' +
 			  '<block type="already_enum">' +
@@ -120,9 +166,17 @@ Blockly.devicesFlyoutCallback_condition = function(workspace) {
 		 xmlList.push(block)
 	}
 
-	if (Blockly.Blocks["now"]) {
+	if (Blockly.Blocks["now_c"]) {
 		 var blockText = '<xml>' +
-			  '<block type="now">' +
+			  '<block type="now_c">' +
+			  '</block>' +
+			  '</xml>';
+		 var block = Blockly.Xml.textToDom(blockText).firstChild;
+		 xmlList.push(block)
+	}
+	 if (Blockly.Blocks["function_invocation_c"]) {
+		 var blockText = '<xml>' +
+			  '<block type="function_invocation_c">' +
 			  '</block>' +
 			  '</xml>';
 		 var block = Blockly.Xml.textToDom(blockText).firstChild;
@@ -229,10 +283,44 @@ Blockly.devicesFlyoutCallback_action = function(workspace) {
 		 var block = Blockly.Xml.textToDom(blockText).firstChild;
 		 xmlList.push(block)
 	}
+	 if (Blockly.Blocks["action_state_def"]) {
+		 var blockText = '<xml>' +
+			  '<block type="action_state_def">' +
+			  '</block>' +
+			  '</xml>';
+		 var block = Blockly.Xml.textToDom(blockText).firstChild;
+		 xmlList.push(block)
+	}
 
+	 if (Blockly.Blocks["math_action"]) {
+		 var blockText = '<xml>' +
+			  '<block type="math_action">' +
+			  '</block>' +
+			  '</xml>';
+		 var block = Blockly.Xml.textToDom(blockText).firstChild;
+		 xmlList.push(block)
+	}
 	add_action_method_xml(xmlList);
 	add_timer_xml(xmlList)
 	add_groupingBlock_xml("map", Block_colour_action, xmlList);
+
+	if (Blockly.Blocks["now_a"]) {
+		 var blockText = '<xml>' +
+			  '<block type="now_a">' +
+			  '</block>' +
+			  '</xml>';
+		 var block = Blockly.Xml.textToDom(blockText).firstChild;
+		 xmlList.push(block)
+	}
+	 if (Blockly.Blocks["function_invocation_a"]) {
+		 var blockText = '<xml>' +
+			  '<block type="function_invocation_a">' +
+			  '</block>' +
+			  '</xml>';
+		 var block = Blockly.Xml.textToDom(blockText).firstChild;
+		 xmlList.push(block)
+	}
+
 
 	if (Blockly.Blocks["getlocation_a"]) {
 		 var blockText = '<xml>' +
@@ -312,14 +400,6 @@ function add_schedule_xml(xmlList){
 		  var block = Blockly.Xml.textToDom(blockText).firstChild;
 		 xmlList.push(block)
 	} 
-	 /*if (Blockly.Blocks["e_year"]) {
-		  var blockText = '<xml>' +
-			  '<block type="e_year">' +
-			  '</block>' +
-			  '</xml>';
-		  var block = Blockly.Xml.textToDom(blockText).firstChild;
-		 xmlList.push(block)
-	} */
 	 if (Blockly.Blocks["input_time"]) {
 		  var blockText = '<xml>' +
 			  '<block type="input_time">' +
@@ -328,70 +408,28 @@ function add_schedule_xml(xmlList){
 		  var block = Blockly.Xml.textToDom(blockText).firstChild;
 		 xmlList.push(block)
 	} 
+	 if (Blockly.Blocks["e_timer"]) {
+		  var blockText = '<xml>' +
+			  '<block type="e_timer">' +
+			  '</block>' +
+			  '</xml>';
+		  var block = Blockly.Xml.textToDom(blockText).firstChild;
+		 xmlList.push(block)
+	} 
 }
 function add_timer_xml(xmlList){
-	 if (Blockly.Blocks["a_time"]) {
+
+	 if (Blockly.Blocks["a_timer"]) {
 		  var blockText = '<xml>' +
-			  '<block type="a_time">' +
+			  '<block type="a_timer">' +
 			  '</block>' +
 			  '</xml>';
 		  var block = Blockly.Xml.textToDom(blockText).firstChild;
 		 xmlList.push(block)
 	} 
-	 if (Blockly.Blocks["a_minutes"]) {
+	 if (Blockly.Blocks["a_stop"]) {
 		  var blockText = '<xml>' +
-			  '<block type="a_minutes">' +
-			  '</block>' +
-			  '</xml>';
-		  var block = Blockly.Xml.textToDom(blockText).firstChild;
-		 xmlList.push(block)
-	} 
-	 if (Blockly.Blocks["a_hours"]) {
-		  var blockText = '<xml>' +
-			  '<block type="a_hours">' +
-			  '</block>' +
-			  '</xml>';
-		  var block = Blockly.Xml.textToDom(blockText).firstChild;
-		 xmlList.push(block)
-	} 
-	 if (Blockly.Blocks["a_day"]) {
-		  var blockText = '<xml>' +
-			  '<block type="a_day">' +
-			  '</block>' +
-			  '</xml>';
-		  var block = Blockly.Xml.textToDom(blockText).firstChild;
-		 xmlList.push(block)
-	} 
-	 if (Blockly.Blocks["a_month"]) {
-		  var blockText = '<xml>' +
-			  '<block type="a_month">' +
-			  '</block>' +
-			  '</xml>';
-		  var block = Blockly.Xml.textToDom(blockText).firstChild;
-		 xmlList.push(block)
-	} 
-	 if (Blockly.Blocks["a_week"]) {
-		  var blockText = '<xml>' +
-			  '<block type="a_week">' +
-			  '</block>' +
-			  '</xml>';
-		  var block = Blockly.Xml.textToDom(blockText).firstChild;
-		 xmlList.push(block)
-	} 
-	 if (Blockly.Blocks["timer"]) {
-		  var blockText = '<xml>' +
-			  '<block type="timer">' +
-			   '<statement name="groupingActions">'+
-						'<block type="timer_actions"></block>'+
-				'</statement>'+
-			  '</block>' +
-			  '</xml>';
-		  var block = Blockly.Xml.textToDom(blockText).firstChild;
-		 xmlList.push(block)
-	} 
-	 if (Blockly.Blocks["stop"]) {
-		  var blockText = '<xml>' +
-			  '<block type="stop">' +
+			  '<block type="a_stop">' +
 			  '</block>' +
 			  '</xml>';
 		  var block = Blockly.Xml.textToDom(blockText).firstChild;

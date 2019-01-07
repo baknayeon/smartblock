@@ -417,7 +417,7 @@ function same_condition(condition, condition_sub){
 						if(left.attr == left_sub.attr && left.dev == left_sub.dev)
 							result = 1
 							
-					}else if(left.constructor == Number && left_sub.constructor == Number){  // f ? n(number)
+					}else if(left.constructor == Data && left_sub.constructor == Data){  // f ? n(number)
 						if(left.value == left_sub.value)
 							result = 1
 						else if(Math.abs(left.value - left_sub.value) <= 5)
@@ -451,7 +451,7 @@ function overlap(condition, condition_sub){
 	var maxmum_sub = 100
 
 	if(right.devname == right_sub.devname && right.constructor == Inputc){// f ? n
-		if(left.constructor == Number && left_sub.constructor == Number){
+		if(left.constructor == Data && left_sub.constructor == Data){
 
 			if(operator == "≤" && operator_sub == "≥" || operator_sub == "≤" && operator == "≥"){
 				if(left.value == left_sub.value)
@@ -548,7 +548,7 @@ function opposite_condition(condition, condition_sub){
 					  		if(operator == operator_sub)
 					  			result = 1
 					  	}
-					}else if(left.constructor == Number && left_sub.constructor == Number){  // f ? n(number)
+					}else if(left.constructor == Data && left_sub.constructor == Data){  // f ? n(number)
 						if(left.value == left_sub.value)
 							if(opposite_operator(operator, operator_sub)){ 
 									result = 1

@@ -27,44 +27,6 @@ function Page(){
   this.section;
 }
 
-function Condition(){
-	this.right;
-	this.left;
-	this.operator;	
-	this.result;
-
-	this.already;
-}
-
-function Already(){
-	this.input;
-	this.attr_value;
-	this.time;
-	this.type;
-	this.operator;
-
-}
-
-
-
-function Inputc(){
-	this.device;
-	this.devname;
-	this.input;
-	
-	this.type;
-	this.name;
-}
-
-
-function Attribute(){
-	this.dev;
-	this.attr_id;
-	this.attr;
-}
-function number(){
-	this.value;
-}
 
 function simpleECA(statements_event, value_condition, statements_action) {
 	this.event = statements_event;
@@ -101,7 +63,7 @@ function ECA(statements_event, value_condition, statements_action) {
 	if(this.condition.constructor == Grouping){
 		this.input_c_make = this.condition.list
 	}else{
-		condition_input(this.condition, this.input_c_make);
+		 this.input_c_make = condition_input(this.condition);
 	}
 
 
@@ -123,10 +85,12 @@ function ECA(statements_event, value_condition, statements_action) {
 				this.input_a_make.push(a);
 			}
 
-			if(action.arginput){
+			if(action.method){
 				for(var input of action.arginput){
-					var a = new Inputa(input);
-					this.input_a_make.push(a);
+					if(input.constructor == Inputa){
+						var a = new Inputa(input);
+						this.input_a_make.push(a);
+					}
 				}
 			}
 			if(action.state){
@@ -143,11 +107,13 @@ function ECA(statements_event, value_condition, statements_action) {
 
 }  
 
-function condition_input(condition, array){
-	
-	if(condition.result){ //true, false, !p
-		if(condition.result != 'true' && condition.result != 'false')
-			condition_input(condition, array)
+function condition_input(condition){
+	var array = new Array()
+	if(condition.operator == "!"){ //!p
+		array = condition_input(condition.right)
+			
+	}else if(condition.operator == "is_null"){ //!p
+		array.push(condition.result);
 			
 	}else if(condition.already){
 		var a = condition.already
@@ -164,25 +130,34 @@ function condition_input(condition, array){
 		var left = condition.left;
 
 		if(operator == '&&' || operator == '||'){
-			condition_input(right, array)
-			condition_input(left, array)
+			var array_right = condition_input(right)
+			var array_left = condition_input(left)
+			array = array.concat(array_right)
+			array = array.concat(array_left)
 		}
-		else if(operator == '==' || operator == '<'|| operator == '>' || operator == '!=' || operator == '≤'|| operator == '≥'){
+		else if(operator == '==' || operator == '<'|| operator == '>' || operator == '!=' || operator == '>='|| operator == '=<'){
 			//smartDevice
 			
 			if(right.constructor == Inputc) // f =< f
 				array.push(right);
+			else if(right.constructor == API && right.inputs) 
+				array = array.concat(right.inputs);
 			
 			if(left.constructor == Inputc) // f =< f
 				array.push(left);
+			else if(left.constructor == API && left.inputs) 
+				array = array.concat(left.inputs);
+			
 		
 		}
 	}
+	return array
 }
+
 function Inpute(e) {
 
-	if(!e.time){
-	
+	if(e.device){// event from dev
+
 		this.name = e.devname;
 		this.device = e.device;
 		this.attr = e.attr;
@@ -206,19 +181,46 @@ function Inpute(e) {
 			this.input = 'input \"'+this.name+'\", \"capability.'+this.device +'\", title:\"'+this.name+'\"' ;
 			var attr_obj = attrMap.getNUMBER(this.device)
 			this.subscribe = "subscribe("+this.name+', \"'+ attr_obj.id+'\", '+ handler_name+")";
-		}else if(this.device == "location" && this.attr != "."){
-			this.subscribe = "subscribe("+this.device+', \"'+ this.attr+'\", '+ handler_name+")";
-		}else if(this.device == "location" && this.attr == "."){
-			this.subscribe = "subscribe("+this.device+', '+ handler_name+")";
-		}else if(this.device == "app"){
-			this.subscribe = "subscribe("+this.device+', '+ handler_name+")";
 		}
-	}else{
+
+	}else if(e.api){ //locate, app, init method
+
+		this.api = e.api;
+		this.attr = e.attr;
+			
+	
+		if(this.api == "installed"){
+			
+			this.handler = e.initmethod + "()";
+		}else{
+		
+			var handler_name = "rule"+eca_num+"_handler";
+			this.handler = handler_name + "(evt)";
+			if(e.event_handler){
+				if(e.event_handler.to != '.')
+					this.attr = e.event_handler.to
+				else 
+					this.attr = ""
+
+			}
+
+			if(this.api == "location" && this.attr != "."){
+				this.subscribe = "subscribe("+this.api+', \"'+ this.attr+'\", '+ handler_name+")";
+			}else if(this.api == "location" && this.attr == "."){
+				this.subscribe = "subscribe("+this.api+', '+ handler_name+")";
+			}else if(this.api == "app"){
+				this.subscribe = "subscribe("+this.api+', '+ handler_name+")";
+			} 
+
+		}
+	}else if(e.timerhandler){ //timer
+
+	}else if(e.time){ //schedule
 		var handler_name = "rule"+eca_num+"_handler";
 		this.handler = handler_name + "(evt)";
 
-		if(e.devname){
-			this.input = 'input \"'+e.devname+'\", \"'+e.device +'\", title:\"'+e.devname+'\"' ;
+		if(e.timevar){
+			this.input = 'input \"'+e.timevar+'\", \"time\", title:\"'+e.timevar+'\"' ;
 			this.subscribe = 'schedule('+e.time+', '+ handler_name+")";
 		}else{
 			this.subscribe = 'schedule(\"'+e.time+'\", '+ handler_name+")";
@@ -227,29 +229,31 @@ function Inpute(e) {
 	}
 }
 
-function Inputa(a) {
-	this.devname = a.devname;
-	this.device = a.device;
-	this.input = a.input;
-}
-
-function Grouping() {
-	this.type;
-	this.p;
-	this.list = new Array();
-}
-
 function Event() {
+	this.device;
 	this.devname;
     this.attr;
-	this.device;
-	this.option;
 	this.event_handler = false;
+
 	this.from;
 	this.to;
 
+	this.api;
+	this.initmethod;
+
 	this.time;
+	this.timerhandler;
+	this.timevar;
 	
+}
+
+function Condition(){
+	this.right;
+	this.left;
+	this.operator;	
+	this.result;
+	
+	this.functionhandler;
 }
 
 function Action() {
@@ -259,11 +263,13 @@ function Action() {
     this.command;
     this.command_part;
 
-	this.timer;
+	this.time;
 	this.timerhandler;
 
 	this.method;
 	this.arginput = new Array;;
+
+	this.functionhandler;
 
 	this.state
 	this.state_command
@@ -271,13 +277,22 @@ function Action() {
 
 }
 
-function Args() {
-	this.devname;
-	this.device;
+
+function Grouping() {
+	this.type;
+	this.p;
+	this.list = new Array();
 }
 
 
-function state() {
-	this.devname;
-	this.device;
+function Inputa(a) {
+	this.devname
+	this.device 
+	this.input
+
+	if(a){
+		this.devname = a.devname
+		this.device  = a.device
+		this.input = a.input
+	}
 }

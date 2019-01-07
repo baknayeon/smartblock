@@ -3419,20 +3419,22 @@ Blockly.Generator.prototype.blockToCode=function(a){
 
 function isit(b){
 	// ny
-	if(b.constructor == Condition || b.constructor == Inputc ||b.constructor == Attribute ||b.constructor == Args )
+	if(b.constructor == Condition)
 		return true
 	else if (b.constructor == Event)
-		return true
-	else if (b.constructor == Grouping)
-		return true
-	else if (b.constructor == Number)
 		return true
 	else if(goog.isArray(b)){
 		var action = b[0]
 		if(action.constructor == Action)
+			return true
+	}else if (b.constructor == Action)
+		return true 
+	else if (b.constructor == Grouping)
 		return true
-	}else if (b.constructor ==Action)
-		return true // actionGoruping
+	else if (b.constructor == API || b.constructor == Inputc || b.constructor == Calculation ||b.constructor == Attribute ||b.constructor == Args) // condition node
+		return true
+	else if (b.constructor == Inputa)
+		return true
 	else
 		return false
 }

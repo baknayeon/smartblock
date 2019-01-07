@@ -82,7 +82,12 @@ Blockly.SmartThings['map'] = function(block) {
 
 	}
 		
-	return result;
+	var groupingDevice = new Grouping();
+	groupingDevice.type = "map"
+	groupingDevice.p = p
+	groupingDevice.list = device_list
+		
+	return groupingDevice;
 };
 
 function groupingBlock(color){
