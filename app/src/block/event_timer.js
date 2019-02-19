@@ -1,12 +1,13 @@
 Blockly.Blocks['e_time'] = {
   init: function() {
+	var time_num = deviceCount.get("schedule")
     this.appendValueInput("time")
-        .setCheck("day")
         .appendField("at")
         .appendField(new Blockly.FieldTextInput("0"), "hour")
         .appendField(":","c")
         .appendField(new Blockly.FieldTextInput("0"), "minute")
-		 .appendField(new Blockly.FieldDropdown([["AM","AM"], ["PM","PM"]]), "apm");
+		.appendField(new Blockly.FieldDropdown([["AM","AM"], ["PM","PM"]]), "apm")
+        .setCheck(["day_e", "week_e"]);
     this.setOutput(true, "Event");
     this.setColour(Block_colour_event);
  this.setTooltip("");
@@ -22,12 +23,11 @@ Blockly.Blocks['e_day'] = {
 	var months = [["Jan","Jan"], ["Feb","Feb"], ["Mar","Mar"], ["Apr","Apr"],
 					["May","May"], ["Jun","Jun"], ["Jul","Jul"], ["Aug","Aug"],
 					["Sept","Sept"], ["Oct","Oct"], ["Nov","Nov"], ["Dec","Dec"]]
-    this.appendValueInput("year")
-        .setCheck("year")
+    this.appendDummyInput("year")
         .appendField(new Blockly.FieldDropdown(months, months[month][0]), "month")
         .appendField(new Blockly.FieldTextInput(day), "day")
         .appendField("th","c");
-    this.setOutput(true, "day");
+    this.setOutput(true, "day_e");
     this.setColour(Block_colour_event);
  this.setTooltip("");
  this.setHelpUrl("");
@@ -35,19 +35,52 @@ Blockly.Blocks['e_day'] = {
 };
 Blockly.Blocks['e_week'] = {
   init: function() {
-    this.appendValueInput("next")
-        .setCheck("every")
+    this.appendDummyInput("next")
         .appendField(new Blockly.FieldDropdown([["Mon","Mon"], ["Tue","Tue"], ["Wed","Wed"], ["Thu","Thu"], ["Fri","Fri"], ["Sat","Sat"], ["Sun","Sun"]]), "week1")
         .appendField("to")
         .appendField(new Blockly.FieldDropdown([["Mon","Mon"], ["Tue","Tue"], ["Wed","Wed"], ["Thu","Thu"], ["Fri","Fri"], ["Sat","Sat"], ["Sun","Sun"]]), "week2")
         ;//.appendField("week");
     this.setInputsInline(false);
-    this.setOutput(true, "every");
+    this.setOutput(true, "week_e");
     this.setColour(Block_colour_event);
  this.setTooltip("");
  this.setHelpUrl("");
   }
 };
+
+
+Blockly.Blocks['input_time'] = {
+  init: function() {
+	var time_num = deviceCount.get("time")
+    this.appendDummyInput("type")
+        .appendField("at time")
+		.appendField(new Blockly.FieldVariable(time_num, null, null, "time"), "name");
+	this.setInputsInline(true);
+	this.setOutput(true, "Event");
+    this.setColour(Block_colour_event);
+	this.setTooltip("");
+	this.setHelpUrl("");
+  }
+};
+
+
+Blockly.Blocks['e_timer'] = {
+  init: function() {
+	var time_num = deviceCount.get("timer")
+    this.appendDummyInput("type")
+        .appendField("timer");
+    this.appendDummyInput("type")
+		.appendField(new Blockly.FieldVariable(time_num, null, null, "timer"), "NAME");
+	this.setInputsInline(true);
+	this.setOutput(true, "Event");
+    this.setColour(Block_colour_event);
+	this.setTooltip("");
+	this.setHelpUrl("");
+  }
+};
+
+
+
 
 
 Blockly.SmartThings['e_day'] = function(block) {
@@ -127,19 +160,6 @@ Blockly.SmartThings['e_time'] = function(block) {
 	return smartevent;
 };
 
-Blockly.Blocks['input_time'] = {
-  init: function() {
-	var time_num = deviceCount.get("time")
-    this.appendDummyInput("type")
-        .appendField("at time")
-		.appendField(new Blockly.FieldVariable(time_num, null, null, "time"), "name");
-	this.setInputsInline(true);
-	this.setOutput(true, "Event");
-    this.setColour(Block_colour_event);
-	this.setTooltip("");
-	this.setHelpUrl("");
-  }
-};
 
 Blockly.SmartThings['input_time'] = function(block) {
 	
@@ -152,21 +172,6 @@ Blockly.SmartThings['input_time'] = function(block) {
   return smartevent;
 };
 
-Blockly.Blocks['e_timer'] = {
-  init: function() {
-	var time_num = deviceCount.get("timer")
-    this.appendDummyInput("type")
-        .appendField("timer");
-    this.appendDummyInput("type")
-		.appendField(new Blockly.FieldVariable(time_num, null, null, "timer"), "NAME");
-	this.setInputsInline(true);
-	this.setOutput(true, "Event");
-    this.setColour(Block_colour_event);
-	this.setTooltip("");
-	this.setHelpUrl("");
-  }
-};
-
 Blockly.SmartThings['e_timer'] = function(block) {
 	var variable_name = Blockly.SmartThings.variableDB_.getName(block.getFieldText('NAME'), Blockly.Variables.NAME_TYPE);
 
@@ -175,3 +180,4 @@ Blockly.SmartThings['e_timer'] = function(block) {
 	
   return smartevent;
 };
+

@@ -96,9 +96,9 @@ Blockly.Blocks['compare'] = {
 		  ['∉','NEO'],
         ];
     this.appendValueInput('A')
-		.setCheck(["Inputc",  "state", "data", "API", "math_condition"]);
+		.setCheck(["Inputc",  "state", "data", "API", "math_condition", "OCC"]);
     this.appendValueInput('B')
-		.setCheck(["Inputc", "Attribute", "state", "data", "API", "math_condition"])
+		.setCheck(["Inputc", "Attribute", "state", "data", "API", "math_condition", "OCC"])
 		.appendField(new Blockly.FieldDropdown(OPERATORS), 'OP');
     this.setInputsInline(true);
     // Assign 'this' to a variable for use in the tooltip closure below.
@@ -156,7 +156,7 @@ Blockly.Blocks['compare'] = {
 		if(dropdown == 'EO' || dropdown == 'NEO'){
 			this.getInput('B').setCheck(["Device"]);
 		}else if(dropdown =='EQ'|| dropdown =='NEQ'|| dropdown =='LT' || dropdown =='GT' || dropdown =='LTQ' || dropdown =='GTQ' ){
-			this.getInput('B').setCheck(["Inputc", "Attribute", "state", "data", "API", "math_condition"]);
+			this.getInput('B').setCheck(["Inputc", "Attribute", "state", "data", "API", "math_condition", "OCC"]);
 		}
 	}else if(this.id == event.newParentId ){
 		if(event.newInputName == "B" || event.newInputName == "A" )
@@ -169,6 +169,7 @@ Blockly.Blocks['compare'] = {
 						if(blockA){
 							device = returnName(blockA.getFieldValue("type"))
 							device_type = blockA.getFieldValue('type');
+							
 						}else {
 							device_type = this.getFieldText('type');
 							device = returnName(this.getFieldText('type'))
@@ -190,6 +191,23 @@ Blockly.Blocks['compare'] = {
 								blockB.appendDummyInput('dev_attr')
 									  .appendField(new Blockly.FieldLabel(device_type, "device"), "device")
 									  .appendField(new Blockly.FieldTextInput("0"), "attribute");
+							}else if(attrMap.isMultiple(device)){
+								var attribute_id = blockA.getFieldValue('attribute_id');
+
+								var typeAttr  = attrMap.getMultipleMethod_type_byid(device, attribute_id)
+								if(typeAttr == "ENUM"){
+									var newAttr = attrMap.getMultipleMethod_vaules_byid(device, attribute_id)
+									blockB.appendDummyInput('dev_attr')
+										  .appendField(new Blockly.FieldLabel(device_type, "device"), "device")
+										  .appendField(new Blockly.FieldDropdown(newAttr), 'attribute');
+									blockB.attribute_id = attribute_id
+
+								}else if(typeAttr == "NUMBER"){
+									blockB.appendDummyInput('dev_attr')
+										 .appendField(new Blockly.FieldLabel(device_type, "device"), "device")
+									  	 .appendField(new Blockly.FieldTextInput("0"), "attribute");
+									blockB.attribute_id = attribute_id
+								}
 							}
 				}
 			}
@@ -219,6 +237,23 @@ Blockly.Blocks['compare'] = {
 						blockB.appendDummyInput('dev_attr')
 							  .appendField(new Blockly.FieldLabel(device_type, "device"), "device")
 							  .appendField(new Blockly.FieldTextInput("0"), "attribute");
+					}else if(attrMap.isMultiple(device)){
+						var attribute_id = blockA.getFieldValue('attribute_id');
+
+						var typeAttr  = attrMap.getMultipleMethod_type_byid(device, attribute_id)
+						if(typeAttr == "ENUM"){
+							var newAttr = attrMap.getMultipleMethod_vaules_byid(device, attribute_id)
+							blockB.appendDummyInput('dev_attr')
+								  .appendField(new Blockly.FieldLabel(device_type, "device"), "device")
+								  .appendField(new Blockly.FieldDropdown(newAttr), 'attribute');
+							blockB.attribute_id = attribute_id
+
+						}else if(typeAttr == "NUMBER"){
+							blockB.appendDummyInput('dev_attr')
+								 .appendField(new Blockly.FieldLabel(device_type, "device"), "device")
+								 .appendField(new Blockly.FieldTextInput("0"), "attribute");
+							blockB.attribute_id = attribute_id
+						}
 					}
 				}
 			}
@@ -286,11 +321,11 @@ Blockly.Blocks['negate'] = {
 Blockly.Blocks['math_condition'] = {
   init: function() {
     this.appendValueInput("A")
-        .setCheck(["API","Inputc", "state", "data"]);
+        .setCheck(["API","Inputc", "state", "data", "OCC", "math_condition"]);
     this.appendDummyInput()
         .appendField(new Blockly.FieldDropdown([["+","+"], ["-","-"], ["*","*"], ["/","/"]]), "OP");
     this.appendValueInput("B")
-        .setCheck(["API","Inputc", "state", "data"]);
+        .setCheck(["API","Inputc", "state", "data", "OCC", "math_condition"]);
     this.setInputsInline(true);
     this.setOutput(true, "math_condition");
     this.setColour(Block_colour_condition);
@@ -363,7 +398,7 @@ Blockly.Blocks['inputc_data'] = {
   		var device = "text"
 		var count = deviceCount.get(device)
 		this.appendDummyInput("device")
-				 .appendField(new Blockly.FieldDropdown([["text","text"], ["bool","bool"], ["number","number"], ["phone","phone"], ["message","message"], ["email","email"], ["password","password"], ["time","time"], ["mode","mode"]]), "type")
+				 .appendField(new Blockly.FieldDropdown(input_data_type), "type") // definder_helper
 				.appendField(new Blockly.FieldVariable(count, null, null, device), "name"); // , null, null, device)
 		this.setColour(Block_colour_condition);
     this.setInputsInline(true);
@@ -371,38 +406,8 @@ Blockly.Blocks['inputc_data'] = {
 	 this.setTooltip("");
 	 this.setHelpUrl("");
   },onchange: function(event) {
-		if(this.id == event.blockId && event.element == "field"&& event.name == "type"){
-		
-			var device = event.newValue
-			var count = deviceCount.get(device)
-			this.getInput("device").removeField("name")
-			this.getInput("device")
-				.appendField(new Blockly.FieldVariable(count, null, null, device), "name");
-		
-		}else if(event.type == Blockly.Events.BLOCK_MOVE){ //block connect
-				if(event.newParentId && event.newInputName == "number"){
-						var type = "number"
-						var count = deviceCount.get(type)
-						this.getInput("device").removeField("type")
-						this.getInput("device").removeField("name")
-						this.getInput("device").appendField(type,"type")
-						.appendField(new Blockly.FieldVariable(count, null, null, type), "name"); // , null, null, device)
-
-					
-					
-				}else if(event.oldParentId && this.parentBlock_ == null && event.oldInputName == "number"){ //block disconnect
-				
-					this.getInput("device").removeField("type")
-					this.getInput("device").removeField("name")
-					var count = deviceCount.get("text")
-					this.getInput("device")
-				 	.appendField(new Blockly.FieldDropdown([["text","text"], ["bool","bool"], ["number","number"], ["phone","phone"], ["message","message"]]), "type")
-					.appendField(new Blockly.FieldVariable(count, null, null, "text"), "name"); // , null, null, device)
-		
-				}
-			}
-		 
-	}
+	changInput(event, this)
+  }
 
 };
 
@@ -440,28 +445,32 @@ Blockly.Blocks['is_null'] = {
 
 
 
-
-
-//API- alreay
+//API- OCC
 Blockly.Blocks['already_enum'] = {
   init: function() {
+    this.appendDummyInput()
+        .appendField("num of occ");
+
     this.appendValueInput("device")
         .setCheck("Inputc");
-    this.appendDummyInput("attribute")
+    this.appendDummyInput("attribute");
+
     this.appendDummyInput()
         .appendField("during last");
+
     this.appendDummyInput("number")
         .appendField(new Blockly.FieldTextInput(3), "time_min");
     this.appendDummyInput("min_checkbox")
         .appendField("min")
 		.appendField(new Blockly.FieldCheckbox("TRUE"), "min_checkbox");
+
     this.setInputsInline(true);
-    this.setOutput(true, "Condition");
+    this.setOutput(true, "OCC");
     this.setColour(Block_colour_condition);
  this.setTooltip("");
  this.setHelpUrl("");
   },onchange: function(event) {
-	if(event.type==Blockly.Events.BLOCK_MOVE){
+	if(event.type==Blockly.Events.BLOCK_MOVE ){
 		if(event.newParentId == this.id){
 			if(event.newInputName == "device"){
 
@@ -472,26 +481,27 @@ Blockly.Blocks['already_enum'] = {
 
 					if(attrMap.onlyInENUM(device)){
 						var newAttr = attrMap.getENUM_vaules(device);
-						attrBlock.appendField(new Blockly.FieldDropdown(newAttr), 'value');
+						attrBlock.appendField(new Blockly.FieldDropdown(newAttr), 'event_value');
 					}
 				}
 			}	
 		}else if(event.oldParentId == this.id){
 			if(event.oldInputName == "device"){
 					var attrBlock = this.getInput("attribute")
-						attrBlock.removeField('value');
+						attrBlock.removeField('event_value');
 			}
 			
 		}
 
-	}else if(event.type == Blockly.Events.BLOCK_CHANGE && event.element == "field" && event.name == "min_checkbox"){//change checkbox
+	}else if(event.type == Blockly.Events.BLOCK_CHANGE &&  event.blockId == this.id &&event.element == "field" && event.name == "min_checkbox"){//change checkbox
 		this.removeInput("number")
 		this.removeInput("min_checkbox")
 		if(event.newValue == false){
-			this.appendValueInput("number");
+			this.appendValueInput("number")
+				.setCheck(["API","Inputc", "state", "data", "math_condition"]);
 			this.appendDummyInput("min_checkbox")
 				.appendField("min")
-				.appendField(new Blockly.FieldCheckbox("False"), "min_checkbox");
+				.appendField(new Blockly.FieldCheckbox("FALSE"), "min_checkbox");
 		}else if(event.newValue == true){
 			this.appendDummyInput("number")
 				.appendField(new Blockly.FieldTextInput(3), "time_min");
@@ -500,7 +510,44 @@ Blockly.Blocks['already_enum'] = {
 				.appendField(new Blockly.FieldCheckbox("TRUE"), "min_checkbox");
 
 		}
-	}
+	}/*else if(this.type = "already_enum" && event.type == Blockly.Events.BLOCK_CREATE && event.blockId == this.id){
+	
+		var block_device = this.getInputTargetBlock('device');
+				if(block_device){
+					var device =  returnName(block_device.getFieldValue('type'))
+					var attrBlock = this.getInput("attribute")
+
+					if(attrMap.onlyInENUM(device)){
+						var newAttr = attrMap.getENUM_vaules(device);
+						attrBlock.appendField(new Blockly.FieldDropdown(newAttr), 'event_value');
+					}
+				}
+		var b = this.getFieldValue("min_checkbox")
+
+
+
+		if(b == "FALSE"){
+
+			this.removeInput("number")
+			this.removeInput("min_checkbox")
+			this.appendValueInput("number")
+				.setCheck("Inputc");
+			this.appendDummyInput("min_checkbox")
+				.appendField("min")
+				.appendField(new Blockly.FieldCheckbox("FALSE"), "min_checkbox");
+	
+		}else if(b == "TRUE"){
+			
+			this.removeInput("number")
+			this.removeInput("min_checkbox")
+			this.appendDummyInput("number")
+				.appendField(new Blockly.FieldTextInput(3), "time_min");
+			this.appendDummyInput("min_checkbox")
+				.appendField("min")
+				.appendField(new Blockly.FieldCheckbox("TRUE"), "min_checkbox");
+
+		}
+	}*/
 	
   }
 };
@@ -515,25 +562,32 @@ Blockly.Blocks['already_num'] = {
 						  ['<', 'GT'],
 						  ['≤', 'GTQ']
 						] ;
+	  
+    this.appendDummyInput()
+        .appendField("num of occ");
+
     this.appendValueInput("device")
         .setCheck("Inputc");
-     this.appendValueInput("attribute")
+     this.appendValueInput("number_operator")
 		 .appendField(new Blockly.FieldDropdown(OPERATORS), 'operator')
-        .setCheck(["data","Inputc"]);
+        .setCheck(["data","Inputc","math_condition" ]);
+
     this.appendDummyInput()
         .appendField("during last");
+
     this.appendDummyInput("number")
         .appendField(new Blockly.FieldTextInput(3), "time_min");
     this.appendDummyInput("min_checkbox")
         .appendField("min")
 		.appendField(new Blockly.FieldCheckbox("TRUE"), "min_checkbox");
+
     this.setInputsInline(true);
-    this.setOutput(true, "Condition");
+    this.setOutput(true, "OCC");
     this.setColour(Block_colour_condition);
  this.setTooltip("");
  this.setHelpUrl("");
   },onchange: function(event) {
-	if(event.type == Blockly.Events.BLOCK_CHANGE && event.element == "field" && event.name == "min_checkbox"){//change checkbox
+	if(event.blockId == this.id && event.type == Blockly.Events.BLOCK_CHANGE && event.element == "field" && event.name == "min_checkbox"){//change checkbox
 		this.removeInput("number")
 		this.removeInput("min_checkbox")
 		if(event.newValue == false){
@@ -549,15 +603,55 @@ Blockly.Blocks['already_num'] = {
 				.appendField(new Blockly.FieldCheckbox("TRUE"), "min_checkbox");
 
 		}
-	}
+	}/*else if(this.type = "already_num" && event.type == Blockly.Events.BLOCK_CREATE && event.blockId == this.id){
+	
+		var block_device = this.getInputTargetBlock('device');
+				if(block_device){
+					var device =  returnName(block_device.getFieldValue('type'))
+					var attrBlock = this.getInput("attribute")
+
+					if(attrMap.onlyInENUM(device)){
+						var newAttr = attrMap.getENUM_vaules(device);
+						attrBlock.appendField(new Blockly.FieldDropdown(newAttr), 'event_value');
+					}
+				}
+		var b = this.getFieldValue("min_checkbox")
+
+
+
+		if(b == "FALSE"){
+
+			this.removeInput("number")
+			this.removeInput("min_checkbox")
+			this.appendValueInput("number")
+				.setCheck("Inputc");
+			this.appendDummyInput("min_checkbox")
+				.appendField("min")
+				.appendField(new Blockly.FieldCheckbox("FALSE"), "min_checkbox");
+	
+		}else if(b == "TRUE"){
+			
+			this.removeInput("number")
+			this.removeInput("min_checkbox")
+			this.appendDummyInput("number")
+				.appendField(new Blockly.FieldTextInput(3), "time_min");
+			this.appendDummyInput("min_checkbox")
+				.appendField("min")
+				.appendField(new Blockly.FieldCheckbox("TRUE"), "min_checkbox");
+
+		}
+	}*/
 	
   }
 };
 
 
-//API- happen
 Blockly.Blocks['happen_enum_dropdown'] = {
   init: function() {
+	  
+    this.appendDummyInput()
+        .appendField("num of occ");
+
 	this.appendValueInput("device")
         .setCheck("Inputc");
     this.appendDummyInput("attribute");
@@ -570,7 +664,7 @@ Blockly.Blocks['happen_enum_dropdown'] = {
         .appendField(new Blockly.FieldDropdown([["present","present"], ["clear time","cleartime"]]), "B");
    
     this.setInputsInline(true);
-    this.setOutput(true, "Condition");
+    this.setOutput(true, "OCC");
     this.setColour(Block_colour_condition);
  this.setTooltip("");
  this.setHelpUrl("");
@@ -598,6 +692,43 @@ Blockly.Blocks['happen_enum_dropdown'] = {
 			
 		}
 
+	}else if(event.type == Blockly.Events.BLOCK_CREATE && event.blockId == this.id){
+	
+		var block_device = this.getInputTargetBlock('device');
+				if(block_device){
+					var device =  returnName(block_device.getFieldValue('type'))
+					var attrBlock = this.getInput("attribute")
+
+					if(attrMap.onlyInENUM(device)){
+						var newAttr = attrMap.getENUM_vaules(device);
+						attrBlock.appendField(new Blockly.FieldDropdown(newAttr), 'event_value');
+					}
+				}
+		var b = this.getFieldValue("min_checkbox")
+
+
+
+		if(b == "FALSE"){
+
+			this.removeInput("time")
+			this.removeInput("min_checkbox")
+			this.appendValueInput("time")
+				.setCheck("Inputc");
+			this.appendDummyInput("min_checkbox")
+				.appendField("min")
+				.appendField(new Blockly.FieldCheckbox("FALSE"), "min_checkbox");
+	
+		}else if(b == "TRUE"){
+			
+			this.removeInput("time")
+			this.removeInput("min_checkbox")
+			this.appendDummyInput("time")
+				.appendField(new Blockly.FieldTextInput(3), "time_min");
+			this.appendDummyInput("min_checkbox")
+				.appendField("min")
+				.appendField(new Blockly.FieldCheckbox("TRUE"), "min_checkbox");
+
+		}
 	}
   }
 };
@@ -624,7 +755,7 @@ Blockly.Blocks['getlocation_c'] = {
 Blockly.Blocks['getsunrise_c'] = {
   init: function() {
     this.appendDummyInput()
-        .appendField("getSunrise");
+        .appendField("getSunriseTime");
     this.setOutput(true, "API");
     this.setColour(Block_colour_condition);
  this.setTooltip("");
@@ -635,7 +766,7 @@ Blockly.Blocks['getsunrise_c'] = {
 Blockly.Blocks['getsunset_c'] = {
   init: function() {
     this.appendDummyInput()
-        .appendField("getSunset");
+        .appendField("getSunsetTime");
     this.setOutput(true, "API");
     this.setColour(Block_colour_condition);
  this.setTooltip("");
@@ -694,6 +825,22 @@ Blockly.Blocks['last_event_data'] = {
         .appendField("last event time of ");
     this.appendValueInput("device")
         .setCheck("Inputc");
+    this.setInputsInline(true);
+    this.setOutput(true, "API");
+    this.setColour(Block_colour_condition);
+ this.setTooltip("");
+ this.setHelpUrl("");
+  }
+};
+
+
+
+//API- timeTodayAfter
+Blockly.Blocks['toDateTime'] = {
+  init: function() {
+    this.appendValueInput("number")
+        .appendField("time of")
+        .setCheck(["Inputc","data"]);
     this.setInputsInline(true);
     this.setOutput(true, "API");
     this.setColour(Block_colour_condition);

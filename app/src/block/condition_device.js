@@ -1,6 +1,7 @@
-function condition_block(device){
-	Blockly.SmartThings['c_'+device] = function(block) {
+function condition_block(device, type){
+	Blockly.SmartThings['c_'+device+type] = function(block) {
 	  var type = block.getFieldValue('type');
+	  var attribute_id = block.getFieldValue('attribute_id');
 	  var variable_name = Blockly.SmartThings.variableDB_.getName(block.getFieldText('name'), Blockly.Variables.NAME_TYPE);
 	  // TODO: Assemble SmartThings into code variable.
 	  type = returnName(type);
@@ -8,28 +9,29 @@ function condition_block(device){
 	  c.device = type;
 	  c.devname =device+variable_name;
 	  c.input = 'input \"'+c.devname+'\", \"capability.'+type +'\", title:\"'+c.devname+'\"' ;
+	  c.attribute_id = attribute_id;
 	  return c;
-	  //var code = 
-	  // TODO: Change ORDER_NONE to the correct strength.
-	  //return [code, Blockly.SmartThings.ORDER_NONE];
+	 
 	};
 
-	Blockly.Blocks['c_'+device] = {
+	Blockly.Blocks['c_'+device+type] = {
 	    init: function() {
 			var new_devName = shortName(device)
 			var count = deviceCount.get(device)
+			if(type == "single"){
+				this.appendDummyInput("device")
+					.appendField(new Blockly.FieldLabel(new_devName), "type")
+					.appendField(new Blockly.FieldVariable(count, null, null, device), "name"); // , null, null, device)
+			}else if(type == "multiple"){
+				var attr = attrMap.getMultipleMethod_id_vaules(device)
+				this.appendDummyInput("device")
+					.appendField(new Blockly.FieldLabel(new_devName), "type")
+					.appendField(new Blockly.FieldVariable(count, null, null, device), "name")
+					.appendField(new Blockly.FieldDropdown(attr),"attribute_id");
 
-			this.appendDummyInput("device")
-				.appendField(new Blockly.FieldLabel(new_devName), "type")
-				.appendField(new Blockly.FieldVariable(count, null, null, device), "name"); // , null, null, device)
-
+			}
 			var block = this.getInput("device");
-			/*if(attrMap.hasMultiTypeENUM(device)){
-				block.appendField(new Blockly.FieldDropdown(attrMap.getMultiType(device)), "attribute_id");
-			}else if(attrMap.hasMultiTypeNUMBER(device)){
-				block.appendField(new Blockly.FieldDropdown(attrMap.getMultiType(device)), "attribute_id");
-			}*/
-
+		
 			this.setOutput(true, "Inputc");
 			this.setColour(Block_colour_condition);
 			this.setTooltip("");

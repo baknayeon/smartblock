@@ -28,12 +28,19 @@ function Page(){
 }
 
 
-function simpleECA(statements_event, value_condition, statements_action) {
-	this.event = statements_event;
-    this.condition = value_condition;
-    this.actionList = statements_action;
-}
 
+function simpleECA(statements_event, value_condition,statements_action) {
+		this.event = statements_event;
+		this.condition = value_condition;
+		this.action = statements_action;
+		this.condition2 = null
+}
+function simpleECA_flow(statements_event, value_condition, value_condition2, statements_action) {
+		this.event = statements_event;
+		this.condition = value_condition;
+		this.action = statements_action;
+		this.condition2 = value_condition2
+}
 function ECA(statements_event, value_condition, statements_action) {
 	this.event = statements_event;
     this.condition = value_condition;
@@ -74,8 +81,8 @@ function ECA(statements_event, value_condition, statements_action) {
 		if(action.constructor == Grouping){
 			var device_list = action.list
 			if(device_list){
-				for(index in device_list){
-					var a = new Inputa(device_list[index]);
+				for(var input of device_list){
+					var a = new Inputa(input);
 					this.input_a_make.push(a);
 				}
 			}
@@ -99,6 +106,12 @@ function ECA(statements_event, value_condition, statements_action) {
 					this.input_a_make.push(a);
 				}
 			}
+			if(action.timerhandler){
+				for(var input of action.arginput){
+					var a = new Inputa(input);
+					this.input_a_make.push(a);
+				}
+			}
 
 		}
 
@@ -113,12 +126,9 @@ function condition_input(condition){
 		array = condition_input(condition.right)
 			
 	}else if(condition.operator == "is_null"){ //!p
-		array.push(condition.result);
+		if(condition.result.constructor == Inputc)
+			array.push(condition.result);
 			
-	}else if(condition.already){
-		var a = condition.already
-		array.push(a.input);
-	
 	}else if(condition.constructor == Grouping){
 		for(var inputc of condition.list){
 			var input = inputc.input
@@ -135,19 +145,57 @@ function condition_input(condition){
 			array = array.concat(array_right)
 			array = array.concat(array_left)
 		}
-		else if(operator == '==' || operator == '<'|| operator == '>' || operator == '!=' || operator == '>='|| operator == '=<'){
+		else if(operator == '==' || operator == '<'|| operator == '>' || operator == '!=' || operator == '>='|| operator == '=<'
+				||
+				operator == '+' || operator == '-'|| operator == '*' || operator == '/' ){
 			//smartDevice
 			
 			if(right.constructor == Inputc) // f =< f
 				array.push(right);
 			else if(right.constructor == API && right.inputs) 
 				array = array.concat(right.inputs);
-			
+			else if(right.constructor == Calculation){
+				array = array.concat(right.inputs)
+				
+			}else if(right.constructor == Occurrences){
+				
+				if(right.type == "already_enum"){
+					array.push(right.input);
+					if(right.arginput)
+						array.push(right.arginput);
+				}else if(right.type == "already_num"){
+					array.push(right.input);
+					if(right.input2)
+						array.push(right.input2);
+					if(right.arginput)
+						array.push(right.arginput);
+				}else if(right.type == "happen_enum_dropdown"){
+					array.push(right.input);
+				}
+			}
+					
 			if(left.constructor == Inputc) // f =< f
 				array.push(left);
 			else if(left.constructor == API && left.inputs) 
 				array = array.concat(left.inputs);
-			
+			else if(left.constructor == Calculation){
+				array = array.concat(left.inputs)
+			}else if(left.constructor == Occurrences){
+				
+				if(left.type == "already_enum"){
+					array.push(left.input);
+					if(left.arginput)
+						array.push(left.arginput);
+				}else if(left.type == "already_num"){
+					array.push(left.input);
+					if(left.input2)
+						array.push(left.input2);
+					if(left.arginput)
+						array.push(left.arginput);
+				}else if(left.type == "happen_enum_dropdown"){
+					array.push(left.input);
+				}
+			} 
 		
 		}
 	}
@@ -160,61 +208,104 @@ function Inpute(e) {
 
 		this.name = e.devname;
 		this.device = e.device;
+		this.attrtype = e.attrtype;
+		this.attr;
+
+		var handler_name = "rule"+eca_num+"_handler";
+		this.handler = handler_name + "(evt)";
+		if(attrMap.isSingle(this.device)){
+			if(attrMap.onlyInENUM(this.device)){
+
+				var enum_event 
+				if(e.attr){
+					this.attr = e.attr;
+					enum_event  = "."+this.attr
+				}else{
+					if(e.event_handler){
+						if(e.event_handler.to != '.'){
+							this.attr = e.event_handler.to
+							enum_event = "."+this.attr
+						}else{
+							this.attr = null
+
+						}	
+					}
+				}
+
+				this.input = 'input \"'+this.name+'\", \"capability.'+this.device +'\", title:\"'+this.name+'\"' ;
+				var attr_obj = attrMap.getENUM(this.device)
+				this.subscribe = "subscribe("+this.name+', \"'+ attr_obj.id + enum_event +'\", '+ handler_name+")";
+			}else if(attrMap.onlyInNUMBER(this.device)){
+				this.input = 'input \"'+this.name+'\", \"capability.'+this.device +'\", title:\"'+this.name+'\"' ;
+				var attr_obj = attrMap.getNUMBER(this.device)
+				this.subscribe = "subscribe("+this.name+', \"'+ attr_obj.id+'\", '+ handler_name+")";
+			}
+		}else if(attrMap.isMultiple(this.device)){
+			var attr_obj = attrMap.getMultipleMethod_byid(this.device, this.attrtype)
+			if(attr_obj.type == "ENUM"){
+
+				var enum_event 
+				if(e.attr){
+					this.attr = e.attr;
+					enum_event  = "."+this.attr
+				}else{
+					if(e.event_handler){
+						if(e.event_handler.to != '.'){
+							this.attr = e.event_handler.to
+							enum_event = "."+this.attr
+						}else{
+							this.attr = null
+
+						}	
+					}
+				}
+				this.input = 'input \"'+this.name+'\", \"capability.'+this.device +'\", title:\"'+this.name+'\"' ;
+				this.subscribe = "subscribe("+this.name+', \"'+ attr_obj.id+ enum_event +'\", '+ handler_name+")";
+			}else if(attr_obj.type == "NUMBER"){
+				this.input = 'input \"'+this.name+'\", \"capability.'+this.device +'\", title:\"'+this.name+'\"' ;
+				this.subscribe = "subscribe("+this.name+', \"'+ attr_obj.id+'\", '+ handler_name+")";
+			}
+
+
+		}
+
+	}else if(e.abstract_){ //locate, app
+
+		this.abstract_ = e.abstract_;
 		this.attr = e.attr;
+
 		
 		var handler_name = "rule"+eca_num+"_handler";
 		this.handler = handler_name + "(evt)";
 
-		if(e.event_handler){
-			if(e.event_handler.to != '.')
+		var enum_event  = "."+this.attr
+		if(e.event_handler && e.event_handler != ""){
+			if(e.event_handler.to != '.'){
 				this.attr = e.event_handler.to
-			else 
+				enum_event = "."+this.attr
+			}else{
 				this.attr = ""
 
+			}	
 		}
 
-		if(attrMap.onlyInENUM(this.device)){
-			this.input = 'input \"'+this.name+'\", \"capability.'+this.device +'\", title:\"'+this.name+'\"' ;
-			var attr_obj = attrMap.getENUM(this.device)
-			this.subscribe = "subscribe("+this.name+', \"'+ attr_obj.id +"."+this.attr+'\", '+ handler_name+")";
-		}else if(attrMap.onlyInNUMBER(this.device)){
-			this.input = 'input \"'+this.name+'\", \"capability.'+this.device +'\", title:\"'+this.name+'\"' ;
-			var attr_obj = attrMap.getNUMBER(this.device)
-			this.subscribe = "subscribe("+this.name+', \"'+ attr_obj.id+'\", '+ handler_name+")";
-		}
+		if(this.abstract_ == "location" && this.attr != "."){
+			this.subscribe = "subscribe("+this.abstract_+', \"'+ this.attr+'\", '+ handler_name+")";
+		}else if(this.abstract_ == "location" && this.attr == "."){
+			this.subscribe = "subscribe("+this.abstract_+', '+ handler_name+")";
+		}else if(this.abstract_ == "app"){
+			this.subscribe = "subscribe("+this.abstract_+', '+ handler_name+")";
+		} 
 
-	}else if(e.api){ //locate, app, init method
-
-		this.api = e.api;
-		this.attr = e.attr;
-			
-	
-		if(this.api == "installed"){
-			
-			this.handler = e.initmethod + "()";
-		}else{
 		
-			var handler_name = "rule"+eca_num+"_handler";
-			this.handler = handler_name + "(evt)";
-			if(e.event_handler){
-				if(e.event_handler.to != '.')
-					this.attr = e.event_handler.to
-				else 
-					this.attr = ""
+	}else if(e.predefined_){ //init method
 
-			}
-
-			if(this.api == "location" && this.attr != "."){
-				this.subscribe = "subscribe("+this.api+', \"'+ this.attr+'\", '+ handler_name+")";
-			}else if(this.api == "location" && this.attr == "."){
-				this.subscribe = "subscribe("+this.api+', '+ handler_name+")";
-			}else if(this.api == "app"){
-				this.subscribe = "subscribe("+this.api+', '+ handler_name+")";
-			} 
-
-		}
+		this.predefined_type = e.predefined_;
+		this.handler = e.handler + "()";
+		
 	}else if(e.timerhandler){ //timer
-
+		this.timerhandler = e.timerhandler
+		this.handler = e.timerhandler + "()";
 	}else if(e.time){ //schedule
 		var handler_name = "rule"+eca_num+"_handler";
 		this.handler = handler_name + "(evt)";
@@ -226,25 +317,27 @@ function Inpute(e) {
 			this.subscribe = 'schedule(\"'+e.time+'\", '+ handler_name+")";
 			
 		}
+	}else if(e.handler){ //schedule
+		this.handler = e.handler + "()";
 	}
 }
 
 function Event() {
 	this.device;
 	this.devname;
+    this.abstract_;
+
     this.attr;
 	this.event_handler = false;
 
 	this.from;
 	this.to;
 
-	this.api;
 	this.initmethod;
 
 	this.time;
 	this.timerhandler;
 	this.timevar;
-	
 }
 
 function Condition(){

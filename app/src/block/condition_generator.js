@@ -52,8 +52,8 @@ Blockly.SmartThings['operation'] = function(block) {
   }
   
   var c = new Condition();
-  c.right = argument0;
-  c.left = argument1;
+  c.right = argument1;
+  c.left = argument0 ;
   c.operator = operator;
   return c;
 };
@@ -138,24 +138,24 @@ Blockly.SmartThings['math_condition'] = function(block) {
 
   if(value_a.constructor == Inputc){
   	inputList.push(value_a)
-  	if(value_a.device)
-		left = value_a.devname
-  	else if(value_a.type)
-		left = value_a.name
   }else if(value_a.constructor == API){
-  	if (value_a.inputs) inputList = inputList.concat(value_a.inputs)
-	left = value_a.value
+  	if (value_a.inputs) 
+  		inputList = inputList.concat(value_a.inputs)
+  }else if(value_a.constructor == Calculation){
+  	if (value_a.inputs) 
+  		inputList = inputList.concat(value_a.inputs)
   }
   
   if(value_b.constructor == Inputc){
   	inputList.push(value_b)
-  	if(value_b.device)
-		right = value_b.devname
-  	else if(value_b.type)
-		right = value_b.name
+
   }else if(value_b.constructor == API){
-  	if (value_b.inputs) inputList = inputList.concat(value_b.inputs)
-	right = value_b.value
+  	if (value_b.inputs) 
+  		inputList = inputList.concat(value_b.inputs)
+
+  }else if(value_a.constructor == Calculation){
+  	if (value_a.inputs) 
+  		inputList = inputList.concat(value_a.inputs)
   }
 
 
@@ -185,9 +185,9 @@ Blockly.SmartThings['dev_attr'] = function(block) {
   // TODO: Assemble SmartThings into code variable.
 
   var dev_attr = new Attribute();
-  dev_attr.device = dropdown_name
-  dev_attr.attr_id = dropdown_attribute_id
-  dev_attr.attr = returnName(dropdown_attribute)
+  dev_attr.device = returnName(dropdown_name)
+  dev_attr.attr = dropdown_attribute
+  dev_attr.attribute_id = block.attribute_id
   // TODO: Change ORDER_NONE to the correct strength.
   return dev_attr
 
@@ -245,14 +245,9 @@ Blockly.SmartThings['is_null'] = function(block) {
   var arg = Blockly.SmartThings.valueToCode(block, 'device', Blockly.SmartThings.ORDER_ATOMIC);
   // TODO: Assemble SmartThings into code variable.
   var c = new Condition();
- 		
-  if(arg.constructor == Inputc){
- 	 c.result = arg.devname
-  	 c.operator = "is_null"
-  }else if(arg.constructor == API){
-  	c.result = arg.value
-  	c.operator = "is_null"
-  }
+   c.operator = "is_null"
+    c.result = arg
+
 
   // TODO: Change ORDER_NONE to the correct strength.
   return c;
@@ -261,30 +256,42 @@ Blockly.SmartThings['is_null'] = function(block) {
 
 //API- alreay
 Blockly.SmartThings['already_enum'] = function(block) {
-  var value_device = Blockly.SmartThings.valueToCode(block, 'device', Blockly.SmartThings.ORDER_ATOMIC);
-  var attr_value = block.getFieldValue('value');
+  var device_input = Blockly.SmartThings.valueToCode(block, 'device', Blockly.SmartThings.ORDER_ATOMIC);
+  var event_value = block.getFieldValue('event_value');
+
+  var time_input = Blockly.SmartThings.valueToCode(block, 'number', Blockly.SmartThings.ORDER_ATOMIC);
   var time_min = block.getFieldValue('time_min');
-  var value_min = Blockly.SmartThings.valueToCode(block, 'min', Blockly.SmartThings.ORDER_ATOMIC);
   // TODO: Assemble SmartThings into code variable.
  
-   var a = new Already();
-   a.attr_value = attr_value
-   a.time = time_min ? time_min : value_min
-   a.input = value_device; 
+   var a = new Occurrences();
    a.type = "already_enum"; 
- 
+   a.input = device_input; 
+   a.event_value = event_value
+
+   if(time_input){
+		a.time = time_input 
+		a.arginput = time_input 
+   }else if(time_min){
+		a.time =time_min*1000
+
+   }
    var c = new Condition();
    c.result = a
+   c.operator = "already"
 
-  return c;
+
+  return a;
 };
 
 Blockly.SmartThings['already_num'] = function(block) {
-  var value_device = Blockly.SmartThings.valueToCode(block, 'device', Blockly.SmartThings.ORDER_ATOMIC);
-  var value_attribute = Blockly.SmartThings.valueToCode(block, 'attribute', Blockly.SmartThings.ORDER_ATOMIC);
-  var attr_value = block.getFieldValue('value');
+  var device_input = Blockly.SmartThings.valueToCode(block, 'device', Blockly.SmartThings.ORDER_ATOMIC);
+  var event_number = Blockly.SmartThings.valueToCode(block, 'number', Blockly.SmartThings.ORDER_ATOMIC);
+  
+  var operator = OPERATORS[block.getFieldValue('operator')];
+
+  var time_input = Blockly.SmartThings.valueToCode(block, 'time', Blockly.SmartThings.ORDER_ATOMIC);
   var time_min = block.getFieldValue('time_min');
-  var value_min = Blockly.SmartThings.valueToCode(block, 'number', Blockly.SmartThings.ORDER_ATOMIC);
+
   var OPERATORS = {
     'EQ': '==',
     'NEQ': '!=',
@@ -294,36 +301,42 @@ Blockly.SmartThings['already_num'] = function(block) {
     'GTQ': '=<',
 	'EO': 'ϵ',
 	'NEO': '∉'
-	
   };
 
- 
-  var operator = OPERATORS[block.getFieldValue('operator')];
-  // TODO: Assemble SmartThings into code variable.
 
-
-   var a = new Already();
-   if(value_attribute.constructor == Inputc)
-  	 a.attr_value = value_attribute.name
-   else if(value_attribute.constructor == String)
-  	 a.attr_value = value_attribute
-   a.time = time_min ? time_min : value_min
-   a.input = value_device; 
-   a.type = "already_num"; 
+   var a = new Occurrences();
+   a.type = "already_num";
+   a.input = device_input;	 
    a.operator = operator;
- 
-   var c = new Condition();
-   c.input = value_device; 
-   c.result = a
 
-  return c;
+   if(event_number.constructor == Inputc){
+  	 a.compare = event_number
+     a.input2 = event_number;
+
+   }else if(event_number.constructor == String)
+  	 a.compare = value_attribute
+   else if(event_number.constructor == Calculation)
+  	 a.compare = value_attribute
+  
+   if(time_input){
+		a.time = time_input 
+		a.arginput = time_input 
+   }else if(time_min){
+		a.time =time_min
+   }
+   
+   var c = new Condition();
+   c.result = a
+   c.operator = "already"
+
+  return a;
 };
 
 
 //API- happen
 Blockly.SmartThings['happen_enum_dropdown'] = function(block) {
-  var value_device = Blockly.SmartThings.valueToCode(block, 'device', Blockly.SmartThings.ORDER_ATOMIC);
-  var attr_value = block.getFieldValue('value'); 
+  var device_input = Blockly.SmartThings.valueToCode(block, 'device', Blockly.SmartThings.ORDER_ATOMIC);
+  var event_value = block.getFieldValue('value'); 
   var dropdown_a = block.getFieldValue('A');
   var dropdown_b = block.getFieldValue('B');
   // TODO: Assemble SmartThings into code variable.
@@ -340,16 +353,16 @@ Blockly.SmartThings['happen_enum_dropdown'] = function(block) {
 	dropdown_b = "new Date()"
 
 
-   var a = new Already();
-   a.attr_value = attr_value
+   var a = new Occurrences();
+   a.event_value = event_value
    a.time = "eventsBetween("+ dropdown_a +", "+ dropdown_b +")"
-   a.input = value_device; 
+   a.input = device_input; 
    a.type = "happen_enum_dropdown"; 
  
    var c = new Condition();
    c.result = a
-
-  return c;
+   c.operator = "already"
+  return a;
 };
 
 
@@ -369,7 +382,7 @@ Blockly.SmartThings['getlocation_c'] = function(block) {
 Blockly.SmartThings['getsunrise_c'] = function(block) {
   // TODO: Assemble SmartThings into code variable.
   var c = new API()
-  c.value =  "getSunriseAndSunset().sunrise";
+  c.value =  "getSunriseAndSunset().sunrise.time";
   return c;
 };
 
@@ -377,7 +390,7 @@ Blockly.SmartThings['getsunrise_c'] = function(block) {
 Blockly.SmartThings['getsunset_c'] = function(block) {
   // TODO: Assemble SmartThings into code variable.
   var c = new API()
-  c.value =  "getSunriseAndSunset().sunset";
+  c.value =  "getSunriseAndSunset().sunset.time";
   return c;
 };
 
@@ -422,14 +435,36 @@ Blockly.SmartThings['last_event_data'] = function(block) {
 	api.inputs = [value_device]
 	api.type = "last_event_data"
 
-  	if(attrMap.onlyInENUM(device)){
-		var attr_id = attrMap.getENUM_id(device)
-		api.value = devname +".currentState(\""+ attr_id+"\").rawDateCreated.time"
-	}else if(attrMap.onlyInNUMBER(device)){
-		var attr_id = attrMap.getNUMBER(device)
-		api.value = devname +".currentValue(\""+ attr_id+"\").rawDateCreated.time"
+	if(attrMap.isSingle(device)){
+		if(attrMap.onlyInENUM(device)){
+			var attr_id = attrMap.getENUM_id(device)
+			api.value = devname +".currentState(\""+ attr_id+"\").rawDateCreated.time"
+		}else if(attrMap.onlyInNUMBER(device)){
+			var attr_id = attrMap.getNUM_id(device)
+			api.value = devname +".currentValue(\""+ attr_id+"\").rawDateCreated.time"
+		}
+	}else if(attrMap.isMultiple(device)){
+	
 	}
   
+  // TODO: Change ORDER_NONE to the correct strength.
+  return api;
+};
+
+
+
+//API- last time (String)
+Blockly.SmartThings['toDateTime'] = function(block) {
+  var time = Blockly.SmartThings.valueToCode(block, 'time', Blockly.SmartThings.ORDER_ATOMIC);
+  // TODO: Assemble SmartThings into code variable.
+  	 var api = new API()
+	
+	if(time.constructor == Inputc){
+		api.inputs = [time]
+		api.value = "toDateTime("+time.name+", location.timeZone).getTime()"
+	}else if(time.constructor == String){
+		api.value = time * 1000
+	}
   // TODO: Change ORDER_NONE to the correct strength.
   return api;
 };
@@ -440,7 +475,7 @@ Blockly.SmartThings['last_event_data'] = function(block) {
 //class
 
 
-function Already(){
+function Occurrences(){
 	this.input;
 	this.attr_value;
 	this.time;

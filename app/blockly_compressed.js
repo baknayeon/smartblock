@@ -2887,6 +2887,13 @@ Blockly.Block.prototype.setOnChange=function(a){if(a&&!goog.isFunction(a))throw 
 Blockly.Block.prototype.getVars=function(){for(var a=[],b=0,c;c=this.inputList[b];b++)for(var d=0,e;e=c.fieldRow[d];d++)e instanceof Blockly.FieldVariable&&a.push(e.getValue());return a};Blockly.Block.prototype.getVarModels=function(){for(var a=[],b=0,c;c=this.inputList[b];b++)for(var d=0,e;e=c.fieldRow[d];d++)e instanceof Blockly.FieldVariable&&(e=this.workspace.getVariableById(e.getValue()))&&a.push(e);return a};
 Blockly.Block.prototype.updateVarName=function(a){for(var b=0,c;c=this.inputList[b];b++)for(var d=0,e;e=c.fieldRow[d];d++)e instanceof Blockly.FieldVariable&&a.getId()==e.getValue()&&e.setText(a.name)};Blockly.Block.prototype.renameVarById=function(a,b){for(var c=0,d;d=this.inputList[c];c++)for(var e=0,f;f=d.fieldRow[e];e++)f instanceof Blockly.FieldVariable&&a==f.getValue()&&f.setValue(b)};
 
+Blockly.Block.prototype.getFieldNY=function(name){//ny
+	for(var a=1;a<this.fieldRow.length;a++)
+		if(this.fieldRow[a].name == name)
+			return this.fieldRow[a]
+	
+	
+};
 Blockly.Block.prototype.getFieldValue=function(a){return(a=this.getField(a))?a.getValue():null};
 Blockly.Block.prototype.getFieldText=function(a){return(a=this.getField(a))?a.getText():null};//ny
 Blockly.Block.prototype.getFieldType=function(a){
@@ -3356,29 +3363,22 @@ Blockly.make_newBlock=function(a){
 Blockly.Field.register("field_variable",Blockly.FieldVariable);Blockly.Generator=function(a){this.name_=a;this.FUNCTION_NAME_PLACEHOLDER_REGEXP_=new RegExp(this.FUNCTION_NAME_PLACEHOLDER_,"g")};Blockly.Generator.NAME_TYPE="generated_function";Blockly.Generator.prototype.INFINITE_LOOP_TRAP=null;Blockly.Generator.prototype.STATEMENT_PREFIX=null;Blockly.Generator.prototype.INDENT="  ";Blockly.Generator.prototype.COMMENT_WRAP=60;Blockly.Generator.prototype.ORDER_OVERRIDES=[];
 
 //ny
-var scru_rule= new Array();
-var scru_page= new Array();
+var blocksArray = new Array();
 Blockly.Generator.prototype.workspaceToCode=function(a){
 	a||(console.warn("No workspace specified in workspaceToCode call.  Guessing."),a=Blockly.getMainWorkspace());var b=[];this.init(a);a=a.getTopBlocks(!0);
 	
 	eca_num = 0;
-	scru_rule= new Array();
-	scru_page= new Array();
-
-	deviceCount.set("time", parseInt("1"))
-	deviceCount.set("message", parseInt("1"))
-	deviceCount.set("phone", parseInt("1"))
-
+	blocksArray = new Array();
 	var rules 
 	for(var c=0,d;d=a[c];c++){//ny
 		if(d.type === "eca" || d.type === "ea"){
-			rules=this.blockToCode(d);
+			rules = this.blockToCode(d);
 			rules = rules.reverse()
 			break;
 		}
 		if(d.type === "page"){
 			rules=this.blockToCode(d);
-			rules = rules.reverse()
+			//rules = rules.reverse()
 			break;
 		}
 		//goog.isArray(e)&&(e=e[0]);e&&(d.outputConnection&&(e=this.scrubNakedValue(e)),b.push(e))
@@ -3398,9 +3398,9 @@ Blockly.Generator.prototype.blockToCode=function(a){
 
 	// ny
 	if(b.constructor == ECA) 
-        return this.scrub_rule(a,b)
+        return this.scrub_2Array(a,b)
 	else if(b.constructor == Page) 
-        return this.scrub_page(a,b);
+        return this.scrub_2Array(a,b);
 
 	if(isit(b))
 		return b;
@@ -3431,7 +3431,7 @@ function isit(b){
 		return true 
 	else if (b.constructor == Grouping)
 		return true
-	else if (b.constructor == API || b.constructor == Inputc || b.constructor == Calculation ||b.constructor == Attribute ||b.constructor == Args) // condition node
+	else if (b.constructor == API || b.constructor == Inputc || b.constructor == Calculation ||b.constructor == Attribute ||b.constructor == Args ||b.constructor == Occurrences) // condition node
 		return true
 	else if (b.constructor == Inputa)
 		return true

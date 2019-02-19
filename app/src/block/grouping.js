@@ -45,7 +45,6 @@ Blockly.SmartThings['all'] = function(block) {
 	return groupingDevice;
 };
 
-
 Blockly.SmartThings['exists'] = function(block) {
 	var p = Blockly.SmartThings.valueToCode(block, 'p', Blockly.SmartThings.ORDER_ATOMIC);
 	var device_list = Blockly.SmartThings.statementToCode(block, 'group');
@@ -59,7 +58,7 @@ Blockly.SmartThings['exists'] = function(block) {
 };
 
 Blockly.SmartThings['map'] = function(block) {
-	var p = Blockly.SmartThings.valueToCode(block, 'p', Blockly.SmartThings.ORDER_ATOMIC);
+	var p = block.getFieldValue('type');
 	var device_list = Blockly.SmartThings.statementToCode(block, 'group');
  
 
@@ -67,27 +66,20 @@ Blockly.SmartThings['map'] = function(block) {
 
 	for(var action of device_list){
 		var device = action.device
-		if(commMap.has1Commad(device)){
-			action.command= action.devname+'.'+ p.device+'()';
+		if(commMap.hasCommad(device)){
+			action.command= action.devname+'.'+ p+'()';
 		}else if(commMap.has1Method(device)){
 			var command = commMap.getMethod(action)
 		}
 		groupingDevice.push(action)
 	}
 	
-	if(goog.isArray(actionList)){
-		var result = actionList.concat(groupingDevice);
-	}else{
-		var result = groupingDevice;
-
-	}
-		
 	var groupingDevice = new Grouping();
 	groupingDevice.type = "map"
 	groupingDevice.p = p
 	groupingDevice.list = device_list
 		
-	return groupingDevice;
+	return [groupingDevice];
 };
 
 function groupingBlock(color){
@@ -370,7 +362,8 @@ Blockly.Blocks['all'] = {
 				var block_group_childBlocks = block_group.childBlocks_
 				if(block_group_childBlocks.length > 0){
 					var childBlock1 = block_group_childBlocks[0]
-					var child_type = childBlock1.type.split("_")[1]
+					
+					var child_type = childBlock1.getField("type").text_
 
 					var blockP = this.getInputTargetBlock('p');
 					settingA(blockP, child_type)
@@ -402,7 +395,7 @@ Blockly.Blocks['exists'] = {
 			var block_group_childBlocks = block_group.childBlocks_
 			if(block_group_childBlocks.length > 0){
 				var childBlock1 = block_group_childBlocks[0]
-				var child_type = childBlock1.type.split("_")[1]
+				var child_type = childBlock1.getField("type").text_
 
    				var blockP = this.getInputTargetBlock('p');
 				settingA(blockP, child_type)
@@ -484,7 +477,7 @@ function getCommandInMap(children_blocks){
 	var newComm = new Set()
 
 	for(let device of deviceList){
-		if(commMap.has1Commad(device)){
+		if(commMap.hasCommad(device)){
 			for(let comm of commMap.getCommad(device))
 			{
 				newComm.add(comm)
@@ -499,3 +492,5 @@ function getCommandInMap(children_blocks){
 
 	return command
 }
+
+

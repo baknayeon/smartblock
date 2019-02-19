@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Samrt Block for SmartThings</title>
+  <title>Smart Block for SmartThings</title>
   
   <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
   <script src="../blockly_compressed.js"></script>
@@ -11,27 +11,42 @@
   <script src="../msg/js/en.js"></script>
   <script src="support/FileSaver.js"></script>
   <script src="support/button_jquery.js"></script>
+
   <script src="cap/cap.js"></script>
-  <script src="cap/cap_help.js"></script>
+  <script src="cap/cap_helper.js"></script>
+  <script src="cap/cap_helper_attrMap.js"></script>
+  <script src="cap/cap_helper_commMap.js"></script>
+
   <script src="help.js"></script>
-  <script src="codegenerate.js"></script>
+
+  <script src="codegenerate1(def+pref).js"></script>
+  <script src="codegenerate2(predefined).js"></script>
+  <script src="codegenerate3(handlers).js"></script>
+
   <script src="toolbox.js"></script>
   <script src="verification.js"></script>
 
   <script src="block/rule_definer.js"></script>
   <script src="block/rule_generator.js"></script>
+
   <script src="block/event.js"></script>
+  <script src="block/event_timer.js"></script>
+
   <script src="block/condition_generator.js"></script>
   <script src="block/condition_device.js"></script>
   <script src="block/condition_definer.js"></script>
+
   <script src="block/action_list.js"></script>
   <script src="block/action_device.js"></script>
-  <script src="block/action_API.js"></script>
+  <script src="block/action_generator.js"></script>
+  <script src="block/action_definer.js"></script>
+  <script src="block/action_timer.js"></script>
+
+  <script src="block/_definer_helper.js"></script>
+
 
   <script src="block/option.js"></script>
   <script src="block/preference.js"></script>
-  <script src="block/a_timer.js"></script>
-  <script src="block/e_timer.js"></script>
   <script src="block/grouping.js"></script>
   <link rel="stylesheet" type="text/css" href="css/main.css">
   <link rel="stylesheet" href="highlight/styles/default.css">
@@ -42,9 +57,12 @@
 	var	deviceCount = new CountMap();
 	var deviceSet = new Set();
 	var selected_dev = new Map();
+
 	var attrMap = new AttributeMap(); 	
 	var commMap = new CommandMap();
+
 	var verificationMap = new VerificationMap();
+
 	var comman_uesed = new Array;
 
 	mapInit(); 	
@@ -87,14 +105,6 @@
 	<category name="Event" custom="SAMRT_DEVICE_E" colour ="#5eb7b5"></category>
 	<category name="Condition" custom="SAMRT_DEVICE_C" colour ="#A2CC0D"></category>
 	<category name="Action" custom="SAMRT_DEVICE_A" colour ="#efcd3f"></category>
-	<!--<category name="State" colour ="#303030">
-		<block type="state"></block>
-		<block type="put_state"></block>
-		<block type="math_number"></block>
-		<block type="math_text"></block>
-		<block type="math_arithmetic"></block>
-	</category>
-	!-->
 </xml>
 
 <body onload="all()">
@@ -168,9 +178,11 @@
 													});
 
 
-	workspace.registerToolboxCategoryCallback('SAMRT_DEVICE_C', Blockly.devicesFlyoutCallback_condition);
 	workspace.registerToolboxCategoryCallback('SAMRT_DEVICE_E', Blockly.devicesFlyoutCallback_event);
+	workspace.registerToolboxCategoryCallback('SAMRT_DEVICE_C', Blockly.devicesFlyoutCallback_condition);
 	workspace.registerToolboxCategoryCallback('SAMRT_DEVICE_A', Blockly.devicesFlyoutCallback_action);
+
+
 
 	var demoWorkspace2; 
      
@@ -178,9 +190,13 @@
 
 		var ecaList = Blockly.SmartThings.workspaceToCode(workspace);
 		if(ecaList != null){
-			///var result_verification = verification(ecaList);
-			//if(result_verification){
-				
+			var result_verification = verification(ecaList);
+			if(result_verification.isReliable()){
+			
+				var code = smartApp(ecaList);
+				_("smartApp_code").textContent = code;
+				hljs.highlightBlock(_("smartApp_code"));	
+			
 				_("in_box1").style.display = "none"
 				_("in_box2").style.display = "none"
 				_("in_box3").style.display = ""
@@ -190,18 +206,16 @@
 				_("click2").style.background = "#fff"
 				_("click3").style.background = "#f4f4f4"
 
-				var code = smartApp(ecaList);
-
-				_("smartApp_code").textContent = code;
-				hljs.highlightBlock(_("smartApp_code"));
-
-			//}
+			}else{
+				result_verification.alert_()
+			}
 		}else{
 
-			alert("plz build SmartBlock");
+			alert("please build SmartBlock");
 		}
 			
 	}
+
 
 	function saveCode() {
 		try{

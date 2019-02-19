@@ -4,18 +4,33 @@ Blockly.devicesFlyoutCallback_event = function(workspace) {
 	selected_dev.forEach(function(itme){
 		var device = itme
 	   if(attrMap.makeBlock(device)){
-			if(attrMap.onlyInENUM(device)){
-				event_block(device, "ENUM");
-				xmlList.push(addXml("e_"+device+"ENUM"))
-			}else if(attrMap.onlyInNUMBER(device)){	
-				event_block(device, "NUMBER");
-				xmlList.push(addXml("e_"+device+"NUMBER"))
-			}else if(attrMap.inENUMandNUMBER(device)){
-				event_block(device, "ENUM");
-				xmlList.push(addXml("e_"+device+"ENUM"))
+			if(attrMap.isSingle(device)){
+				var attr = attrMap.getSingle(device)
+				var id = attr.id
+				var type = attr.type
+				/*if(attrMap.onlyInENUM(device)){
+					event_block(device, "ENUM");
+					xmlList.push(addXml("e_"+device+"SingleENUM"))
+				}
+				if(attrMap.onlyInNUMBER(device)){	
+					event_block(device, "NUMBER");
+					xmlList.push(addXml("e_"+device+"SingleNUMBER"))
+				}*/
+				//devie s/n type id
+				event_block(device, "Single", type, id);
+				xmlList.push(addXml("e_"+device+"Single"+type+id))
+			}else if(attrMap.isMultiple(device)){
+				var attr_map = attrMap.getMultiple(device)
+							
+				attr_map.forEach(function (item, key, mapObj) {
+					var attr = item
+					var id = attr.id
+					var type = attr.type
+					event_block(device, "Multiple", type, id);
+					xmlList.push(addXml("e_"+device+"Multiple"+type+id))
+				});
+			
 				
-				event_block(device, "NUMBER");
-				xmlList.push(addXml("e_"+device+"NUMBER"))
 			}
 		}
 	});
@@ -31,7 +46,17 @@ Blockly.devicesFlyoutCallback_event = function(workspace) {
 	} 
 		 
 
-	
+	subscribes_fromaction.forEach(function (item, key, mapObj) {
+		var method_blockId = key
+		var input_block = item; //subscribes_fromaction.set(this.id, [input_type, input_name, attr])
+
+		//var sub_block = workspace.getBlockById(method_blockId)
+		
+		event_block2(method_blockId, input_block)
+		xmlList.push(addXml('e_sub'+input_block[3]))
+	});
+
+
 	if (Blockly.Blocks["inpute_data"]) {
 		  var blockText = '<xml>' +
 			  '<block type="inpute_data">' +
@@ -70,6 +95,16 @@ Blockly.devicesFlyoutCallback_event = function(workspace) {
 	add_groupingBlock_xml("any", Block_colour_event, xmlList);
 	add_schedule_xml(xmlList)
 
+	
+	if (Blockly.Blocks["e_updated"]) {
+		  var blockText = '<xml>' +
+			  '<block type="e_updated">' +
+			  '</block>' +
+			  '</xml>';
+		  var block = Blockly.Xml.textToDom(blockText).firstChild;
+		 xmlList.push(block)
+	} 
+		 
 	return xmlList;
 };
 
@@ -78,13 +113,19 @@ Blockly.devicesFlyoutCallback_condition = function(workspace) {
 	var xmlList = [];
 	selected_dev.forEach(function(itme){
 		var device = itme;
-		condition_block(device);
-	  xmlList.push(addXml("c_"+device));
+
+		if(attrMap.isSingle(device)){
+			condition_block(device, "single");
+			xmlList.push(addXml("c_"+device+"single"));
+		}else if(attrMap.isMultiple(device)){			
+			condition_block(device,"multiple");
+			xmlList.push(addXml("c_"+device+"multiple"));
+
+
+		}
 	});
 
 	
-	add_groupingBlock_xml("all", Block_colour_condition, xmlList);
-	add_groupingBlock_xml("exists", Block_colour_condition, xmlList);
 	add_logic_xml(xmlList)
 
 		
@@ -141,14 +182,7 @@ Blockly.devicesFlyoutCallback_condition = function(workspace) {
 		 xmlList.push(block)
 	}
 
-	if (Blockly.Blocks["happen_enum_dropdown"]) {
-		 var blockText = '<xml>' +
-			  '<block type="happen_enum_dropdown">' +
-			  '</block>' +
-			  '</xml>';
-		 var block = Blockly.Xml.textToDom(blockText).firstChild;
-		 xmlList.push(block)
-	}
+	//already
 	if (Blockly.Blocks["already_enum"]) {
 		 var blockText = '<xml>' +
 			  '<block type="already_enum">' +
@@ -165,7 +199,16 @@ Blockly.devicesFlyoutCallback_condition = function(workspace) {
 		 var block = Blockly.Xml.textToDom(blockText).firstChild;
 		 xmlList.push(block)
 	}
+	if (Blockly.Blocks["happen_enum_dropdown"]) {
+		 var blockText = '<xml>' +
+			  '<block type="happen_enum_dropdown">' +
+			  '</block>' +
+			  '</xml>';
+		 var block = Blockly.Xml.textToDom(blockText).firstChild;
+		 xmlList.push(block)
+	}
 
+	
 	if (Blockly.Blocks["now_c"]) {
 		 var blockText = '<xml>' +
 			  '<block type="now_c">' +
@@ -182,16 +225,6 @@ Blockly.devicesFlyoutCallback_condition = function(workspace) {
 		 var block = Blockly.Xml.textToDom(blockText).firstChild;
 		 xmlList.push(block)
 	}
-
-	if (Blockly.Blocks["getlocation_c"]) {
-		 var blockText = '<xml>' +
-			  '<block type="getlocation_c">' +
-			  '</block>' +
-			  '</xml>';
-		 var block = Blockly.Xml.textToDom(blockText).firstChild;
-		 xmlList.push(block)
-	}
-
 	if (Blockly.Blocks["getsunrise_c"]) {
 		 var blockText = '<xml>' +
 			  '<block type="getsunrise_c">' +
@@ -211,6 +244,15 @@ Blockly.devicesFlyoutCallback_condition = function(workspace) {
 	}
 		 
 
+	if (Blockly.Blocks["getlocation_c"]) {
+		 var blockText = '<xml>' +
+			  '<block type="getlocation_c">' +
+			  '</block>' +
+			  '</xml>';
+		 var block = Blockly.Xml.textToDom(blockText).firstChild;
+		 xmlList.push(block)
+	}
+
 	if (Blockly.Blocks["getweatherfeature_c"]) {
 		 var blockText = '<xml>' +
 			  '<block type="getweatherfeature_c">' +
@@ -220,7 +262,17 @@ Blockly.devicesFlyoutCallback_condition = function(workspace) {
 		 xmlList.push(block)
 	}
 		 
-		 
+	add_groupingBlock_xml("all", Block_colour_condition, xmlList);
+	add_groupingBlock_xml("exists", Block_colour_condition, xmlList);
+
+	if (Blockly.Blocks["toDateTime"]) {
+		 var blockText = '<xml>' +
+			  '<block type="toDateTime">' +
+			  '</block>' +
+			  '</xml>';
+		 var block = Blockly.Xml.textToDom(blockText).firstChild;
+		 xmlList.push(block)
+	}
 		 
 		 
 
@@ -233,22 +285,42 @@ Blockly.devicesFlyoutCallback_action = function(workspace) {
 	selected_dev.forEach(function(itme){
 		var device = itme
 	   if(commMap.makeBlock(device)){
-			if(commMap.has1Commad(device)){
+			if(commMap.hasCommad(device)){
 				action_block(device, "Command");
 				xmlList.push(addXml("a_"+device+"Command"))
-			}else if(commMap.has1Method(device)){
-				action_block(device, "Method");
-				xmlList.push(addXml("a_"+device+"Method"))
-			}else if(commMap.hasBoth(device)){
-
-				action_block(device, "Command");
-				xmlList.push(addXml("a_"+device+"Command"))
-
+			}
+			if(commMap.hasMethod(device)){
 				action_block(device, "Method");
 				xmlList.push(addXml("a_"+device+"Method"))
 			}
+			if(commMap.hasMethodS(device)){
+				action_block(device, "MethodS");
+				xmlList.push(addXml("a_"+device+"MethodS"))
+			}
+			
 		}
+
 	});
+
+
+
+	selected_dev.forEach(function(itme){
+		var device = itme;
+
+		if(attrMap.isSingle(device)){
+			action_block2(device, "single");
+			xmlList.push(addXml("a_"+device+"single"));
+		}else if(attrMap.isMultiple(device)){			
+			action_block2(device,"multiple");
+			xmlList.push(addXml("a_"+device+"multiple"));
+
+
+		}
+
+
+	});
+
+
 
 	if (Blockly.Blocks["action_group"]) {
 		 var blockText = '<xml>' +
@@ -321,6 +393,32 @@ Blockly.devicesFlyoutCallback_action = function(workspace) {
 		 xmlList.push(block)
 	}
 
+	if (Blockly.Blocks["subscribe_method"]) {
+		 var blockText = '<xml>' +
+			  '<block type="subscribe_method">' +
+			  '</block>' +
+			  '</xml>';
+		 var block = Blockly.Xml.textToDom(blockText).firstChild;
+		 xmlList.push(block)
+	}
+	if (Blockly.Blocks["location_a"]) {
+		 var blockText = '<xml>' +
+			  '<block type="location_a">' +
+			  '</block>' +
+			  '</xml>';
+		 var block = Blockly.Xml.textToDom(blockText).firstChild;
+		 xmlList.push(block)
+	}
+	if (Blockly.Blocks["app_a"]) {
+		 var blockText = '<xml>' +
+			  '<block type="app_a">' +
+			  '</block>' +
+			  '</xml>';
+		 var block = Blockly.Xml.textToDom(blockText).firstChild;
+		 xmlList.push(block)
+	}
+		
+		 
 
 	if (Blockly.Blocks["getlocation_a"]) {
 		 var blockText = '<xml>' +
@@ -369,6 +467,15 @@ Blockly.devicesFlyoutCallback_action = function(workspace) {
 	}
 		 
 		 
+	/*	 
+	if (Blockly.Blocks["time_a"]) {
+		 var blockText = '<xml>' +
+			  '<block type="time_a">' +
+			  '</block>' +
+			  '</xml>';
+		 var block = Blockly.Xml.textToDom(blockText).firstChild;
+		 xmlList.push(block)
+	}*/
 		 
 		 
 
@@ -419,9 +526,41 @@ function add_schedule_xml(xmlList){
 }
 function add_timer_xml(xmlList){
 
-	 if (Blockly.Blocks["a_timer"]) {
+	 if (Blockly.Blocks["a_timer_after"]) {
 		  var blockText = '<xml>' +
-			  '<block type="a_timer">' +
+			  '<block type="a_timer_after">' +
+			  '</block>' +
+			  '</xml>';
+		  var block = Blockly.Xml.textToDom(blockText).firstChild;
+		 xmlList.push(block)
+	} 
+	 if (Blockly.Blocks["a_timer_every"]) {
+		  var blockText = '<xml>' +
+			  '<block type="a_timer_every">' +
+			  '</block>' +
+			  '</xml>';
+		  var block = Blockly.Xml.textToDom(blockText).firstChild;
+		 xmlList.push(block)
+	} 
+	 if (Blockly.Blocks["a_time"]) {
+		  var blockText = '<xml>' +
+			  '<block type="a_time">' +
+			  '</block>' +
+			  '</xml>';
+		  var block = Blockly.Xml.textToDom(blockText).firstChild;
+		 xmlList.push(block)
+	} 
+	 if (Blockly.Blocks["a_day"]) {
+		  var blockText = '<xml>' +
+			  '<block type="a_day">' +
+			  '</block>' +
+			  '</xml>';
+		  var block = Blockly.Xml.textToDom(blockText).firstChild;
+		 xmlList.push(block)
+	} 
+	 if (Blockly.Blocks["a_week"]) {
+		  var blockText = '<xml>' +
+			  '<block type="a_week">' +
 			  '</block>' +
 			  '</xml>';
 		  var block = Blockly.Xml.textToDom(blockText).firstChild;

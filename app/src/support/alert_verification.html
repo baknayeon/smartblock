@@ -12,16 +12,8 @@
 
 	<div>
 		
-		<h2 class="error" id ="error_title"></h2>
-		<p class="subtitle" id="error_subtitle"></p>
-		<p id="errorText"></p>
-	<div>
-		<hr>
-		</div>
-		<h2 class="warning" id="warning_title"></h2>
-		<p class="subtitle" id="warning_subtitle"></p>
-		<p id="warningTex"></p>
-
+		<h2 class="subtitle" id ="circularityErrorTitle"></h2>
+		<h2 class="message" id ="circularityErrorMessage"></h2>
 	</div>
 
 
@@ -45,8 +37,13 @@
     window.onload = function () {
         var search = window.location.search;
         var getData =  _GET(search);
-		_("error_title").innerHTML = getData.error+" Error"
-		_("warning_title").innerHTML = getData.warning+" Warning"
+		var circularityError = getData.CircularityError
+		if(circularityError){
+
+			_("circularityErrorTitle").innerHTML = "Circularity Error"
+			_("circularityErrorMessage").innerHTML = circularityError
+		}
+		/*_("warning_title").innerHTML = getData.warning+" Warning"
 
 		var inconsistency1 = getData.inconsistency1
 		var redundancy1 = getData.redundancy1
@@ -64,7 +61,7 @@
 			_("warning_subtitle").innerHTML = "There is "+warnings[0]+" redundancy" 
 
 		_("errorText").innerHTML = errors[1]
-		_("warningTex").innerHTML = warnings[1]
+		_("warningTex").innerHTML = warnings[1]*/
     }
 
 function generate_inconsistency1(inconsistency1){

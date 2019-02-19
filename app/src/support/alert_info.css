@@ -1,31 +1,18 @@
 body{
-	margin:20px 0px 20px 0px;
-	font-size:16px;
+	margin:5px 5px 20px 5px;
+	
 }
-h2{
-	text-align:center;
-	margin:5px 0 5px 0;
-	font-size:26px;
-	font-weight: 700;
-}
+
 .subtitle{
-	margin: 0 0 3px 20px;
-	font-size:20px;
-	font-weight: 700;
-}
-div{
-
-	margin:15px 0 15px 0;
-}
-p{
-	margin: 0 0 3px 20px;
-
-}
-.error{
+	margin:5px 0 0 0;
+	font-size:15px;
+	font-weight:bold;
 	color: #ff3300;  
 }
-.warning{
 
-	color: #19b2e6;  
-
+.message{
+	margin:0 0 0 15px;
+	font-size:15px;
+	font-weight:normal;
+	color: #ff3300;  
 }

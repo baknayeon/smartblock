@@ -49,7 +49,8 @@ Blockly.SmartThings.scrub_=function(a,b){
 		e=Blockly.SmartThings.blockToCode(e);
 		return c+b+e
 };
-Blockly.SmartThings.scrub_rule=function(a,b){
+
+Blockly.SmartThings.scrub_2Array=function(a,b){
 	if(!a.outputConnection||!a.outputConnection.targetConnection)
 		{
 		var d=a.getCommentText();
@@ -59,21 +60,10 @@ Blockly.SmartThings.scrub_rule=function(a,b){
 		}
 	e=a.nextConnection&&a.nextConnection.targetBlock();
 	e=Blockly.SmartThings.blockToCode(e);
-	scru_rule.push(b);
-	return scru_rule;
-};
-Blockly.SmartThings.scrub_page=function(a,b){
-	if(!a.outputConnection||!a.outputConnection.targetConnection)
-		{
-		var d=a.getCommentText();
-		(d=Blockly.utils.wrap(d,Blockly.SmartThings.COMMENT_WRAP-3))&&(c=a.getProcedureDef?c+("/**\n"+Blockly.SmartThings.prefixLines(d+"\n"," * ")+" */\n"):c+Blockly.SmartThings.prefixLines(d+"\n","// "));
-		for(var e=0;e<a.inputList.length;e++)
-			a.inputList[e].type==Blockly.INPUT_VALUE&&(d=a.inputList[e].connection.targetBlock())&&(d=Blockly.SmartThings.allNestedComments(d))&&(c+=Blockly.SmartThings.prefixLines(d,"// "))
-		}
-		e=a.nextConnection&&a.nextConnection.targetBlock();
-		e=Blockly.SmartThings.blockToCode(e);
-		scru_page.push(b);
-		return scru_page;
+
+	blocksArray.push(b);//ny
+
+	return blocksArray;
 };
 Blockly.SmartThings.getAdjusted=function(a,b,c,d,e){c=c||0;e=e||Blockly.SmartThings.ORDER_NONE;a.workspace.options.oneBasedIndex&&c--;var f=a.workspace.options.oneBasedIndex?"1":"0";a=0<c?Blockly.SmartThings.valueToCode(a,b,Blockly.SmartThings.ORDER_ADDITION)||f:0>c?Blockly.SmartThings.valueToCode(a,b,Blockly.SmartThings.ORDER_SUBTRACTION)||f:d?Blockly.SmartThings.valueToCode(a,b,Blockly.SmartThings.ORDER_UNARY_NEGATION)||f:Blockly.SmartThings.valueToCode(a,b,e)||f;if(Blockly.isNumber(a))a=parseFloat(a)+c,
 d&&(a=-a);else{if(0<c){a=a+" + "+c;var g=Blockly.SmartThings.ORDER_ADDITION}else 0>c&&(a=a+" - "+-c,g=Blockly.SmartThings.ORDER_SUBTRACTION);d&&(a=c?"-("+a+")":"-"+a,g=Blockly.SmartThings.ORDER_UNARY_NEGATION);g=Math.floor(g);e=Math.floor(e);g&&e>=g&&(a="("+a+")")}return a};Blockly.SmartThings.colour={};Blockly.SmartThings.colour_picker=function(a){return["'"+a.getFieldValue("COLOUR")+"'",Blockly.SmartThings.ORDER_ATOMIC]};Blockly.SmartThings.colour_random=function(a){return[Blockly.SmartThings.provideFunction_("colourRandom",["function "+Blockly.SmartThings.FUNCTION_NAME_PLACEHOLDER_+"() {","  var num = Math.floor(Math.random() * Math.pow(2, 24));","  return '#' + ('00000' + num.toString(16)).substr(-6);","}"])+"()",Blockly.SmartThings.ORDER_FUNCTION_CALL]};
