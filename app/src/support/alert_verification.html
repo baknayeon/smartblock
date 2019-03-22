@@ -11,91 +11,70 @@
 
 
 	<div>
-		
-		<h2 class="subtitle" id ="circularityErrorTitle"></h2>
-		<h2 class="message" id ="circularityErrorMessage"></h2>
+		<p class="title" id ="error"></p>
+		<p class="subtitle" id ="inconsistencyErrorTitle"></p>
+		<p class="message" id ="inconsistencyErrorMessage"><br></p>
+		<p class="subtitle" id ="redundancyErrorTitle"></p>
+		<p class="message" id ="redundancyErrorMessage"><br></p>
+		<p class="subtitle" id ="circularityErrorTitle"></p>
+		<p class="message" id ="circularityErrorMessage"><br></p>
+		<p class="message" id ="circularityErrorMessage2"><br></p>
 	</div>
 
 
 <script type="text/javascript">
  
-    function _GET(search) {
-        var obj = {};
-        var uri = decodeURI(search);
-            uri = uri.slice(1,uri.length);
- 
-        var param = uri.split('&');
-        
-        for (var i = 0; i < param.length; i++) {
-            var devide = param[i].split('=');
-            obj[devide[0]] = devide[1];
-        }
- 
-        return obj;
-    }
- 
-    window.onload = function () {
-        var search = window.location.search;
-        var getData =  _GET(search);
-		var circularityError = getData.CircularityError
-		if(circularityError){
+function _GET(search) {
+	var obj = {};
+	var uri = decodeURI(search);
+		uri = uri.slice(1,uri.length);
 
-			_("circularityErrorTitle").innerHTML = "Circularity Error"
-			_("circularityErrorMessage").innerHTML = circularityError
-		}
-		/*_("warning_title").innerHTML = getData.warning+" Warning"
-
-		var inconsistency1 = getData.inconsistency1
-		var redundancy1 = getData.redundancy1
-		var errors = generate_inconsistency1(inconsistency1)
-		var warnings = generate_redundancy1(redundancy1)
-		
-		if(errors[0] > 1)
-			_("error_subtitle").innerHTML = "There are "+errors[0]+" inconsistencys" 
-		else if(errors[0] == 1)
-			_("error_subtitle").innerHTML = "There is "+errors[0]+" inconsistency" 
-
-		if(warnings[0] > 1)
-			_("warning_subtitle").innerHTML = "There are "+warnings[0]+" redundancys" 
-		else if(warnings[0] == 1)
-			_("warning_subtitle").innerHTML = "There is "+warnings[0]+" redundancy" 
-
-		_("errorText").innerHTML = errors[1]
-		_("warningTex").innerHTML = warnings[1]*/
-    }
-
-function generate_inconsistency1(inconsistency1){
-	var error_message = ""
-	var param = inconsistency1.split('/');
-	for (var i = 0; i < param.length-1; i++) {
-		var error = param[i].split('*');
-		var event = error[0]
-		var action1 = error[1]
-		var action2 = error[2]
-
-		error_message += "&nbsp;&nbsp;&nbsp;&nbsp;<b>WHEN</b> "+event + "<br>" + "&nbsp;&nbsp;&nbsp;&nbsp;<b>ACTION</b> " + action1+" and "+ action2+"<br><br>"
+	var param = uri.split('&');
+	
+	for (var i = 0; i < param.length; i++) {
+		var devide = param[i].split('=');
+		obj[devide[0]] = devide[1];
 	}
 
-	return [param.length-1, error_message]
-
+	return obj;
 }
-function generate_redundancy1(redundancy1){
-	var warnings_message = ""
-	var param = redundancy1.split('/');
-	for (var i = 0; i < param.length-1; i++) {
-		var error = param[i].split('*');
-		var event = error[0]
-		var action1 = error[1]
-		var action2 = error[2]
 
-		warnings_message += "&nbsp;&nbsp;&nbsp;&nbsp;<b>WHEN</b> "+event + "<br>" + "&nbsp;&nbsp;&nbsp;&nbsp;<b>ACTION</b> " + action1+"<br><br>"
+window.onload = function () {
+	var search = window.location.search;
+	var getData =  _GET(search);
+	var circularityError = getData.CircularityError
+	var inconsistencyError = getData.InconsistencyError
+	var redundancyError = getData.RedundancyError
+	var numError = getData.numError
+	
+	if(numError > 1)
+		_("error").innerHTML = numError+" Errors detected."
+	else
+		_("error").innerHTML = numError+" Error detected."
+
+	if(circularityError){
+		_("circularityErrorTitle").innerHTML = "Circularity Error"
+		var array = circularityError.split("frist rule will repeat"); 
+		_("circularityErrorMessage").innerHTML = array[0]
+		_("circularityErrorMessage2").innerHTML = "Frist rule"+array[1]+" will repeat"
+	}else{
+		_("circularityErrorMessage").innerHTML = ""
+		_("circularityErrorMessage2").innerHTML = ""
 	}
-
-	return [param.length-1, warnings_message]
-
+	if(inconsistencyError){	
+		_("inconsistencyErrorTitle").innerHTML = "Inconsistency Error"
+		_("inconsistencyErrorMessage").innerHTML = inconsistencyError.replace("*op*", "vs")
+	}else
+		_("inconsistencyErrorMessage").innerHTML = ""
+	if(redundancyError){
+		_("redundancyErrorTitle").innerHTML = "Redundancy Error"
+		_("redundancyErrorMessage").innerHTML = redundancyError.replace("*op*", "==")
+	}else
+		_("redundancyErrorMessage").innerHTML = ""
 }
 
-	function _(x){ return document.getElementById(x); }
+
+function _(x){ return document.getElementById(x); }
 </script>
 </body>
 </html>

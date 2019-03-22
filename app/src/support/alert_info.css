@@ -1,17 +1,24 @@
 body{
-	margin:5px 5px 20px 5px;
-	
+	margin:8px 15px 2px 15px;
+	background-color:#ffebeb
 }
 
-.subtitle{
+.title{
 	margin:5px 0 0 0;
 	font-size:15px;
 	font-weight:bold;
 	color: #ff3300;  
 }
 
+.subtitle{
+	margin:5px 0 0 10px;
+	font-size:15px;
+	font-weight:bold;
+	color: #ff3300;  
+}
+
 .message{
-	margin:0 0 0 15px;
+	margin:0 0 0 25px;
 	font-size:15px;
 	font-weight:normal;
 	color: #ff3300;  

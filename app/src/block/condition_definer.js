@@ -392,23 +392,22 @@ Blockly.Blocks['datac'] = {
 
 
 
-//input
+//input variable(one of the condition block
 Blockly.Blocks['inputc_data'] = {
-  init: function() {
-  		var device = "text"
-		var count = deviceCount.get(device)
+	init: function() {
+		var type = "text"
+		var count = deviceCount.get(type)
 		this.appendDummyInput("device")
-				 .appendField(new Blockly.FieldDropdown(input_data_type), "type") // definder_helper
-				.appendField(new Blockly.FieldVariable(count, null, null, device), "name"); // , null, null, device)
+			.appendField(new Blockly.FieldDropdown(input_data_type), "type")						// definder_helper
+			.appendField(new Blockly.FieldVariable(count, null, null, type), "name");
 		this.setColour(Block_colour_condition);
-    this.setInputsInline(true);
-    this.setOutput(true, "Inputc");
-	 this.setTooltip("");
-	 this.setHelpUrl("");
-  },onchange: function(event) {
-	changInput(event, this)
-  }
-
+		this.setInputsInline(true);
+		this.setOutput(true, "Inputc");
+		this.setTooltip("");
+		this.setHelpUrl("");
+	},onchange: function(event) {
+		changInput(event, this)
+	}
 };
 
 

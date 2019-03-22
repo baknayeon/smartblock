@@ -92,6 +92,44 @@ Blockly.Blocks['inputa_data'] = {
 
 
 //send method
+Blockly.Blocks['send'] = {
+  init: function() {
+    this.appendDummyInput("action")
+        .appendField("sendMessage");
+    this.appendValueInput("message")
+		.setCheck("Inputa")
+        .appendField("message")
+        .appendField(new Blockly.FieldTextInput(""), "text");
+    this.appendValueInput("phone")
+		.setCheck("Inputa")
+        .appendField("phone")
+        .appendField(new Blockly.FieldTextInput(""), "phone");
+    this.setOutput(true,  "Action");
+    this.setColour(Block_colour_action);
+ this.setTooltip("");
+ this.setHelpUrl("");
+  }, onchange: function(event){
+  	if(event.type == Blockly.Events.BLOCK_MOVE){
+		if(event.newParentId == this.id)
+			if(event.newInputName == "message")
+				this.getInput("message").removeField("text");
+			else if(event.newInputName == "phone")
+				this.getInput("phone").removeField("phone");
+
+		if(event.oldParentId == this.id)
+			if(event.oldInputName == "message")
+				this.getInput("message").appendField(new Blockly.FieldTextInput(""), "text");
+			else if(event.oldInputName == "phone")
+				this.getInput("phone").appendField(new Blockly.FieldTextInput("+8210"), "phone");
+	  }else if ( event.type == Blockly.Events.BLOCK_CREATE ){
+		if(event.blockId == this.id){
+  			var block = this.getInput("message")
+  		}
+
+	  }
+  }
+};
+
 Blockly.Blocks['sendpush'] = {
   init: function() {
     this.appendDummyInput("action")
@@ -194,6 +232,8 @@ Blockly.Blocks['sendnotification'] = {
 };
 
 
+
+
 //init method
 Blockly.Blocks['function_invocation_a'] = {
   init: function() {
@@ -279,7 +319,7 @@ Blockly.Blocks['setlocationmode_a'] = {
         .setCheck(["Inputa"])
         .appendField("setLocationMode");
     this.setInputsInline(true);
-    this.setOutput(true, "setAPI");
+    this.setOutput(true, "Action");
     this.setColour(Block_colour_action);
  this.setTooltip("");
  this.setHelpUrl("");
@@ -327,6 +367,7 @@ Blockly.Blocks['subscribe_method'] = {
 
 		if(attrMap.onlyInENUM(input_type)){
 			var newAttr = attrMap.getENUM_vaules(input_type);
+			newAttr.push([".","."])
 			this.getInput("attribute").appendField(new Blockly.FieldDropdown(newAttr), 'attribute');
 		}else if(input_type == "location"){
 			this.getInput("attribute").appendField(new Blockly.FieldDropdown(location_attr), 'attribute');

@@ -166,7 +166,13 @@ Blockly.SmartThings['a_timer_after'] = function(block) {
 	smartAction.timer_type = "after"
 	smartAction.time = text_minute? text_minute * 60 : value_min
 	smartAction.timerhandler = "timer"+variable_name;
-	smartAction.arginput = [value_min]
+
+
+	if(value_min.constructor == Inputa){
+		smartAction.arginput = [value_min]
+	}else if(value_min.constructor == Calculation){
+		smartAction.arginput = value_min.inputs
+	}
 
   return [smartAction];
 };

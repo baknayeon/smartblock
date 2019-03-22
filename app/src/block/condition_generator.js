@@ -66,7 +66,7 @@ Blockly.SmartThings['compare'] = function(block) {
     'LT': '>',
     'LTQ': '>=',
     'GT': '<',
-    'GTQ': '=<',
+    'GTQ': '<=',
 	'EO': 'ϵ',
 	'NEO': '∉'
 	
@@ -76,7 +76,7 @@ Blockly.SmartThings['compare'] = function(block) {
   var operator = OPERATORS[block.getFieldValue('OP')];
   var order = (operator == '==' || operator == '!=') ?Blockly.SmartThings.ORDER_EQUALITY : Blockly.SmartThings.ORDER_RELATIONAL;
   var argument0 = Blockly.SmartThings.valueToCode(block, 'A', order) || "%grouping";
-  var argument1 = Blockly.SmartThings.valueToCode(block, 'B', order) || 0;
+  var argument1 = Blockly.SmartThings.valueToCode(block, 'B', order) || "";
   
   if(argument0 != "%grouping" ){
 	  //not grouping
@@ -161,7 +161,7 @@ Blockly.SmartThings['math_condition'] = function(block) {
 
   var c = new Calculation()
   c.inputs = inputList
-  c.operation = dropdown_op 
+  c.operator = dropdown_op 
   c.left = left   // =  left+" "+dropdown_op+" "+right;
   c.right = right  
   // TODO: Change ORDER_NONE to the correct strength.
@@ -284,24 +284,26 @@ Blockly.SmartThings['already_enum'] = function(block) {
 };
 
 Blockly.SmartThings['already_num'] = function(block) {
+    var OPERATORS = {
+    'EQ': '==',
+    'NEQ': '!=',
+    'LT': '>',
+    'LTQ': '>=',
+    'GT': '<',
+    'GTQ': '<=',
+	'EO': 'ϵ',
+	'NEO': '∉'
+  };
+
+
   var device_input = Blockly.SmartThings.valueToCode(block, 'device', Blockly.SmartThings.ORDER_ATOMIC);
-  var event_number = Blockly.SmartThings.valueToCode(block, 'number', Blockly.SmartThings.ORDER_ATOMIC);
+  var event_number = Blockly.SmartThings.valueToCode(block, 'number_operator', Blockly.SmartThings.ORDER_ATOMIC);
   
   var operator = OPERATORS[block.getFieldValue('operator')];
 
   var time_input = Blockly.SmartThings.valueToCode(block, 'time', Blockly.SmartThings.ORDER_ATOMIC);
   var time_min = block.getFieldValue('time_min');
 
-  var OPERATORS = {
-    'EQ': '==',
-    'NEQ': '!=',
-    'LT': '>',
-    'LTQ': '>=',
-    'GT': '<',
-    'GTQ': '=<',
-	'EO': 'ϵ',
-	'NEO': '∉'
-  };
 
 
    var a = new Occurrences();
@@ -486,7 +488,7 @@ function Occurrences(){
 
 function Calculation() {
 	this.inputs;
-	this.operation;
+	this.operator;
 	this.left;
 	this.right;
 }

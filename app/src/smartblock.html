@@ -128,7 +128,7 @@
 		</div>
 		<div id="box" >
 			<div id="in_box1">
-			  <div id="blocklyDiv" style="height: 701px; width: 1200px;"></div>
+			  <div id="blocklyDiv" style="height: 770px; width: 2000px;"></div>
 			</div>
 
 			<div id="in_box2">
@@ -159,25 +159,30 @@
 	<script>
 
 	//document.getElementById("click1").click();
-
+	var options_workspace
 	
 	var workspace = Blockly.inject('blocklyDiv', { toolbox : toolbox, 
-														collapse : false, 
-														comments : false, 
-														disable : false, 
-														maxBlocks : Infinity, 
-														trashcan : true, 
-														horizontalLayout : false, 
-														toolboxPosition : 'start', 
-														css : true, 
-														media : '../media/',
-														rtl : false, 
-														scrollbars : true, 
-														sounds : true, 
-														oneBasedIndex : true
-													});
-
-
+												   collapse : false, 
+												   comments : false, 
+												   disable : false, 
+												   maxBlocks : Infinity, 
+												   trashcan : true, 
+												   horizontalLayout : false, 
+												   toolboxPosition : 'start', 
+												   css : true, 
+												   media : '../media/',
+												   rtl : false, 
+												   scrollbars : true, 
+												   sounds : true, 
+												   oneBasedIndex : true,
+												   zoom:
+													 {controls: true,
+													  wheel: true,
+													  startScale: 1.0,
+													  maxScale: 3,
+													  minScale: 0.3,
+													  scaleSpeed: 1.2},
+											     });
 	workspace.registerToolboxCategoryCallback('SAMRT_DEVICE_E', Blockly.devicesFlyoutCallback_event);
 	workspace.registerToolboxCategoryCallback('SAMRT_DEVICE_C', Blockly.devicesFlyoutCallback_condition);
 	workspace.registerToolboxCategoryCallback('SAMRT_DEVICE_A', Blockly.devicesFlyoutCallback_action);

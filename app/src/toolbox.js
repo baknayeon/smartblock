@@ -372,7 +372,50 @@ Blockly.devicesFlyoutCallback_action = function(workspace) {
 		 var block = Blockly.Xml.textToDom(blockText).firstChild;
 		 xmlList.push(block)
 	}
-	add_action_method_xml(xmlList);
+	
+	if (Blockly.Blocks["send"]) {
+		var blockText = '<xml>' +
+		  '<block type="send">' +
+		  '<field name="phone">+8210</field>'+
+		  '<field name="mes"></field>'+
+		  '</block>' +
+		  '</xml>';
+		var block = Blockly.Xml.textToDom(blockText).firstChild;
+		xmlList.push(block)
+	}	
+
+	 if (Blockly.Blocks["sendpush"]) {
+		  var blockText = '<xml>' +
+			  '<block type="sendpush">' +
+			  '<field name="mes"></field>'+
+			  '</block>' +
+			  '</xml>';
+		  var block = Blockly.Xml.textToDom(blockText).firstChild;
+		 xmlList.push(block)
+	}
+	if (Blockly.Blocks["sendsms"]) {
+		var blockText = '<xml>' +
+		  '<block type="sendsms">' +
+		  '<field name="phone">+82010</field>'+
+		  '<field name="mes"></field>'+
+		  '</block>' +
+		  '</xml>';
+		var block = Blockly.Xml.textToDom(blockText).firstChild;
+		xmlList.push(block)
+	}
+	if (Blockly.Blocks["sendnotification"]) {
+		var blockText = '<xml>' +
+		  '<block type="sendnotification">' +
+		  '<field name="mes"></field>'+
+		  '</block>' +
+		  '</xml>';
+		var block = Blockly.Xml.textToDom(blockText).firstChild;
+		xmlList.push(block)
+	}
+
+
+
+
 	add_timer_xml(xmlList)
 	add_groupingBlock_xml("map", Block_colour_action, xmlList);
 
@@ -631,46 +674,6 @@ function add_logic_xml(xmlList){
 			  '</xml>';
 		  var block = Blockly.Xml.textToDom(blockText).firstChild;
 		 xmlList.push(block)
-	}
-
-}
-
-function add_action_method_xml(xmlList){
-	 /*if (Blockly.Blocks["option"]) {
-		  var blockText = '<xml>' +
-				 '<block type="option">'+
-				 '</block>'+
-			  '</xml>';
-		  var block = Blockly.Xml.textToDom(blockText).firstChild;
-		 xmlList.push(block)
-	}*/
-	 if (Blockly.Blocks["sendpush"]) {
-		  var blockText = '<xml>' +
-			  '<block type="sendpush">' +
-			  '<field name="mes"></field>'+
-			  '</block>' +
-			  '</xml>';
-		  var block = Blockly.Xml.textToDom(blockText).firstChild;
-		 xmlList.push(block)
-	}
-	if (Blockly.Blocks["sendsms"]) {
-		var blockText = '<xml>' +
-		  '<block type="sendsms">' +
-		  '<field name="phone">+82010</field>'+
-		  '<field name="mes"></field>'+
-		  '</block>' +
-		  '</xml>';
-		var block = Blockly.Xml.textToDom(blockText).firstChild;
-		xmlList.push(block)
-	}
-	if (Blockly.Blocks["sendnotification"]) {
-		var blockText = '<xml>' +
-		  '<block type="sendnotification">' +
-		  '<field name="mes"></field>'+
-		  '</block>' +
-		  '</xml>';
-		var block = Blockly.Xml.textToDom(blockText).firstChild;
-		xmlList.push(block)
 	}
 
 }

@@ -115,6 +115,57 @@ Blockly.SmartThings['inputa_data'] = function(block) {
 
 
 //send method
+Blockly.SmartThings['send'] = function(block) {
+	var string_phone = block.getFieldValue('phone');
+	var block_phone = Blockly.SmartThings.valueToCode(block, 'phone', Blockly.SmartThings.ORDER_ATOMIC);
+	var string_message = block.getFieldValue('text');
+	var block_message = Blockly.SmartThings.valueToCode(block, 'message', Blockly.SmartThings.ORDER_ATOMIC);
+	// TODO: Assemble SmartThings into code variable.
+
+	var smartAction = new Action();
+
+	var message
+	var phone
+	var if_statement = ""
+
+	var sendNotification
+	var sendSms
+	var sendPush
+	
+	if(string_phone){
+		phone = '\"'+string_phone+'\"'
+		if_statement =  'if(true)'
+	}else{	
+		phone = block_phone.name
+		smartAction.arginput.push(block_phone)
+		if_statement =  'if('+phone+')'
+	}
+
+	if(string_message){
+		message = '\"'+string_message+'\"'
+	}else{	
+		message = block_message.name
+		smartAction.arginput.push(block_message)
+	}
+
+	sendNotification = 'sendNotification('+message+')'
+	sendPush = 'sendPush('+message+')'
+	sendSms = 'sendSms('+ phone + ', '+message +')'
+
+
+
+	smartAction.method = 'if(location.contactBookEnabled)\n'
+						+'\t\t'+ '\t'+sendNotification+'\n'
+						+'\t\t'+'else{\n'
+						+'\t\t'+'\t'+if_statement+'\n'
+						+'\t\t'+'\t\t '+ sendSms+'\n'
+						+'\t\t'+'\t else\n'
+						+'\t\t'+'\t\t '+sendPush +'\n'
+						+'\t\t'+'}';
+	
+
+	return [smartAction];
+};
 
 Blockly.SmartThings['sendpush'] = function(block) {
 	var text_text = block.getFieldValue('text');
@@ -247,7 +298,8 @@ Blockly.SmartThings['setlocationmode_a'] = function(block) {
   // TODO: Assemble SmartThings into code variable.
   var value_mode= Blockly.SmartThings.valueToCode(block, 'mode', Blockly.SmartThings.ORDER_ATOMIC);
   var a = new Action()
-  a.method = "if(location.mode != "+value_mode.name+") "+"setLocationMode("+value_mode.name+")" // "if(location.modes?.find{it.name == "+value_mode.devname+"}) "+
+  a.method = "if(location.mode != "+value_mode.name+" && location.modes?.find{it.name == "+value_mode.name+"})"
+  +" setLocationMode("+value_mode.name+")" // "if(location.modes?.find{it.name == "+value_mode.devname+"}) "+
   a.arginput.push(value_mode)
   return a;
 };
@@ -273,15 +325,17 @@ Blockly.SmartThings['subscribe_method'] = function(block) {
   if(value_arg.constructor == Inputa) {
 	var devname = value_arg.devname
 	var device = value_arg.device
-	var attr = dropdown_event
+	var attr = ""
+	if(dropdown_event != ".")
+		attr = "."+dropdown_event
 	if(attrMap.isSingle(device)){
 		if(attrMap.onlyInENUM(device)){
 			var attr_obj = attrMap.getENUM(device)
-			a.method =  "subscribe("+this.name+', \"'+ attr_obj.id + enum_event +'\", '+"subscribe"+index+"_handler"+")"
+			a.method =  "subscribe("+devname+', \"'+ attr_obj.id + attr +'\", '+"subscribe"+index+"_handler"+")"
 	 	    a.arginput.push(value_arg)
 		}else if(attrMap.onlyInNUMBER(device)){
 			var attr_obj = attrMap.getNUMBER(device)
-			a.method = "subscribe("+this.name+', \"'+ attr_obj.id+'\", '+"subscribe"+index+"_handler"+")"
+			a.method = "subscribe("+devname+', \"'+ attr_obj.id+'\", '+"subscribe"+index+"_handler"+")"
 	        a.arginput.push(value_arg)
 		}
 	}else if(attrMap.isMultiple(device)){

@@ -244,7 +244,7 @@ function generating_condition(condition, devList){
 				var pre_right = generating_condition(right, devList)
 				var pre_left = generating_condition(left, devList)
 				if_condition = " ("+pre_left+") "+operator+" ("+pre_right+") "
-			}else if(operator == '==' || operator == '<'|| operator == '>' || operator == '!=' || operator == '>='|| operator == '=<'){
+			}else if(operator == '==' || operator == '<'|| operator == '>' || operator == '!=' || operator == '>='|| operator == '<='){
 				//smartDevice
 				if(right == "%grouping"){ // grouping
 					var expr= ""
@@ -307,7 +307,7 @@ function generating_node(field){
 			else if(field.device)
 				if_condition = field.devname
 		}
-	}else if (field.constructor == Attribute){// device field =< n(attr)	
+	}else if (field.constructor == Attribute){// device field <= n(attr)	
 		if(attrMap.onlyInENUM(field.device)){
 			var field_attr = attrMap.getENUM(field.device)
 			if_condition = ' "'+field.attr+'"';
@@ -325,13 +325,15 @@ function generating_node(field){
 	}else if (field.constructor == Calculation){// Calculation	
 		var lefe = generating_node(field.left)
 		var right = generating_node(field.right)
-		if_condition = "("+ lefe +" "+field.operation+" "+right + ")";
+		if_condition = "("+ lefe +" "+field.operator+" "+right + ")";
 
 	}else if(field.constructor == String){
 	  //hard coding data
-		if(isNaN(field) && field != 'null' && field != 'true' && field != 'false') //hard coding data
+		if(isNaN(field) && field != 'null' && field != 'true' && field != 'false'  && field == "") //hard coding data
 			if_condition = '\"'+field+ '\"'//string
-		else
+		if(field == "") //hard coding data
+			if_condition = '\"\"'//string
+		else		
 			if_condition = field
 		
 	}else if(field.constructor == Number ){

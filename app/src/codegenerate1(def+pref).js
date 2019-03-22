@@ -135,6 +135,7 @@ function generating_pref(ecaList){
 				var aSt_c = action_input.indexOf(input_c[c].input);
 				if(cSt_c == -1 && eSt_c == -1 && aSt_c == -1)
 					if(input_c[c])
+						if(input_c[c].constructor == Inputc)
 						codition_input += "\n\t\t\t"+input_c[c].input;
 
 			}

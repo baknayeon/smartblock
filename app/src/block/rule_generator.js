@@ -131,8 +131,7 @@ function condition_input(condition){
 			
 	}else if(condition.constructor == Grouping){
 		for(var inputc of condition.list){
-			var input = inputc.input
-			array.push(input);
+			array.push(inputc);
 		}
 	}else{ // p&&p, p||p, f <= fn, m <= n, fϵd  
 		var operator = condition.operator
@@ -145,12 +144,12 @@ function condition_input(condition){
 			array = array.concat(array_right)
 			array = array.concat(array_left)
 		}
-		else if(operator == '==' || operator == '<'|| operator == '>' || operator == '!=' || operator == '>='|| operator == '=<'
+		else if(operator == '==' || operator == '<'|| operator == '>' || operator == '!=' || operator == '>='|| operator == '<='
 				||
 				operator == '+' || operator == '-'|| operator == '*' || operator == '/' ){
 			//smartDevice
 			
-			if(right.constructor == Inputc) // f =< f
+			if(right.constructor == Inputc) // f <= f
 				array.push(right);
 			else if(right.constructor == API && right.inputs) 
 				array = array.concat(right.inputs);
@@ -162,19 +161,19 @@ function condition_input(condition){
 				if(right.type == "already_enum"){
 					array.push(right.input);
 					if(right.arginput)
-						array.push(right.arginput);
+						array.push( condition_input(right.arginput));
 				}else if(right.type == "already_num"){
 					array.push(right.input);
 					if(right.input2)
 						array.push(right.input2);
 					if(right.arginput)
-						array.push(right.arginput);
+						array.push( condition_input(right.arginput));
 				}else if(right.type == "happen_enum_dropdown"){
 					array.push(right.input);
 				}
 			}
 					
-			if(left.constructor == Inputc) // f =< f
+			if(left.constructor == Inputc) // f <= f
 				array.push(left);
 			else if(left.constructor == API && left.inputs) 
 				array = array.concat(left.inputs);
@@ -185,13 +184,13 @@ function condition_input(condition){
 				if(left.type == "already_enum"){
 					array.push(left.input);
 					if(left.arginput)
-						array.push(left.arginput);
+						array.push(condition_input(left.arginput));
 				}else if(left.type == "already_num"){
 					array.push(left.input);
 					if(left.input2)
 						array.push(left.input2);
 					if(left.arginput)
-						array.push(left.arginput);
+						array.push(condition_input(left.arginput));
 				}else if(left.type == "happen_enum_dropdown"){
 					array.push(left.input);
 				}
@@ -216,17 +215,17 @@ function Inpute(e) {
 		if(attrMap.isSingle(this.device)){
 			if(attrMap.onlyInENUM(this.device)){
 
-				var enum_event 
+				var enum_event =""
 				if(e.attr){
 					this.attr = e.attr;
 					enum_event  = "."+this.attr
 				}else{
 					if(e.event_handler){
-						if(e.event_handler.to != '.'){
+						if(e.event_handler.to != "."){
 							this.attr = e.event_handler.to
 							enum_event = "."+this.attr
 						}else{
-							this.attr = null
+							this.attr = ""
 
 						}	
 					}
@@ -244,7 +243,7 @@ function Inpute(e) {
 			var attr_obj = attrMap.getMultipleMethod_byid(this.device, this.attrtype)
 			if(attr_obj.type == "ENUM"){
 
-				var enum_event 
+				var enum_event =""
 				if(e.attr){
 					this.attr = e.attr;
 					enum_event  = "."+this.attr
@@ -254,7 +253,7 @@ function Inpute(e) {
 							this.attr = e.event_handler.to
 							enum_event = "."+this.attr
 						}else{
-							this.attr = null
+							this.attr = ""
 
 						}	
 					}
@@ -278,15 +277,20 @@ function Inpute(e) {
 		var handler_name = "rule"+eca_num+"_handler";
 		this.handler = handler_name + "(evt)";
 
-		var enum_event  = "."+this.attr
-		if(e.event_handler && e.event_handler != ""){
-			if(e.event_handler.to != '.'){
-				this.attr = e.event_handler.to
-				enum_event = "."+this.attr
-			}else{
-				this.attr = ""
+		var enum_event =""
+		if(e.attr){
+			this.attr = e.attr;
+			enum_event  = "."+this.attr
+		}else{
+			if(e.event_handler){
+				if(e.event_handler.to != '.'){
+					this.attr = e.event_handler.to
+					enum_event = "."+this.attr
+				}else{
+					this.attr = ""
 
-			}	
+				}	
+			}
 		}
 
 		if(this.abstract_ == "location" && this.attr != "."){

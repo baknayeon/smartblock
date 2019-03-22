@@ -37,14 +37,7 @@ Blockly.Blocks['specific_event'] = {
 							fromBlock.appendField(new Blockly.FieldTextInput(""), "dropDownFrom");
 							toBlock.removeField("dropDownTo");
 							toBlock.appendField(new Blockly.FieldTextInput(parentBlock_attr), "dropDownTo");
-						}/*else if(attrMap.hasMultiTypeENUM(device)){
-							var attribute_id = parentBlock.getField("attribute_id").text_;
-							newAttr = newAttr.concat(attrMap.getENUM_vaulesById(device, attribute_id));
-							fromBlock.removeField('dropDownFrom');
-							fromBlock.appendField(new Blockly.FieldDropdown(newAttr), "dropDownFrom");
-							toBlock.removeField("dropDownTo");
-							toBlock.appendField(new Blockly.FieldDropdown(newAttr,parentBlock_attr), "dropDownTo");
-						}*/
+						}
 					
 				}else if(event.element == "field" && event.name ==="attribute_id"){
 					var device = parentBlock.getField("device").text_
@@ -142,10 +135,11 @@ function event_block(device, s_m, type, id){
 						.appendField(id, "attribute_id")
 						.appendField(new Blockly.FieldCheckbox("TRUE"), "attribute_checkbox")
 						.appendField(new Blockly.FieldTextInput(""), "attribute");
-					this.setInputsInline(true);
+					
 						
 				}	
 			}  
+			//this.setInputsInline(true);
 			this.setOutput(true, "Event");
 			this.setColour(Block_colour_event);
 			this.setTooltip("");
@@ -173,33 +167,53 @@ function event_block(device, s_m, type, id){
 						appendAttr(device, block)
 					
 				}
-			}else if(event.type == Blockly.Events.BLOCK_CREATE && this.id == event.blockId){ //copy with specific_event
+			}else if(event.type == Blockly.Events.BLOCK_CREATE && this.id == event.blockId){ 
+				//copy with specific_event
 				if(this.childBlocks_.length == 1){
 					var device = this.getField("device").text_;
 					var block = this.getInput(device);
 					block.removeField("attribute")
 				}
 			}else if(event.type == Blockly.Events.BLOCK_CHANGE && event.element == "field" && event.name == "attribute_checkbox" && this.id == event.blockId){//change checkbox
+				//change field to true or false
 				var shortdevice = this.getField("device").text_;
 				var device = returnName(shortdevice)
 				var count = deviceCount.get(device)
 				this.removeInput(device)
+
+
 				if(event.newValue == false){
-					this.appendValueInput(device) //connect with Inpute
+					if(attrMap.isSingle(device)){
+						this.appendValueInput(device) //connect with Inpute
 						.appendField(shortdevice, "device")
 						.appendField(new Blockly.FieldVariable(count, null, null, device), "name")
-						.appendField(id, "attribute_id")
 						.appendField(new Blockly.FieldCheckbox("FALSE"), "attribute_checkbox")
 						.setCheck("Inpute");
-
-				}else if(event.newValue == true){
-					this.appendDummyInput(device)
+					}else if(attrMap.isMultiple(device)){
+						this.appendValueInput(device) //connect with Inpute
 						.appendField(shortdevice, "device")
 						.appendField(new Blockly.FieldVariable(count, null, null, device), "name")
-						.appendField(id, "attribute_id")
-						.appendField(new Blockly.FieldCheckbox("TRUE"), "attribute_checkbox")
-						.appendField(new Blockly.FieldTextInput(""), "attribute");
+						.appendField(this.attribute_id, "attribute_id")
+						.appendField(new Blockly.FieldCheckbox("FALSE"), "attribute_checkbox")
+						.setCheck("Inpute");
+					}
+				
 
+				}else if(event.newValue == true){
+					if(attrMap.isSingle(device)){
+							this.appendDummyInput(device)
+							.appendField(shortdevice, "device")
+							.appendField(new Blockly.FieldVariable(count, null, null, device), "name")
+							.appendField(new Blockly.FieldCheckbox("TRUE"), "attribute_checkbox")
+							.appendField(new Blockly.FieldTextInput(""), "attribute");
+					}else if(attrMap.isMultiple(device)){
+						this.appendDummyInput(device)
+							.appendField(shortdevice, "device")
+							.appendField(new Blockly.FieldVariable(count, null, null, device), "name")
+							.appendField(this.attribute_id, "attribute_id")
+							.appendField(new Blockly.FieldCheckbox("TRUE"), "attribute_checkbox")
+							.appendField(new Blockly.FieldTextInput(""), "attribute");
+					}
 
 				}
 			}

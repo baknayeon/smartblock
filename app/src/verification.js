@@ -13,8 +13,8 @@ function verification(ecaLists){
 		
 	else{
 
-		result.reportInconsistency_Redundancy(
-			inconsistency_redundancy(simpleECA, ruleFlows))
+		//result.reportInconsistency_Redundancy(
+			//inconsistency_redundancy(simpleECA, ruleFlows))
 	}
 	
 
@@ -22,45 +22,6 @@ function verification(ecaLists){
 
 }
 
-function alert_verification(IR){
-	var inconsistency1List = IR[0]
-	var redundancy1List = IR[1]
-	
-	var inconsistency1 = ""
-	var redundancy1 = ""
-	var error = 0
-	var warning = 0
-
-
-	for( ecas of inconsistency1List ){
-
-		var eca1 = ecas[0]
-		var eca2 = ecas[1]
-		var event = eca1.event
-		var condition = eca1.condition
-		var action1 = eca1.actionList
-		var action2 = eca2.actionList
-
-		error = error+1
-		inconsistency1 = inconsistency1+event.devname+"."+event.attr+"*"+
-							action1.command+"*"+action2.command+"*/"
-	}
-
-	for( ecas of redundancy1List ){
-		warning = warning+1
-		
-		var eca1 = ecas[0]
-		var eca2 = ecas[1]
-		var event = eca1.event
-		var action1 = eca1.actionList
-		var action2 = eca2.actionList
-		redundancy1 = redundancy1+event.devname+"."+event.attr+"*"+
-							action1.command+"*"+action2.command+"*/"
-	}
-	var height = 230 + (error+warning)*100
-	var windowObj = window.open("support/alert_verification.html?error="+error+"&warning="+warning, 'myWindow', 'location=no , scrollbars=no,toolbar=no,resizable=no,width=430px,height='+height+'px,left=400,top=100');
-			
-}
 
 function simplifyAST(ecaLists){
 	var result = new Array()
@@ -99,7 +60,7 @@ function getRelation(simplyECAs){
 function getRuleFlows(relation_ECA){
 
 	var pairs = relation_ECA
-	var flow = new Flow(pairs[0])
+	var flow = new Flow(pairs)
 	var loop = true
 	while(loop){
 		loop = false
@@ -120,8 +81,7 @@ function getRuleFlows(relation_ECA){
 
 class Flow{
 	constructor(pair){
-		this.ecaflows = new Array()
-		this.ecaflows.push(pair)
+		this.ecaflows =pair
 		this.circularity_error = new Array()
 	}
 	setNewFlows(pair){
@@ -208,14 +168,22 @@ class VerficationResult{
 		return this.circularity
 	}
 	isReliable(){
-		if(this.inconsistency1.length == 0 && 
-			this.redundancy1.length == 0 && 
-			this.circularity.length == 0 )
-
+		if(this.getNumError() == 0)
 			return true
 		else
 			return false
 		
+	}
+	getNumError(){
+		var total = 0
+		total += this.inconsistency1.length
+		total += this.redundancy1.length
+		total += this.inconsistency2.length
+		total += this.redundancy2.length
+		total += this.inconsistency3.length
+		total += this.redundancy3.length
+		total += this.circularity.length
+		return total
 	}
 	getInconsistencyErrorMessage(){
 		var message = ""
@@ -226,31 +194,31 @@ class VerficationResult{
 				var eca1 = error_pairs[0]
 				var eca2 = error_pairs[1]
 
-				message += "("+ this.getEventString(eca1.event) +" + "+ this.getActionString(eca1.action) +")"
-				message += " vs "
-				message += "("+ this.getEventString(eca2.event) +" + "+ this.getActionString(eca2.action) +")\n"
+				message += "["+ this.getEventString(eca1.event) +" + "+ this.getActionString(eca1.action) +"]"
+				message += " *op* "
+				message += "["+ this.getEventString(eca2.event) +" + "+ this.getActionString(eca2.action) +"]\n"
 			
 			}
 		}
 		if(this.inconsistency2.length > 0){
 			for(var error_pairs of this.inconsistency2){
 				var eca1 = error_pairs[0]
-				var eca2 = error_pairs[1]
-
-				message += "("+ this.getEventString(eca1.event) +" + "+ this.getActionString(eca1.action) +")"
-				message += " vs "
-				message += "("+ this.getEventString(eca2.event) +" + "+ this.getActionString(eca2.action) +")\n"
+				var eca_index2 = error_pairs[1]
+				
+				message += "["+ this.getEventString(eca1.event) +" + "+ this.getActionString(eca1.action) +"]"
+				message += " *op* "
+				message += this.getECAFlows(eca_index2)+"\n"
 			
 			}
 		}
 		if(this.inconsistency3.length > 0){
 			for(var error_pairs of this.inconsistency3){
-				var eca1 = error_pairs[0]
-				var eca2 = error_pairs[1]
+				var eca_index1 = error_pairs[0]
+				var eca_index2 = error_pairs[1]
 
-				message += "("+ this.getEventString(eca1.event) +" + "+ this.getActionString(eca1.action) +")"
-				message += " vs "
-				message += "("+ this.getEventString(eca2.event) +" + "+ this.getActionString(eca2.action) +")\n"
+				message += this.getECAFlows(eca_index1)+"\n"
+				message += " *op* "
+				message += this.getECAFlows(eca_index2)+"\n"
 			
 			}
 		}
@@ -262,35 +230,35 @@ class VerficationResult{
 
 		//Redundancy error
 		if(this.redundancy1.length > 0){
-			for(var error_pairs of this.redundancy11){
+			for(var error_pairs of this.redundancy1){
 				var eca1 = error_pairs[0]
 				var eca2 = error_pairs[1]
 
-				message += "("+ this.getEventString(eca1.event) +" + "+ this.getActionString(eca1.action) +")"
-				message += " vs "
-				message += "("+ this.getEventString(eca2.event) +" + "+ this.getActionString(eca2.action) +")\n"
+				message += "["+ this.getEventString(eca1.event) +" + "+ this.getActionString(eca1.action) +"]"
+				message += " *op* "
+				message += "["+ this.getEventString(eca2.event) +" + "+ this.getActionString(eca2.action) +"]\n"
 			
 			}
 		}
 		if(this.redundancy2.length > 0){
 			for(var error_pairs of this.redundancy2){
 				var eca1 = error_pairs[0]
-				var eca2 = error_pairs[1]
+				var eca_index2 = error_pairs[1]
 
-				message += "("+ this.getEventString(eca1.event) +" + "+ this.getActionString(eca1.action) +")"
-				message += " vs "
-				message += "("+ this.getEventString(eca2.event) +" + "+ this.getActionString(eca2.action) +")\n"
+				message += "["+ this.getEventString(eca1.event) +" + "+ this.getActionString(eca1.action) +"]"
+				message += " *op* "
+				message += this.getECAFlows(eca_index2)+"\n"
 			
 			}
 		}
 		if(this.redundancy3.length > 0){
 			for(var error_pairs of this.redundancy3){
-				var eca1 = error_pairs[0]
-				var eca2 = error_pairs[1]
+				var eca_index1 = error_pairs[0]
+				var eca_index2 = error_pairs[1]
 
-				message += "("+ this.getEventString(eca1.event) +" + "+ this.getActionString(eca1.action) +")"
-				message += " vs "
-				message += "("+ this.getEventString(eca2.event) +" + "+ this.getActionString(eca2.action) +")\n"
+				message += this.getECAFlows(eca_index1)+"\n"
+				message += " *op* "
+				message += this.getECAFlows(eca_index2)+"\n"
 			
 			}
 		}
@@ -306,23 +274,32 @@ class VerficationResult{
 				var ecaflows_index = error_pairs[0]
 				var eca2_index = error_pairs[1][1]
 
-				for(var eca_index of ecaflows_index){
-					//action -> event
-					var event = this.simpleECA[eca_index].event
-					var action = this.simpleECA[eca_index].action
-
-					message += "("+ this.getEventString(event) +" + "+ this.getActionString(action) +")"
-									+" -> "
-				}
+				message += this.getECAFlows(ecaflows_index)
 
 				var event = this.simpleECA[eca2_index].event
 				var action = this.simpleECA[eca2_index].action
-				message += "\n\tfrist rule will repeat("+ this.getEventString(event) +" + "+ this.getActionString(action) +")"
+				message += "frist rule will repeat["+ this.getEventString(event) +" + "+ this.getActionString(action) +"]"
 			}
 		}
 
 		return message
 
+
+	}
+	getECAFlows(ecaflows_index){
+		var message = ""
+
+		for(var eca_index of ecaflows_index){
+			//action -> event
+			var event = this.simpleECA[eca_index].event
+			var action = this.simpleECA[eca_index].action
+
+			message += "["+ this.getEventString(event) +" + "+ this.getActionString(action) +"]"
+							+" -> "
+		}
+		message += "rm"
+		message = message.replace(" -> rm","");
+		return message
 
 	}
 	getEventString(e){
@@ -406,8 +383,10 @@ class VerficationResult{
 		var circularityErrorMessage = this.getCircularityErrorMessage()
 		var inconsistencyErrorMessage = this.getInconsistencyErrorMessage()
 		var redundancyErrorMessage = this.getRedundancyErrorMessage()
+		var numError = this.getNumError()
  
-		var windowObj = window.open("support/alert_verification.html?CircularityError="+circularityErrorMessage+"&inconsistencyError="+inconsistencyErrorMessage+"&redundancyError="+redundancyErrorMessage+", 'myWindow', 'location=no , scrollbars=no,toolbar=no,resizable=no,width=800px,height='+500+'px,left=400,top=100");
+		var windowObj = window.open("support/alert_verification.html?CircularityError="+circularityErrorMessage+"&InconsistencyError="+inconsistencyErrorMessage+"&RedundancyError="+redundancyErrorMessage+"&numError="+numError, 
+							'myWindow', 'location=no , scrollbars=no,toolbar=no,resizable=no,width=800px,height=500px,left=400,top=100"');
 				
 	}
 }
@@ -428,47 +407,48 @@ function inconsistency_redundancy(ecaLists, ruleFlows){
 			var eca2 = ecaLists[sub_index]
 
 			if(redundancy(eca1, eca2))
-				redundancy1.push(eca1, eca2)
+				redundancy1.push([eca1, eca2])
 			
 
 			if(inconsistency(eca1, eca2))
-				inconsistency1.push(eca1, eca2)
+				inconsistency1.push([eca1, eca2])
 			
 		}
 	}
 
 	var ecaflows = ruleFlows.ecaflows
-	//eca vs eca flow
-	for(var eca1 of ecaLists){ 
-		for(var flow of ecaflows){
-			var eca2 = getECAofFlow(ecaLists, flow)
+	if(ecaflows.length > 0){
+		//eca vs eca flow
+		for(var eca1 of ecaLists){ 
+			for(var flow of ecaflows){
+				var eca2 = getECAofFlow(ecaLists, flow)
 
-			if(redundancy(eca1, eca2))
-				redundancy2.push(eca1, eca2)
-			
+				if(redundancy(eca1, eca2))
+					redundancy2.push([eca1, flow])
 
-			if(inconsistency(eca1, eca2))
-				inconsistency2.push(eca1, eca2)
-			
+
+				if(inconsistency(eca1, eca2))
+					inconsistency2.push([eca1, flow])
+
+			}
 		}
-	}
 
-	for(var index = 0; index < ecaflows.length; index++){ 
-		var flow1 = ecaflows[index]
-		var eca1 = getECAofFlow(ecaLists, flow1)
-		for(var sub_index = index+1; sub_index < ecaflows.length; sub_index++){ 
-			var flow2 = ecaflows[index]
+		for(var index = 0; index < ecaflows.length; index++){ 
+			var flow1 = ecaflows[index]
 			var eca1 = getECAofFlow(ecaLists, flow1)
+			for(var sub_index = index+1; sub_index < ecaflows.length; sub_index++){ 
+				var flow2 = ecaflows[sub_index]
+				var eca1 = getECAofFlow(ecaLists, flow1)
 
-			if(redundancy(eca1, eca2))
-				redundancy3.push(eca1, eca2)
+				if(redundancy(eca1, eca2))
+					redundancy3.push([flow1, flow2])
 
-			if(inconsistency(eca1, eca2))
-				inconsistency3.push(eca1, eca2)
-			
+				if(inconsistency(eca1, eca2))
+					inconsistency3.push([flow1, flow2])
+
+			}
 		}
 	}
-
 
 
 	return [inconsistency1, inconsistency2, inconsistency3, 
@@ -500,7 +480,7 @@ function redundancy(eca1, eca2){
 	var action1 = eca1.action
 	var action2 = eca2.action	
 
-	if(conflictAction(action1, action2))//Check Redundancy
+	if(sameAction(action1, action2))//Check Redundancy
 		if(sameEvent(event1, event2) && sameCondition(condition1, condition2))
 			return true
 	return false
@@ -515,7 +495,7 @@ function inconsistency(eca1, eca2){
 	var action1 = eca1.action
 	var action2 = eca2.action	
 
-	if(sameAction(action1, action2))//Check Inconsistency
+	if(conflictAction(action1, action2))//Check Inconsistency
 		if(sameEvent(event1, event2) && sameCondition(condition1, condition2))
 			return true
 	return false
@@ -650,7 +630,7 @@ function sameCondition(condition, condition_sub){
 						
 					}
 				}
-			}else if(overlap(condition, condition_sub)){
+			}else {//if(overlap(condition, condition_sub)){
 				result = 1
 			}
 		}

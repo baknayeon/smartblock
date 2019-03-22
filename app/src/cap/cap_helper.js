@@ -16,7 +16,9 @@ VerificationMap = function(){
 	this.influenceObject["unmute"] = "unmuted"; 
 	this.influenceObject["close"] = "closed"; 
 	this.influenceObject["play"] = "unmuted"; 
-	this.influenceObject["stop"] = "muted"; 
+	this.influenceObject["stop"] = "muted";
+	this.influenceObject["siren"] = "siren"; 
+	this.influenceObject["off"] = "off"; 
 };   
 VerificationMap.prototype = {  
     conflict : function(attribute1, attribute2){ 
@@ -26,10 +28,11 @@ VerificationMap.prototype = {
     influence: function(action, event){
     	if(action.devname && event.devname)
 		if(action.devname == event.devname){
+			var influence_action = this.influenceObject[action.command_part]
 			if(action.command_part == event.attr){
 				return true
 			}
-			else if(this.influenceObject[action.command_part] == event.attr)
+			else if(influence_action.includes(event.attr))
 				return true;
 
 		}
