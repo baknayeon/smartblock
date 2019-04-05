@@ -252,6 +252,14 @@ Blockly.devicesFlyoutCallback_condition = function(workspace) {
 		 var block = Blockly.Xml.textToDom(blockText).firstChild;
 		 xmlList.push(block)
 	}
+	if (Blockly.Blocks["getlocationmode_c"]) {
+		 var blockText = '<xml>' +
+			  '<block type="getlocationmode_c">' +
+			  '</block>' +
+			  '</xml>';
+		 var block = Blockly.Xml.textToDom(blockText).firstChild;
+		 xmlList.push(block)
+	}
 
 	if (Blockly.Blocks["getweatherfeature_c"]) {
 		 var blockText = '<xml>' +

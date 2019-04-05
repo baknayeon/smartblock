@@ -403,6 +403,13 @@ Blockly.SmartThings['getweatherfeature_c'] = function(block) {
   c.value =  "getWeatherFeature()";
   return c;
 };
+Blockly.SmartThings['getlocationmode_c'] = function(block) {
+  // TODO: Assemble SmartThings into code variable.
+  var c = new API()
+  c.value =  "location.mode";
+  return c;
+};
+
 
 
 //API - now (String)

@@ -32,7 +32,7 @@ VerificationMap.prototype = {
 			if(action.command_part == event.attr){
 				return true
 			}
-			else if(influence_action.includes(event.attr))
+			else //if(influence_action.includes(event.attr))
 				return true;
 
 		}

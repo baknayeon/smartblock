@@ -25,7 +25,7 @@ Blockly.SmartThings['math_action'] = function(block) {
 
   var c = new Calculation()
   c.inputs = inputList
-  c.operation = dropdown_op 
+  c.operator = dropdown_op 
   c.left = left   // =  left+" "+dropdown_op+" "+right;
   c.right = right  
   // TODO: Change ORDER_NONE to the correct strength.
@@ -70,7 +70,7 @@ Blockly.SmartThings['action_state_def'] = function(block) {
 			smartAction.state_command = "state.box"+variable_name +" = " + right_input_value
 			
 		}else if(value_input.constructor == Calculation){
-			var experssion =  generating_node(value_input.left)+" "+value_input.operation+" "+ generating_node(value_input.right);
+			var experssion =  generating_node(value_input.left)+" "+value_input.operator+" "+ generating_node(value_input.right);
 			smartAction.valueinput = value_input.inputs
 			smartAction.state = "state.box"+variable_name;
 			smartAction.state_command = "state.box"+variable_name +" = (" + experssion+")"
@@ -200,7 +200,7 @@ Blockly.SmartThings['sendsms'] = function(block) {
 	if(value_phone == ""){
 		text_phone = '\"'+text_phone+'\"'
 	}else{	
-		text_phone = value_phone.devname
+		text_phone = value_phone.name
 		smartAction.arginput.push(value_phone)
 	}
 
@@ -301,7 +301,7 @@ Blockly.SmartThings['setlocationmode_a'] = function(block) {
   a.method = "if(location.mode != "+value_mode.name+" && location.modes?.find{it.name == "+value_mode.name+"})"
   +" setLocationMode("+value_mode.name+")" // "if(location.modes?.find{it.name == "+value_mode.devname+"}) "+
   a.arginput.push(value_mode)
-  return a;
+  return [a];
 };
 
 

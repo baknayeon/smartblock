@@ -783,6 +783,17 @@ Blockly.Blocks['getweatherfeature_c'] = {
  this.setHelpUrl("");
   }
 };
+Blockly.Blocks['getlocationmode_c'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField("getLocationMode");
+    this.setOutput(true, "API");
+    this.setColour(Block_colour_condition);
+ this.setTooltip("");
+ this.setHelpUrl("");
+  }
+};
+
 
 
 //API - now 
@@ -796,7 +807,6 @@ Blockly.Blocks['now_c'] = {
  this.setHelpUrl("");
   }
 };
-
 
 //API - state 
 Blockly.Blocks['condition_state'] = {

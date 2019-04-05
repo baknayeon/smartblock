@@ -313,9 +313,10 @@ Blockly.Blocks['e_installed'] = {
   init: function() {
 			var count = deviceCount.get("installed")
 
-  	this.appendDummyInput()
+  	this.appendValueInput("updated")
   		.appendField("installed")
-  		.appendField(new Blockly.FieldVariable(count, null, null, "installed"), "name");
+  		.appendField(new Blockly.FieldVariable(count, null, null, "installed"), "name")
+		.setCheck("Event");
   		this.setOutput(true, "Event");
 		this.setColour(Block_colour_event);
 		this.setTooltip("");
@@ -325,13 +326,21 @@ Blockly.Blocks['e_installed'] = {
 
 
 Blockly.SmartThings['e_installed'] = function(block) {
-	 var dropdown_attr = block.getFieldValue('attr');
-	  var variable_name = Blockly.SmartThings.variableDB_.getName(block.getFieldText('name'), Blockly.Variables.NAME_TYPE);
+	var dropdown_attr = block.getFieldValue('attr');
+	var variable_name = Blockly.SmartThings.variableDB_.getName(block.getFieldText('name'), Blockly.Variables.NAME_TYPE);
+	var value_updated = Blockly.SmartThings.valueToCode(block, 'updated', Blockly.SmartThings.ORDER_ATOMIC);
+  
 	// TODO: Assemble SmartThings into code variable.
 
 	var smartevent = new Event();
-	smartevent.predefined_ = "installed"
-	smartevent.handler = "init_method"+variable_name;
+	if(!value_updated){ // only at installed 
+		smartevent.predefined_ = "installed"
+		smartevent.handler = "init_method"+variable_name;
+	}else{
+		smartevent.predefined_ = "predefined_both"
+		smartevent.handler = "init_method"+variable_name;
+
+	}
 
 	// TODO: Change ORDER_NONE to the correct strength.
 	return smartevent;

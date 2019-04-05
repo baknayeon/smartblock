@@ -36,12 +36,13 @@ function generating_atinstalled(ecaList){
 		var event = eca.event
 		var inputes = eca.input_e_make;
 		for(var input_e of inputes){
-			if(event.predefined_ && event.predefined_ == "installed"){ //init method
+			if(event.predefined_){
+				if(event.predefined_ == "installed" || event.predefined_ =="predefined_both"){ //init method
 
-				var init_e = predefined_method.indexOf(input_e.handler);
-				if(init_e == -1 )
-					predefined_method += "\t"+input_e.handler+"\n";
-			
+					var init_e = predefined_method.indexOf(input_e.handler);
+					if(init_e == -1 )
+						predefined_method += "\t"+input_e.handler+"\n";
+				}
 			}
 		}
 	}
@@ -56,12 +57,12 @@ function generating_atupdated(ecaList){
 		var event = eca.event
 		var inputes = eca.input_e_make;
 		for(var input_e of inputes){
-			if(event.predefined_ && event.predefined_ == "updated"){ //init method
-
-				var init_e = predefined_method.indexOf(input_e.handler);
-				if(init_e == -1 )
-					predefined_method += "\t"+input_e.handler+"\n";
-			
+			if(event.predefined_){
+				if(event.predefined_ == "updated"|| event.predefined_ =="predefined_both"){ //init method
+					var init_e = predefined_method.indexOf(input_e.handler);
+					if(init_e == -1 )
+						predefined_method += "\t"+input_e.handler+"\n";
+				}
 			}
 		}
 	}

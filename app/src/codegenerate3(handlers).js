@@ -166,12 +166,12 @@ function generating_action(actionList){
 				var args = generating_node(action.method.args)
 				var method = action.method.id
 
-				if(method == "setColor")
+				/*if(method == "setColor")
 					args = "[color: "+args+"]"
 				else if(method == "setHue")
 					args = "[hue: "+args+"]"
 				else if(method == "setSaturation")
-					args = "[saturation: "+args+"]"	
+					args = "[saturation: "+args+"]"	*/
 
 				var action_method = action.devname + "."+method+"("+ args +")"
 				expr =  "\t\t"+action_method+"\n"		
@@ -185,7 +185,7 @@ function generating_action(actionList){
 		}else if(action.constructor == Grouping){
 			var list = action.list
 			for(var a of list)
-				expr += "\t\t"+a.command+"\n"	
+				expr = "\t\t"+a.command+"\n"	
 		}
 		exprs += expr
 	}
