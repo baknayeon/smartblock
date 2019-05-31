@@ -17,8 +17,8 @@ function smartApp(ecaList){
 		//predefined_callback
 		var subscribes = generating_subscribes(ecaList)
 		var initmethods = generating_atinstalled(ecaList)
-		var installed = "def installed() {\n" + subscribes + initmethods+"}";
 		var updatedmethods = generating_atupdated(ecaList)
+		var installed = "def installed() {\n" + subscribes + initmethods+"}";
 		var updated = "def updated() {\n\tunsubscribe()\n\tunschedule()\n" +subscribes + updatedmethods+"}";
 		var predefined_callback= installed+"\n"+updated;
 		
@@ -44,7 +44,7 @@ function generating_definition(){
 		
 	var definition ='definition( '+'\n'+'name: \"'+name+'\",'+"\n"
 	if(author)
-		definition +=  'author: "'+ author +'"'+"\n"
+		definition +=  'author: "'+ author +'",'+"\n"
 	else
 		definition += 'author: "SmartBlock",'+"\n"
 	if(namespace)
@@ -54,7 +54,7 @@ function generating_definition(){
 	if(description)
 		definition += 'description: "'+ description +'",'+"\n"
 	else 
-		definition += 'description: "this app is made by SmartBlock",\n'
+		definition += 'description: "this app is developed in Smart Block",\n'
 	if(iconUrl)
 		definition +='iconUrl: \"'+iconUrl+'",'+"\n"
 		+'iconX2Url: \"'+iconUrl+'"'+"\n"
@@ -106,7 +106,7 @@ function generating_pref(ecaList){
 		for(i in ecaList){
 			var input_e = ecaList[i].input_e_make;
 			var input_a = ecaList[i].input_a_make;
-			var input_c = ecaList[i].input_c_make;
+			var input_cs = ecaList[i].input_c_make;
 
 			//eliminate dutulicate
 			for(e in input_e){
@@ -120,23 +120,24 @@ function generating_pref(ecaList){
 			}
 
 			for(j in input_a){
-				var cSt_a = codition_input.indexOf(input_a[j].input);
-				var eSt_a = event_input.indexOf(input_a[j].input);
-				var aSt_a = action_input.indexOf(input_a[j].input);
-				if(cSt_a == -1 && eSt_a == -1 && aSt_a == -1)
+				var cSt_a = codition_input.includes(input_a[j].input);
+				var eSt_a = event_input.includes(input_a[j].input);
+				var aSt_a = action_input.includes(input_a[j].input);
+				if(cSt_a == false && eSt_a == false && aSt_a == false)
 					if(input_a[j].input)
 						action_input += "\n\t\t\t"+input_a[j].input;
 
 			}
 
-			for(c in input_c){
-				var cSt_c = codition_input.indexOf(input_c[c].input);
-				var eSt_c = event_input.indexOf(input_c[c].input);
-				var aSt_c = action_input.indexOf(input_c[c].input);
-				if(cSt_c == -1 && eSt_c == -1 && aSt_c == -1)
-					if(input_c[c])
-						if(input_c[c].constructor == Inputc)
-						codition_input += "\n\t\t\t"+input_c[c].input;
+			for(input_c of input_cs){
+				if(input_c){
+					var cSt_c = codition_input.indexOf(input_c.input);
+					var eSt_c = event_input.indexOf(input_c.input);
+					var aSt_c = action_input.indexOf(input_c.input);
+					if(cSt_c == -1 && eSt_c == -1 && aSt_c == -1)
+							if(input_c.constructor == Inputc)
+							codition_input += "\n\t\t\t"+input_c.input;
+				}
 
 			}
 

@@ -67,11 +67,9 @@ function ECA(statements_event, value_condition, statements_action) {
 
 
 
-	if(this.condition.constructor == Grouping){
-		this.input_c_make = this.condition.list
-	}else{
-		 this.input_c_make = condition_input(this.condition);
-	}
+
+	this.input_c_make = condition_input(this.condition);
+	
 
 
 
@@ -122,82 +120,87 @@ function ECA(statements_event, value_condition, statements_action) {
 
 function condition_input(condition){
 	var array = new Array()
-	if(condition.operator == "!"){ //!p
-		array = condition_input(condition.right)
-			
-	}else if(condition.operator == "is_null"){ //!p
-		if(condition.result.constructor == Inputc)
-			array.push(condition.result);
-			
-	}else if(condition.constructor == Grouping){
-		for(var inputc of condition.list){
-			array.push(inputc);
-		}
-	}else{ // p&&p, p||p, f <= fn, m <= n, fϵd  
-		var operator = condition.operator
-		var right = condition.right;
-		var left = condition.left;
 
-		if(operator == '&&' || operator == '||'){
-			var array_right = condition_input(right)
-			var array_left = condition_input(left)
-			array = array.concat(array_right)
-			array = array.concat(array_left)
-		}
-		else if(operator == '==' || operator == '<'|| operator == '>' || operator == '!=' || operator == '>='|| operator == '<='
-				||
-				operator == '+' || operator == '-'|| operator == '*' || operator == '/' ){
-			//smartDevice
-			
-			if(right.constructor == Inputc) // f <= f
-				array.push(right);
-			else if(right.constructor == API && right.inputs) 
-				array = array.concat(right.inputs);
-			else if(right.constructor == Calculation){
-				array = array.concat(right.inputs)
+	if(condition.constructor == Grouping){
+		array = condition.list
+	}else{
+			if(condition.operator == "!"){ //!p
+				array = condition_input(condition.right)
+					
+			}else if(condition.operator == "is_null"){ //!p
+				if(condition.result.constructor == Inputc)
+					array.push(condition.result);
+					
+			}else if(condition.constructor == Grouping){
+				for(var inputc of condition.list){
+					array.push(inputc);
+				}
+			}else{ // p&&p, p||p, f <= fn, m <= n, fϵd  
+				var operator = condition.operator
+				var right = condition.right;
+				var left = condition.left;
+
+				if(operator == '&&' || operator == '||'){
+					var array_right = condition_input(right)
+					var array_left = condition_input(left)
+					array = array.concat(array_right)
+					array = array.concat(array_left)
+				}
+				else if(operator == '==' || operator == '<'|| operator == '>' || operator == '!=' || operator == '>='|| operator == '<='
+						||
+						operator == '+' || operator == '-'|| operator == '*' || operator == '/' ){
+					//smartDevice
+					
+					if(right.constructor == Inputc) // f <= f
+						array.push(right);
+					else if(right.constructor == API && right.inputs) 
+						array = array.concat(right.inputs);
+					else if(right.constructor == Calculation){
+						array = array.concat(right.inputs)
+						
+					}else if(right.constructor == Occurrences){
+						
+						if(right.type == "already_enum"){
+							array.push(right.input);
+							if(right.arginput)
+								array.push( condition_input(right.arginput));
+						}else if(right.type == "already_num"){
+							array.push(right.input);
+							if(right.input2)
+								array.push(right.input2);
+							if(right.arginput)
+								array.push( condition_input(right.arginput));
+						}else if(right.type == "happen_enum_dropdown"){
+							array.push(right.input);
+						}
+					}
+							
+					if(left.constructor == Inputc) // f <= f
+						array.push(left);
+					else if(left.constructor == API && left.inputs) 
+						array = array.concat(left.inputs);
+					else if(left.constructor == Calculation){
+						array = array.concat(left.inputs)
+					}else if(left.constructor == Occurrences){
+						
+						if(left.type == "already_enum"){
+							array.push(left.input);
+							if(left.arginput)
+								array.push(condition_input(left.arginput));
+						}else if(left.type == "already_num"){
+							array.push(left.input);
+							if(left.input2)
+								array.push(left.input2);
+							if(left.arginput)
+								array.push(condition_input(left.arginput));
+						}else if(left.type == "happen_enum_dropdown"){
+							array.push(left.input);
+						}
+					} 
 				
-			}else if(right.constructor == Occurrences){
-				
-				if(right.type == "already_enum"){
-					array.push(right.input);
-					if(right.arginput)
-						array.push( condition_input(right.arginput));
-				}else if(right.type == "already_num"){
-					array.push(right.input);
-					if(right.input2)
-						array.push(right.input2);
-					if(right.arginput)
-						array.push( condition_input(right.arginput));
-				}else if(right.type == "happen_enum_dropdown"){
-					array.push(right.input);
 				}
 			}
-					
-			if(left.constructor == Inputc) // f <= f
-				array.push(left);
-			else if(left.constructor == API && left.inputs) 
-				array = array.concat(left.inputs);
-			else if(left.constructor == Calculation){
-				array = array.concat(left.inputs)
-			}else if(left.constructor == Occurrences){
-				
-				if(left.type == "already_enum"){
-					array.push(left.input);
-					if(left.arginput)
-						array.push(condition_input(left.arginput));
-				}else if(left.type == "already_num"){
-					array.push(left.input);
-					if(left.input2)
-						array.push(left.input2);
-					if(left.arginput)
-						array.push(condition_input(left.arginput));
-				}else if(left.type == "happen_enum_dropdown"){
-					array.push(left.input);
-				}
-			} 
-		
 		}
-	}
 	return array
 }
 
@@ -382,6 +385,9 @@ function Grouping() {
 }
 
 
+function Condition_devs() {
+	this.list = new Array();
+}
 function Inputa(a) {
 	this.devname
 	this.device 

@@ -340,7 +340,9 @@ width: 1180px;
 
 .groovy::-webkit-scrollbar-corner {
       background-color: #f4f4f4;
-} /*
+} 
+
+
 
 
 
@@ -382,3 +384,5 @@ width: 1180px;
 a{
 	color:#999;
 }
+
+

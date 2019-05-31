@@ -5,53 +5,53 @@
   <title>Smart Block for SmartThings</title>
   
   <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
-  <script src="../blockly_compressed.js"></script>
-  <script src="../blocks_compressed.js"></script>
-  <script src="../smartthings_compressed.js"></script>
-  <script src="../msg/js/en.js"></script>
-  <script src="support/FileSaver.js"></script>
-  <script src="support/button_jquery.js"></script>
+  <script src="blockly_compressed.js"></script>
+  <script src="blocks_compressed.js"></script>
+  <script src="smartthings_compressed.js"></script>
+  <script src="msg/js/en.js"></script>
+  <script src="src/support/FileSaver.js"></script>
+  <script src="src/support/button_jquery.js"></script>
 
-  <script src="cap/cap.js"></script>
-  <script src="cap/cap_helper.js"></script>
-  <script src="cap/cap_helper_attrMap.js"></script>
-  <script src="cap/cap_helper_commMap.js"></script>
+  <script src="src/cap/cap.js"></script>
+  <script src="src/cap/cap_helper.js"></script>
+  <script src="src/cap/cap_helper_attrMap.js"></script>
+  <script src="src/cap/cap_helper_commMap.js"></script>
 
-  <script src="help.js"></script>
+  <script src="src/help.js"></script>
 
-  <script src="codegenerate1(def+pref).js"></script>
-  <script src="codegenerate2(predefined).js"></script>
-  <script src="codegenerate3(handlers).js"></script>
+  <script src="src/codegenerate1(def+pref).js"></script>
+  <script src="src/codegenerate2(predefined).js"></script>
+  <script src="src/codegenerate3(handlers).js"></script>
 
-  <script src="toolbox.js"></script>
-  <script src="verification.js"></script>
+  <script src="src/toolbox.js"></script>
+  <script src="src/verification.js"></script>
 
-  <script src="block/rule_definer.js"></script>
-  <script src="block/rule_generator.js"></script>
+  <script src="src/block/rule_definer.js"></script>
+  <script src="src/block/rule_generator.js"></script>
 
-  <script src="block/event.js"></script>
-  <script src="block/event_timer.js"></script>
+  <script src="src/block/event.js"></script>
+  <script src="src/block/event_timer.js"></script>
 
-  <script src="block/condition_generator.js"></script>
-  <script src="block/condition_device.js"></script>
-  <script src="block/condition_definer.js"></script>
+  <script src="src/block/condition_generator.js"></script>
+  <script src="src/block/condition_device.js"></script>
+  <script src="src/block/condition_definer.js"></script>
 
-  <script src="block/action_list.js"></script>
-  <script src="block/action_device.js"></script>
-  <script src="block/action_generator.js"></script>
-  <script src="block/action_definer.js"></script>
-  <script src="block/action_timer.js"></script>
+  <script src="src/block/action_list.js"></script>
+  <script src="src/block/action_device.js"></script>
+  <script src="src/block/action_generator.js"></script>
+  <script src="src/block/action_definer.js"></script>
+  <script src="src/block/action_timer.js"></script>
 
-  <script src="block/_definer_helper.js"></script>
+  <script src="src/block/_definer_helper.js"></script>
 
 
-  <script src="block/option.js"></script>
-  <script src="block/preference.js"></script>
-  <script src="block/grouping.js"></script>
-  <link rel="stylesheet" type="text/css" href="css/main.css">
-  <link rel="stylesheet" href="highlight/styles/default.css">
+  <script src="src/block/option.js"></script>
+  <script src="src/block/preference.js"></script>
+  <script src="src/block/grouping.js"></script>
+  <link rel="stylesheet" type="text/css" href="src/css/main.css">
+  <link rel="stylesheet" href="src/highlight/styles/default.css">
 
-  <script src="highlight/highlight.pack.js"></script>
+  <script src="src/highlight/highlight.pack.js"></script>
 
 <script>
 	var	deviceCount = new CountMap();
@@ -101,6 +101,8 @@
 	<category name="Rule" colour ="#304777">
 		<block type="eca"></block>
 		<block type="ea"></block>
+		<block type="ca"></block>
+			  
 	</category>
 	<category name="Event" custom="SAMRT_DEVICE_E" colour ="#5eb7b5"></category>
 	<category name="Condition" custom="SAMRT_DEVICE_C" colour ="#A2CC0D"></category>
@@ -109,7 +111,7 @@
 
 <body onload="all()">
 	<center>
-		<img src="./css/snowblock_logo_s.png" id ="logo">
+		<img src="src/css/snowblock_logo_s.png" id ="logo">
 	</center>
 	<div id="top">
 		<div id="app">  
@@ -128,7 +130,7 @@
 		</div>
 		<div id="box" >
 			<div id="in_box1">
-			  <div id="blocklyDiv" style="height: 770px; width: 2000px;"></div>
+			  <div id="blocklyDiv" style="height: 701px; width: 1200px;"></div>
 			</div>
 
 			<div id="in_box2">
@@ -136,10 +138,13 @@
 			</div>
 
 			<div id="in_box3" style="height: 701px; width: 1200px; background: #f4f4f4;">
+		
 				<pre style="margin:0px;">
-					<code style="padding: 0px 8px 8px 8px;" class="groovy" id="smartApp_code">
+					<code style="padding: 0px 8px 8px 8px;" id="smartApp_code" >
+				
 					</code>
 				</pre>
+
 				<button id="save_but" onClick="saveCode()">SaveCode</button>
 			</div>
 		</div>
@@ -158,9 +163,7 @@
 	<input type="text" id = "iconUrl" hidden></input>
 	<script>
 
-	//document.getElementById("click1").click();
 	var options_workspace
-	
 	var workspace = Blockly.inject('blocklyDiv', { toolbox : toolbox, 
 												   collapse : false, 
 												   comments : false, 
@@ -170,7 +173,7 @@
 												   horizontalLayout : false, 
 												   toolboxPosition : 'start', 
 												   css : true, 
-												   media : '../media/',
+												   media : 'media/',
 												   rtl : false, 
 												   scrollbars : true, 
 												   sounds : true, 
@@ -210,6 +213,7 @@
 				_("click1").style.background = "#fff"
 				_("click2").style.background = "#fff"
 				_("click3").style.background = "#f4f4f4"
+				//countLines()
 
 			}else{
 				result_verification.alert_()
@@ -355,7 +359,6 @@
 
 	function preference(){
 		var pre = '  <category name="Preference">\n';
-		//pre += '    <block type="preference"></block>\n';
 		pre += '    <block type="page"> <field name="name"></field>\n  <field name="nextPage"></field>\n  </block>\n ';
 		pre += '    <block type="section">'+' <field name="NAME"></field>\n ' + ' </block>\n ';
 		pre += '    <block type="dynamicpage">'+' <field name="name"></field>\n ' + ' <field name="nextPage"></field>\n ' + ' </block>\n ';
@@ -377,6 +380,116 @@
 		+'  </category>\n';
 		return preference_option
 	}
+    
+    
+	function toolbox_pre(){
+			
+		var toolbox_pre = '<xml>\n';
+		toolbox_pre += sample();
+		toolbox_pre += preference();
+		toolbox_pre += preference_option();
+
+		var ecaList = Blockly.SmartThings.workspaceToCode(workspace);
+		var event_block ="";
+		var action_block ="";
+		var condition_block ="";
+		
+		toolbox_pre += '  <category name="input" >\n';
+		if(ecaList){
+			for(i in ecaList){
+				var event = ecaList[i].event;
+				var actionList = ecaList[i].actionList;
+				var coditionList = new Array();
+
+				var e_devname = event.devname;
+				
+				//eliminate dutulicate
+				var eSt_e = event_block.indexOf(e_devname);
+				var aSt_e = action_block.indexOf(e_devname);
+				var cSt_e = condition_block.indexOf(e_devname);
+
+				if(eSt_e == -1 && aSt_e == -1 && cSt_e == -1){
+					pre_block(e_devname, Block_colour_event)
+					event_block += '    <block type="input '+e_devname+'">'+ ' </block> \n';
+				}
+
+
+				condition_input(ecaList[i].condition, coditionList);
+
+				for(c in coditionList){
+					var c_devname = coditionList[c].devname
+					if(c_devname){
+						var eSt_a = event_block.indexOf(c_devname);
+						var aSt_a = action_block.indexOf(c_devname);
+						var cSt_e = condition_block.indexOf(c_devname);
+						if(eSt_a == -1 && aSt_a == -1 && cSt_e == -1){
+							pre_block(c_devname, Block_colour_condition)
+							condition_block += '    <block type="input '+c_devname+'">'+ ' </block> \n';
+						}
+					}
+				}
+
+				for(a in actionList){
+					var a_devname = actionList[a].devname
+					if(a_devname){
+						var eSt_a = event_block.indexOf(a_devname);
+						var aSt_a = action_block.indexOf(a_devname);
+						var cSt_e = condition_block.indexOf(a_devname);
+						if(eSt_a == -1 && aSt_a == -1 && cSt_e == -1){
+							pre_block(a_devname, Block_colour_action)
+							action_block += '    <block type="input '+a_devname+'">'+ ' </block> \n';
+						}
+					}
+				}
+			}
+		}
+
+		toolbox_pre += event_block + condition_block + action_block;
+		toolbox_pre += '  </category>\n';
+		toolbox_pre += '</xml>\n';
+
+		return toolbox_pre;
+
+	}
+
+	var db;
+    function createDB(){
+        db = window.openDatabase("myDB","1.0", "Things", 1024*1024);
+    }
+      
+    function createTable(){
+        db.transaction(function(tx){
+          tx.executeSql("create table Things(device)");
+        });
+    }
+    function insertData(device){
+        db.transaction(function(tx){
+          tx.executeSql("insert into Things values(?)",[device]);
+        });
+    }
+      
+    function deleteData(device){
+        db.transaction(function(tx){
+          tx.executeSql("delete into Things values(?)",[device]);
+        });
+    }
+    function selectData(){
+        db.transaction(function(tx){
+          tx.executeSql("select * from Things",[],
+            
+            function(tx,result){            
+              for(var i = 0; i < result.rows.length; i++){
+                var row = result.rows.item(i);
+				var device = row['device']
+
+              }            
+                                   
+            });
+            
+        });
+    }
+            
+
 
   </script>
 </body>

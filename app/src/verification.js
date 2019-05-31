@@ -13,8 +13,8 @@ function verification(ecaLists){
 		
 	else{
 
-		//result.reportInconsistency_Redundancy(
-			//inconsistency_redundancy(simpleECA, ruleFlows))
+		result.reportInconsistency_Redundancy(
+			inconsistency_redundancy(simpleECA, ruleFlows))
 	}
 	
 
@@ -45,13 +45,13 @@ function getRelation(simplyECAs){
 		var action =  simplyECAs[index].action	
 
 		for(var sub_index = 0; sub_index < simplyECAs.length; sub_index++){
-			if(index != sub_index){
+			//if(index != sub_index){?
 				var event_sub = simplyECAs[sub_index].event	
 				if(verificationMap.influence(action, event_sub)){
 					relation.push([index, sub_index])
 					
 				}
-			}
+			//}
 		}
 	}
 	return relation
@@ -409,7 +409,6 @@ function inconsistency_redundancy(ecaLists, ruleFlows){
 			if(redundancy(eca1, eca2))
 				redundancy1.push([eca1, eca2])
 			
-
 			if(inconsistency(eca1, eca2))
 				inconsistency1.push([eca1, eca2])
 			
@@ -438,7 +437,7 @@ function inconsistency_redundancy(ecaLists, ruleFlows){
 			var eca1 = getECAofFlow(ecaLists, flow1)
 			for(var sub_index = index+1; sub_index < ecaflows.length; sub_index++){ 
 				var flow2 = ecaflows[sub_index]
-				var eca1 = getECAofFlow(ecaLists, flow1)
+				var eca2 = getECAofFlow(ecaLists, flow2)
 
 				if(redundancy(eca1, eca2))
 					redundancy3.push([flow1, flow2])

@@ -31,14 +31,14 @@ Blockly.SmartThings['any'] = function(block) {
 
 
 Blockly.SmartThings['all'] = function(block) {
-	var p = Blockly.SmartThings.valueToCode(block, 'p', Blockly.SmartThings.ORDER_ATOMIC);
+	var condition = Blockly.SmartThings.valueToCode(block, 'p', Blockly.SmartThings.ORDER_ATOMIC);
 	var device_list = Blockly.SmartThings.statementToCode(block, 'group');
 
-	p.device = device_list["0"].device
+	condition.devices = device_list
 	
 	var groupingDevice = new Grouping();
 	groupingDevice.type = "all"
-	groupingDevice.p = p
+	groupingDevice.p = condition
 	groupingDevice.list = device_list
 
 		
@@ -46,12 +46,14 @@ Blockly.SmartThings['all'] = function(block) {
 };
 
 Blockly.SmartThings['exists'] = function(block) {
-	var p = Blockly.SmartThings.valueToCode(block, 'p', Blockly.SmartThings.ORDER_ATOMIC);
+	var condition = Blockly.SmartThings.valueToCode(block, 'p', Blockly.SmartThings.ORDER_ATOMIC);
 	var device_list = Blockly.SmartThings.statementToCode(block, 'group');
  
+	condition.devices = device_list
+
 	var groupingDevice = new Grouping();
 	groupingDevice.type = "exists"
-	groupingDevice.p = p
+	groupingDevice.p = condition
 	groupingDevice.list = device_list
 		
 	return groupingDevice;

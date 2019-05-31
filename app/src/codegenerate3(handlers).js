@@ -2,19 +2,14 @@
 var condition_functionhandlerSet = new Set();
 var action_functionhandlerSet = new Set();
 
-function generating_Handler(ecaLists, devList){
+function generating_Handler(ecaLists){
 	var handler_methods = "";
 
 	var devList = new Array;
 
-	for(var ecaList of ecaLists){
-		devList = devList.concat(ecaList.event, ecaList.actionList)
-	}
-
 	var timerHandlerMethod = new Map();
 	var predefinedMethods = new Map();
 	var subscribeMethods = new Map();
-	var anyGrouingHandlers =  new Map();
 
 	//handlerMethod
 	for(var ecaList of ecaLists){
@@ -23,28 +18,7 @@ function generating_Handler(ecaLists, devList){
 		var condition = ecaList.condition;
 		var actionList = ecaList.actionList;
 		var input_e = ecaList.input_e_make[0]
-		if(event.timerhandler){ //timer
-			var key_handler = input_e.timerhandler
-			if(timerHandlerMethod.has(key_handler)){
-				var ecaLists = timerHandlerMethod.get(key_handler)
-				ecaLists = ecaLists.concat(ecaList)
-				timerHandlerMethod.set(key_handler,ecaLists)
-
-			}else{
-				timerHandlerMethod.set(key_handler, [ecaList])
-			}
-
-		}else if(event.predefined_method){ // predefined_method
-			var key_handler = input_e.handler
-			if(predefinedMethods.has(key_handler)){
-				var ecaLists = predefinedMethods.get(key_handler)
-				ecaLists = ecaLists.concat(ecaList)
-				predefinedMethods.set(key_handler,ecaLists)
-			}else{
-				predefinedMethods.set(key_handler, [ecaList])
-			}
-
-		}else if(event.device || event.time || event.abstract_ || event.constructor == Grouping ){// event from dev and schedule and location, app
+		 if(event.device || event.time || event.abstract_ || event.constructor == Grouping ){// event from dev and schedule and location, app
 
 			//handlerMethod
 			var eventHandler = "def "+input_e.handler+"{\n" ;
@@ -56,7 +30,7 @@ function generating_Handler(ecaLists, devList){
 
 
 			//predicate
-			var predicate = generating_condition(condition, devList)
+			var predicate = generating_condition(condition)
 			eventHandler +="\tif("+predicate+"){\n"
 
 			//action
@@ -75,14 +49,32 @@ function generating_Handler(ecaLists, devList){
 			}else{
 				subscribeMethods.set(key_handler, [ecaList])
 			}
+		}else if(event.timerhandler){ //timer
+			var key_handler = input_e.timerhandler
+			if(timerHandlerMethod.has(key_handler)){
+				var ecaLists = timerHandlerMethod.get(key_handler)
+				ecaLists = ecaLists.concat(ecaList)
+				timerHandlerMethod.set(key_handler,ecaLists)
+			}else{
+				timerHandlerMethod.set(key_handler, [ecaList])
+			}
+
+		}else if(event.predefined_method){ // predefined_method
+			var key_handler = input_e.handler
+			if(predefinedMethods.has(key_handler)){
+				var ecaLists = predefinedMethods.get(key_handler)
+				ecaLists = ecaLists.concat(ecaList)
+				predefinedMethods.set(key_handler,ecaLists)
+			}else{
+				predefinedMethods.set(key_handler, [ecaList])
+			}
+
 		}
 	}
 
-
-
-	handler_methods += generating_handlerFromMap(subscribeMethods, devList)
-	handler_methods += generating_handlerFromMap(predefinedMethods, devList)
-	handler_methods += generating_handlerFromMap(timerHandlerMethod, devList)
+	handler_methods += generating_handlerFromMap(timerHandlerMethod)
+	handler_methods += generating_handlerFromMap(predefinedMethods)
+	handler_methods += generating_handlerFromMap(subscribeMethods)
 	handler_methods += generating_condition_functionhandler(condition_functionhandlerSet)
 	handler_methods += generating_action_functionhandler(action_functionhandlerSet)
 
@@ -90,7 +82,7 @@ function generating_Handler(ecaLists, devList){
 }
 
 
-function generating_handlerFromMap(map, devList){
+function generating_handlerFromMap(map){
 
 	var methods = "";
 	
@@ -106,7 +98,7 @@ function generating_handlerFromMap(map, devList){
 			var actionList = ecaList.actionList;
 
 			//predicate
-			var predicate = generating_condition(condition, devList)
+			var predicate = generating_condition(condition)
 			 method +="\tif("+predicate+"){\n"
 
 			//action
@@ -195,11 +187,11 @@ function generating_action(actionList){
 
 
 
-function generating_condition(condition, devList){
+function generating_condition(condition){
 	var if_condition = "?";
 
 	if(condition.constructor == Grouping){
-		var i = generating_condition(condition.p, condition.list)
+		var i = generating_condition(condition.p)
 		if(condition.type == "all")
 			if_condition = i.replace(/%/gi, "&&")
 		else if (condition.type == "exists")
@@ -211,7 +203,7 @@ function generating_condition(condition, devList){
 		else if(condition.result == 'false')
 			if_condition = 'false';
 		else if(condition.operator == "!" && condition.right){
-			var predicate = generating_condition(condition.right, devList)
+			var predicate = generating_condition(condition.right)
 			if_condition = '!('+predicate+")";
 		}else if(condition.operator == "is_null"){ 
 
@@ -241,14 +233,14 @@ function generating_condition(condition, devList){
 			var left = condition.left;
 
 			if(operator == '&&' || operator == '||'){
-				var pre_right = generating_condition(right, devList)
-				var pre_left = generating_condition(left, devList)
+				var pre_right = generating_condition(right)
+				var pre_left = generating_condition(left)
 				if_condition = " ("+pre_left+") "+operator+" ("+pre_right+") "
 			}else if(operator == '==' || operator == '<'|| operator == '>' || operator == '!=' || operator == '>='|| operator == '<='){
 				//smartDevice
 				if(right == "%grouping"){ // grouping
 					var expr= ""
-					for(var inputc of devList){
+					for(var inputc of condition.devices){
 						var device = returnName(inputc.device)
 						var devname = inputc.devname
 						var dev_attr = left
@@ -329,9 +321,9 @@ function generating_node(field){
 
 	}else if(field.constructor == String){
 	  //hard coding data
-		if(isNaN(field) && field != 'null' && field != 'true' && field != 'false'  && field == "") //hard coding data
-			if_condition = '\"'+field+ '\"'//string
-		if(field == "") //hard coding data
+		if(isNaN(field) && field != 'null' && field != 'true' && field != 'false'  && field != "" && !field.includes("//")) //hard coding data
+				if_condition = '\"'+field+ '\"'//string
+		else if(field == "") //hard coding data
 			if_condition = '\"\"'//string
 		else		
 			if_condition = field
@@ -357,11 +349,11 @@ function generating_node(field){
 					else if(time.type)
 						time = time.name
 
-					if_condition = "("+devname+'.eventsSince(new Date(now() - (1000 * 60 * '+time+'))).findAll { it.name == \"'+attr_id+'\" }).count { it.value && it.value == \"'+event_value+'\" }' 
+					if_condition = "("+devname+'.eventsSince(new Date(now() - (1000 * 60 * '+time+'))).findAll{ it.name == \"'+attr_id+'\" }).count{ it.value && it.value == \"'+event_value+'\" }' 
 
 				}else if(time.constructor != Inputc){
 					time = generating_node(time)
-					if_condition = "("+devname+'.eventsSince(new Date(now() - ('+time+'))).findAll { it.name == \"'+attr_id+'\" }).count { it.value && it.value == \"'+event_value+'\" }' 
+					if_condition = "("+devname+'.eventsSince(new Date(now() - (1000 * 60 *'+time+'))).findAll{ it.name == \"'+attr_id+'\" }).count{ it.value && it.value == \"'+event_value+'\" }' 
 
 				}
 					
@@ -390,7 +382,7 @@ function generating_node(field){
   
 
 				var attr_id = attrMap.getNUM_id(input.device)
-				if_condition = "("+devname+'.eventsSince(new Date(now() - (1000 * 60 * '+time+')))?.findAll { it.name == \"'+attr_id+'\" }).count { it.doubleValue '+operator+' '+compare+' } ' 
+				if_condition = "("+devname+'.eventsSince(new Date(now() - (1000 * 60 * '+time+'))).findAll{ it.name == \"'+attr_id+'\" }).count{ it.doubleValue '+operator+' '+compare+' } ' 
 			}
 			else if(field.type == "happen_enum_dropdown"){ // it is happen?
 

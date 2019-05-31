@@ -1,23 +1,8 @@
-
-
 function device_table(){
 
 	var alphabet = ["Things", "A","B","C","D", "E","FG","H","IJ","KL","M","NO","P","QR","S", "T", "UV","WXYZ"]
 	
 	var index = 0;
-	/*if (!deviceMap.keys) {
-	  deviceMap.keys = function(obj) {
-		var keys = [];
-
-		for (var i in obj) {
-		  if (obj.hasOwnProperty(i)) {
-			keys.push(i);
-		  }
-		}
-
-		return keys;
-	  };
-	}*/
 
 	var deviceList = Array.from(deviceSet);
 	deviceList.sort()
@@ -108,85 +93,17 @@ function setting_close(){
 	things.innerHTML = things_table();
 }
 
-function toolbox_pre(){
-		
-	var toolbox_pre = '<xml>\n';
-	toolbox_pre += sample();
-	toolbox_pre += preference();
-	toolbox_pre += preference_option();
-
-	var ecaList = Blockly.SmartThings.workspaceToCode(workspace);
-	var event_block ="";
-	var action_block ="";
-	var condition_block ="";
-	
-	toolbox_pre += '  <category name="input" >\n';
-	if(ecaList){
-		for(i in ecaList){
-			var event = ecaList[i].event;
-			var actionList = ecaList[i].actionList;
-			var coditionList = new Array();
-
-			var e_devname = event.devname;
-			
-			//eliminate dutulicate
-			var eSt_e = event_block.indexOf(e_devname);
-			var aSt_e = action_block.indexOf(e_devname);
-			var cSt_e = condition_block.indexOf(e_devname);
-
-			if(eSt_e == -1 && aSt_e == -1 && cSt_e == -1){
-				pre_block(e_devname, Block_colour_event)
-				event_block += '    <block type="input '+e_devname+'">'+ ' </block> \n';
-			}
-
-
-			condition_input(ecaList[i].condition, coditionList);
-
-			for(c in coditionList){
-				var c_devname = coditionList[c].devname
-				if(c_devname){
-					var eSt_a = event_block.indexOf(c_devname);
-					var aSt_a = action_block.indexOf(c_devname);
-					var cSt_e = condition_block.indexOf(c_devname);
-					if(eSt_a == -1 && aSt_a == -1 && cSt_e == -1){
-						pre_block(c_devname, Block_colour_condition)
-						condition_block += '    <block type="input '+c_devname+'">'+ ' </block> \n';
-					}
-				}
-			}
-
-			for(a in actionList){
-				var a_devname = actionList[a].devname
-				if(a_devname){
-					var eSt_a = event_block.indexOf(a_devname);
-					var aSt_a = action_block.indexOf(a_devname);
-					var cSt_e = condition_block.indexOf(a_devname);
-					if(eSt_a == -1 && aSt_a == -1 && cSt_e == -1){
-						pre_block(a_devname, Block_colour_action)
-						action_block += '    <block type="input '+a_devname+'">'+ ' </block> \n';
-					}
-				}
-			}
-		}
-	}
-
-	toolbox_pre += event_block + condition_block + action_block;
-	toolbox_pre += '  </category>\n';
-	toolbox_pre += '</xml>\n';
-
-	return toolbox_pre;
-
-}
-
 function change_setbutton_color(x){
 	if(!comman_uesed.includes(x.id)){
 		comman_uesed.push(x.id)
+		insertData(x.id)
 		x.style.background = 'rgb(238, 238, 238)';
 	}else if(comman_uesed.includes(x.id)){
 		var index = comman_uesed.indexOf(x.id);
 		if (index > -1) {
 			comman_uesed.splice(index, 1);
 			x.style.background = 'rgb(255, 255, 255)';
+			deleteData(x.id)
 		}
 	}
 
@@ -275,4 +192,10 @@ function change(event, block){
 function set2blocksMap(blocks){
 	blocks
 	blocksMap
+}
+
+function countLines() {
+   var text =_("smartApp_code").textContent
+   var lines = text.split("\n").length -1;
+   alert("Lines: " + lines);
 }

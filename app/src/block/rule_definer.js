@@ -9,7 +9,7 @@ Blockly.Blocks['eca'] = {
 			.appendField("Condition");
 		this.appendValueInput("Action")
 			.setCheck("Action")
-			.appendField("Action")
+			.appendField("Action");
 		this.setPreviousStatement(true, ["ECA", "EA"]);
 		this.setNextStatement(true, ["ECA", "EA"]);
 		this.setColour(Block_colour_eca);
@@ -18,6 +18,22 @@ Blockly.Blocks['eca'] = {
 	}
 };
 
+
+Blockly.Blocks['ca'] = {
+	init: function() {
+		this.appendValueInput("Condition")
+			.setCheck("Condition")
+			.appendField("Condition");
+		this.appendValueInput("Action")
+			.setCheck("Action")
+			.appendField("Action");
+		this.setPreviousStatement(true, ["ECA", "EA", "CA"]);
+		this.setNextStatement(true, ["ECA", "EA", "CA"]);
+		this.setColour(Block_colour_eca);
+		this.setTooltip("");
+		this.setHelpUrl("");
+	}
+};
 
 
 Blockly.Blocks['ea'] = {

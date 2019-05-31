@@ -272,8 +272,7 @@ Blockly.SmartThings['already_enum'] = function(block) {
 		a.time = time_input 
 		a.arginput = time_input 
    }else if(time_min){
-		a.time =time_min*1000
-
+		a.time =time_min
    }
    var c = new Condition();
    c.result = a

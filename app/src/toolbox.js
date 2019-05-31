@@ -8,15 +8,7 @@ Blockly.devicesFlyoutCallback_event = function(workspace) {
 				var attr = attrMap.getSingle(device)
 				var id = attr.id
 				var type = attr.type
-				/*if(attrMap.onlyInENUM(device)){
-					event_block(device, "ENUM");
-					xmlList.push(addXml("e_"+device+"SingleENUM"))
-				}
-				if(attrMap.onlyInNUMBER(device)){	
-					event_block(device, "NUMBER");
-					xmlList.push(addXml("e_"+device+"SingleNUMBER"))
-				}*/
-				//devie s/n type id
+	
 				event_block(device, "Single", type, id);
 				xmlList.push(addXml("e_"+device+"Single"+type+id))
 			}else if(attrMap.isMultiple(device)){
@@ -56,7 +48,7 @@ Blockly.devicesFlyoutCallback_event = function(workspace) {
 		xmlList.push(addXml('e_sub'+input_block[3]))
 	});
 
-
+		 
 	if (Blockly.Blocks["inpute_data"]) {
 		  var blockText = '<xml>' +
 			  '<block type="inpute_data">' +
@@ -65,7 +57,6 @@ Blockly.devicesFlyoutCallback_event = function(workspace) {
 		  var block = Blockly.Xml.textToDom(blockText).firstChild;
 		 xmlList.push(block)
 	} 
-		 
 		 
 	if (Blockly.Blocks["specific_event"]) {
 		  var blockText = '<xml>' +
@@ -272,16 +263,6 @@ Blockly.devicesFlyoutCallback_condition = function(workspace) {
 		 
 	add_groupingBlock_xml("all", Block_colour_condition, xmlList);
 	add_groupingBlock_xml("exists", Block_colour_condition, xmlList);
-
-	if (Blockly.Blocks["toDateTime"]) {
-		 var blockText = '<xml>' +
-			  '<block type="toDateTime">' +
-			  '</block>' +
-			  '</xml>';
-		 var block = Blockly.Xml.textToDom(blockText).firstChild;
-		 xmlList.push(block)
-	}
-		 
 		 
 
   return xmlList;
@@ -355,6 +336,7 @@ Blockly.devicesFlyoutCallback_action = function(workspace) {
 		 var block = Blockly.Xml.textToDom(blockText).firstChild;
 		 xmlList.push(block)
 	}
+
 	 if (Blockly.Blocks["action_state"]) {
 		 var blockText = '<xml>' +
 			  '<block type="action_state">' +
@@ -420,9 +402,6 @@ Blockly.devicesFlyoutCallback_action = function(workspace) {
 		var block = Blockly.Xml.textToDom(blockText).firstChild;
 		xmlList.push(block)
 	}
-
-
-
 
 	add_timer_xml(xmlList)
 	add_groupingBlock_xml("map", Block_colour_action, xmlList);
@@ -516,18 +495,6 @@ Blockly.devicesFlyoutCallback_action = function(workspace) {
 		 var block = Blockly.Xml.textToDom(blockText).firstChild;
 		 xmlList.push(block)
 	}
-		 
-		 
-	/*	 
-	if (Blockly.Blocks["time_a"]) {
-		 var blockText = '<xml>' +
-			  '<block type="time_a">' +
-			  '</block>' +
-			  '</xml>';
-		 var block = Blockly.Xml.textToDom(blockText).firstChild;
-		 xmlList.push(block)
-	}*/
-		 
 		 
 
   return xmlList;
