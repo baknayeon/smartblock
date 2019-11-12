@@ -13,9 +13,11 @@ SmartThings
 
 Smart Block
 -------------
-Users can have difficulty in writing SmartApp in Groovy code textually
-Smart Block which is a visual block language can help users develop SmartApp easily by building blocks graphically
-So, Users can develop SmartApp easily in Smart Block, even though they are not expert programmers
+Users can have difficulty in writing SmartApp in Groovy code textually.
+
+Smart Block which is a visual block language can help users develop SmartApp easily by building blocks graphically.
+
+So, Users can develop SmartApp easily in Smart Block, even though they are not expert programmers.
 
 ![Smart Block](https://github.com/baknayeon/smartblock/blob/master/main.PNG)
 
