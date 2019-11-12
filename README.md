@@ -17,6 +17,10 @@ Visual programming environment for SmartThings so that users can write their own
 
 ![Smart Block](https://github.com/baknayeon/smartblock/blob/master/main.PNG)
 
-
-**Demo**
+you can see the demo video
 https://www.youtube.com/watch?v=d_obu3ArKW8
+
+related paper
+-------------
+Smart Block: A Visual Programming Environment for SmartThings
+https://ieeexplore.ieee.org/document/8377826
