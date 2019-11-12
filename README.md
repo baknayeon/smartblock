@@ -24,6 +24,8 @@ So, Users can develop SmartApp easily in Smart Block, even though they are not e
 you can see the demo video
 https://www.youtube.com/watch?v=d_obu3ArKW8
 
+You can start developing a smart block in![there](https://github.com/baknayeon/smartblock/blob/master/app/smartblock.html)
+
 Related paper
 -------------
 Smart Block: A Visual Programming Environment for SmartThings
