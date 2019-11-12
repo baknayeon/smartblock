@@ -15,7 +15,7 @@ Smart Block
 -------------
 Visual programming environment for SmartThings so that users can write their own SmartApps in this language easily, even though they are not expert programmers.
 
-![Smart Block](https://github.com/baknayeon/smartblock/main.PNG)
+![Smart Block](https://github.com/baknayeon/smartblock/blob/master/main.PNG)
 
 
 **Demo**
