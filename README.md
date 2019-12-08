@@ -19,6 +19,8 @@ Smart Block which is a visual block language can help users develop SmartApp eas
 
 So, Users can develop SmartApp easily in Smart Block, even though they are not expert programmers.
 
+When users build the blocks in smart block, it offers the actual groovy code to user
+
 ![Smart Block](https://github.com/baknayeon/smartblock/blob/master/main.PNG)
 
 you can see the demo video
