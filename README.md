@@ -28,5 +28,5 @@ and start developing smart blocks at smartblock.html
 
 Related paper
 -------------
-Smart Block: A Visual Programming Environment for SmartThings
+Smart Block: A Visual Programming Environment for SmartThings, 2018 IEEE COMPSAC
 https://ieeexplore.ieee.org/document/8377826
