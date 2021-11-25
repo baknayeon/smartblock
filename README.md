@@ -30,5 +30,8 @@ and start developing smart blocks at smartblock.html
 
 Related paper
 -------------
-Smart Block: A Visual Programming Environment for SmartThings, 2018 IEEE COMPSAC
+Na-Yeon Bak, Byeong-Mo Chang, Kwanghoon Choi, Smart Block: A Visual Block Language and its Programming Environment for IoT, Journal of Computer Languages, Vol.60, 100999, October 2020.
+https://www.sciencedirect.com/science/article/pii/S2590118420300599
+
+Nayeon Park, Byeong-Mo Chang, Kwanghoon Choi, Smart Block: A Visual Programming Environment for SmartThings, SCA2018: the 1st IEEE International Workshop on Smart Computing and Applications, Tokyo, Japan, July 23-27, 2018.
 https://ieeexplore.ieee.org/document/8377826
